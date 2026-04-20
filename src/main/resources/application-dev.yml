@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/StockAndShop
+    username: postgres
+    password: Hugo099!
+  jpa:
+    show-sql: true
