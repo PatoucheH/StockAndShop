@@ -15,10 +15,6 @@ public class Product extends BaseEntity<Long> {
     @Column(nullable = false, length = 100)
     private String name;
 
-    @Getter @Setter
-    @Column(nullable = true)
-    private Integer quantity;
-
     public Product(String name) {
         this.name = name;
     }

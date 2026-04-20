@@ -18,9 +18,9 @@ public class ShoppingList extends BaseEntity<Long>{
     @Column(length = 500, nullable = true)
     private String description;
 
-    @OneToMany
     @Getter
+    @OneToMany
     @JoinColumn(name = "shopping_list_id")
-    private List<Product> products;
+    private List<ProductListLine> products;
 
 }
