@@ -26,9 +26,12 @@ public class User implements UserDetails {
 
     @Column(nullable = false, unique = true)
     @Getter
+    @Setter
     private String email;
 
     @Column(nullable = true)
+    @Getter
+    @Setter
     private String username;
 
     @Column(nullable = false)

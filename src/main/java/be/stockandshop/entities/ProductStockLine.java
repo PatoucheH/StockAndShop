@@ -4,7 +4,6 @@ import be.stockandshop.entities.base.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.*;
 
 @Entity
@@ -15,6 +14,9 @@ public class ProductStockLine extends BaseEntity<Long> {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Home home;
 
     private Integer quantity;
 }

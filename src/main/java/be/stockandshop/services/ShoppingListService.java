@@ -6,6 +6,7 @@ import be.stockandshop.entities.ShoppingList;
 import be.stockandshop.repositories.ShoppingListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ public class ShoppingListService {
         shoppingListRepository.deleteById(id);
     }
 
+    @Transactional
     public ShoppingList addProduct(Long productId, Long shoppingListId, Integer quantity) {
         ShoppingList shoppingList = getShoppingListById(shoppingListId);
         Product productToAdd = productService.findById(productId);
@@ -37,6 +39,7 @@ public class ShoppingListService {
         return shoppingListRepository.save(shoppingList);
     }
 
+    @Transactional
     public ShoppingList removeProduct(Long productListLineId, Long shoppingListId) {
         ShoppingList shoppingList = getShoppingListById(shoppingListId);
         ProductListLine product = productListlineService.findById(productListLineId);
