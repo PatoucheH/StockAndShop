@@ -2,8 +2,11 @@ package be.stockandshop.services;
 
 import be.stockandshop.dto.requests.RegisterRequest;
 import be.stockandshop.entities.User;
+import be.stockandshop.enums.Roles;
 import be.stockandshop.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+
+import java.util.UUID;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +24,11 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
+    public User findById(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
     public User register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already in use");
@@ -29,6 +37,7 @@ public class UserService implements UserDetailsService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setUsername(request.getUsername());
+        user.setRole(Roles.USER);
         return userRepository.save(user);
     }
 }

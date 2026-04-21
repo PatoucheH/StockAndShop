@@ -1,5 +1,6 @@
 package be.stockandshop.entities;
 
+import be.stockandshop.enums.Roles;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,11 +18,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
+@Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Getter
     protected UUID id;
 
     @Column(nullable = false, unique = true)
@@ -37,6 +40,11 @@ public class User implements UserDetails {
     @Column(nullable = false)
     @Setter
     private String password;
+
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'USER'")
+    @Getter @Setter
+    @Enumerated(EnumType.STRING)
+    private Roles role;
 
     @OneToMany(mappedBy = "user")
     private List<UserHome> userHomes;
@@ -67,7 +75,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override

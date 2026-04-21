@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProductListlineRepository extends JpaRepository<ProductListLine, Long> {
+public interface ProductListLineRepository extends JpaRepository<ProductListLine, Long> {
 }
