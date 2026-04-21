@@ -1,7 +1,7 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/StockAndShop
-    username: postgres
-    password: Hugo099!
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:StockAndShop}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD}
   jpa:
     show-sql: true
