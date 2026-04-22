@@ -1,6 +1,6 @@
 package be.stockandshop.config;
 
-import be.stockandshop.filters.JwtAuthenticationFilter;
+import be.stockandshop.pl.filters.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
