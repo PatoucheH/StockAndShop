@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: StockAndShop-backend
+  datasource:
+    url: jdbc:postgresql://localhost:5432/StockAndShop
+    username: postgres
+    password: Hugo099!
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: PostgreSQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
