@@ -1,26 +1,23 @@
 package be.stockandshopbackend.dl.entities;
 
 import be.stockandshopbackend.dl.entities.base.LongBaseEntity;
-import be.stockandshopbackend.dl.enums.Unity;
+import be.stockandshopbackend.dl.enums.HomeRole;
 import jakarta.persistence.*;
 import lombok.*;
-
 
 @Entity
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @ToString
-public class Product extends LongBaseEntity {
-
-    @Column(nullable = false, unique = true)
-    private String name;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Unity unity;
+public class UserHome extends LongBaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
-    private Category category;
+    private User user;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private HomeRole homeRole;
+
 
 }

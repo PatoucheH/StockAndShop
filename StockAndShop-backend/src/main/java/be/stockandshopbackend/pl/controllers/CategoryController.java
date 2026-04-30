@@ -1,0 +1,43 @@
+package be.stockandshopbackend.pl.controllers;
+
+import be.stockandshopbackend.bll.services.CategoryService;
+import be.stockandshopbackend.pl.DTOs.Response.CategoryResponse;
+import be.stockandshopbackend.pl.DTOs.requests.CategoryRequest;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/category")
+public class CategoryController {
+
+    private final CategoryService categoryService;
+
+    //region GET
+
+    @GetMapping
+    public ResponseEntity<List<CategoryResponse>> findAll() {
+        return ResponseEntity.ok(categoryService.findAll().stream()
+                .map(CategoryResponse::fromCategory)
+                .toList());
+    }
+
+    //endregion
+
+    //region PUT
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoryResponse> update(@PathVariable Long id, @RequestBody @Valid CategoryRequest categoryRequest) {
+        return ResponseEntity.ok(
+                CategoryResponse.fromCategory(
+                        categoryService.updateCategory(id,categoryRequest)
+                )
+        );
+    }
+
+    //endregion
+}

@@ -1,15 +1,21 @@
 package be.stockandshopbackend.dl.entities;
 
-import be.stockandshopbackend.dl.entities.base.BaseEntity;
+import be.stockandshopbackend.dl.entities.base.LongBaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor @AllArgsConstructor
 @Getter @Setter
-@EqualsAndHashCode @ToString
-public class ShoppingList extends BaseEntity<Long> {
+@ToString
+public class ShoppingList extends LongBaseEntity {
 
     @Column(nullable = false)
     private String name;
@@ -17,7 +23,24 @@ public class ShoppingList extends BaseEntity<Long> {
     @Column(nullable = true)
     private String description;
 
-    
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "shopping_list_id", nullable = false)
+    private List<ProductListItem> products = new ArrayList<>();
+
+    public ShoppingList(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public void addProduct(ProductListItem item) {
+        products.stream()
+                .filter(p -> p.getProduct().getId().equals(item.getProduct().getId()))
+                .findFirst()
+                .ifPresentOrElse(
+                        existing -> existing.setQuantity(existing.getQuantity() + item.getQuantity()),
+                        () -> products.add(item)
+                );
+    }
 
 
 }

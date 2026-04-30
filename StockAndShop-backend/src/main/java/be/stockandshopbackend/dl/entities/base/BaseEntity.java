@@ -9,11 +9,9 @@ import java.util.Objects;
 
 @MappedSuperclass
 @Getter @Setter
-public abstract class BaseEntity<T>{
+public abstract class BaseEntity<T> {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private T id;
+    public abstract T getId();
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

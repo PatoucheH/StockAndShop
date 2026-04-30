@@ -1,0 +1,19 @@
+package be.stockandshopbackend.dl.entities.base;
+
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.UUID;
+
+@MappedSuperclass
+@Getter @Setter
+public abstract class UuidBaseEntity extends BaseEntity<UUID> {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+}
