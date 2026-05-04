@@ -3,26 +3,32 @@ package be.stockandshopbackend.dl.entities;
 import be.stockandshopbackend.dl.entities.base.UuidBaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
-@Getter @Setter
-@ToString
+@ToString(exclude = "password")
 @NoArgsConstructor @AllArgsConstructor
-public class User extends UuidBaseEntity {
+public class User extends UuidBaseEntity implements UserDetails {
 
+    @Setter
     @Column(nullable = false)
     private String username;
 
+    @Setter
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Getter @Setter
     @Column(nullable = false)
     private String password;
 
-    @ManyToMany
+    @Getter @Setter
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -30,4 +36,25 @@ public class User extends UuidBaseEntity {
     )
     private Set<Role> roles;
 
+    public String getDisplayName(){
+        return this.username;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles;
+    }
+
+    public void addRole(Role role){
+        this.roles.add(role);
+    }
+
+    public void  removeRole(Role role){
+        this.roles.remove(role);
+    }
 }

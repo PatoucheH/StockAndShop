@@ -37,6 +37,8 @@ public class ShoppingListService extends BaseCRUDService<ShoppingList, Long, Sho
     }
 
     //region ADD / REMOVE
+
+    @Transactional
     public void addProductFromList(Long shoppingListId, String productName, int quantity){
         ShoppingList shoppingList = repository.findById(shoppingListId)
                 .orElseThrow(() -> new NotFoundException("ShoppingList with id " + shoppingListId + " not found"));

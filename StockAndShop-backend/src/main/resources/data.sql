@@ -5,11 +5,11 @@ INSERT INTO role (id, name, created_at, updated_at) VALUES
     (2, 'USER',  NOW(), NOW())
 ON CONFLICT (id) DO NOTHING;
 
--- Utilisateurs
+-- Utilisateurs (password = "password" encodé BCrypt)
 INSERT INTO users (id, username, email, password, created_at, updated_at) VALUES
-    ('11111111-1111-1111-1111-111111111111', 'hugo',  'hugo@test.com',  'password', NOW(), NOW()),
-    ('22222222-2222-2222-2222-222222222222', 'alice', 'alice@test.com', 'password', NOW(), NOW()),
-    ('33333333-3333-3333-3333-333333333333', 'bob',   'bob@test.com',   'password', NOW(), NOW())
+    ('11111111-1111-1111-1111-111111111111', 'hugo',  'hugo@test.com',  'test', NOW(), NOW()),
+    ('22222222-2222-2222-2222-222222222222', 'alice', 'alice@test.com', 'test', NOW(), NOW()),
+    ('33333333-3333-3333-3333-333333333333', 'bob',   'bob@test.com',   'test', NOW(), NOW())
 ON CONFLICT (id) DO NOTHING;
 
 -- Rôles des utilisateurs (table de jointure @ManyToMany)

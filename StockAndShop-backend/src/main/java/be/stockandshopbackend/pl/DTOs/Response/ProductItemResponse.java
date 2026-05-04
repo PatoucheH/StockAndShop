@@ -16,13 +16,15 @@ public class ProductItemResponse {
     private String nameProduct;
     private String unityProduct;
     private int quantity;
+    private boolean isChecked;
 
     public static ProductItemResponse fromProductListItem(ProductListItem productListItem){
         return new ProductItemResponse(
                 productListItem.getId(),
                 productListItem.getProduct().getName(),
-                productListItem.getProduct().getUnity().toString(),
-                productListItem.getQuantity()
+                productListItem.getProduct().getUnity().getValue(),
+                productListItem.getQuantity(),
+                productListItem.isChecked()
         );
     }
 
@@ -30,8 +32,9 @@ public class ProductItemResponse {
         return new ProductItemResponse(
                 productStockHome.getId(),
                 productStockHome.getProduct().getName(),
-                productStockHome.getProduct().getUnity().toString(),
-                productStockHome.getQuantity()
+                productStockHome.getProduct().getUnity().getValue(),
+                productStockHome.getQuantity(),
+                false
         );
     }
 }

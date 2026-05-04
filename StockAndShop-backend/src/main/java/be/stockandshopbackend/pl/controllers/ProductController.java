@@ -9,7 +9,9 @@ import be.stockandshopbackend.pl.DTOs.Response.ProductResponse;
 import be.stockandshopbackend.pl.DTOs.requests.ProductRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,7 +50,7 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@RequestBody @Valid ProductRequest p){
         Product product = productService.createProduct(p.name(), p.unity(), p.category());
-        return ResponseEntity.ok(ProductResponse.fromProduct(product));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ProductResponse.fromProduct(product));
     }
 
     //endregion
@@ -56,6 +58,7 @@ public class ProductController {
     //region DELETE
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id){
         productService.deleteById(id);
         return ResponseEntity.noContent().build();
@@ -66,6 +69,7 @@ public class ProductController {
     //region PUT
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,
                                                          @RequestBody @Valid ProductRequest p){
         Product product = productService.findById(id);
