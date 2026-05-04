@@ -17,7 +17,7 @@ public class ProductListItemController {
     private final ProductListItemService productListItemService;
 
     @PatchMapping("/{id}/check")
-    @PreAuthorize("@homeSecurity.isInHomeByProductItem(#id, authentication.principal) or hasAuthority('ADMIN')")
+    @PreAuthorize("@homeSecurity.isInHomeByProductItem(#id, authentication.principal)")
     public ResponseEntity<?> toggleCheckedProduct(@PathVariable Long id){
         productListItemService.checkedItem(id);
         return ResponseEntity.noContent().build();

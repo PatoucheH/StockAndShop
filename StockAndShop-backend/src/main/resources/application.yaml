@@ -21,6 +21,9 @@ spring:
         format_sql: true
     database: PostgreSQL
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  ai:
+    anthropic:
+      api-key: ${ANTHROPIC_SECRET_KEY}
 
 jwt:
   secret: ${JWT_SECRET}

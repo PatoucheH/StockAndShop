@@ -29,7 +29,7 @@ public class ProductService extends BaseCRUDService<Product, Long, ProductReposi
     public Product createProduct(String name, String unity, String categoryName){
         Category category = categoryService.findByNameOrCreate(categoryName);
         Product product = new Product();
-        product.setName(name);
+        product.setName(name.toLowerCase());
         product.setUnity(Unity.fromValue(unity));
         product.setCategory(category);
         return repository.save(product);

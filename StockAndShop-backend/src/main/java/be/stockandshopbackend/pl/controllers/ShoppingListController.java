@@ -26,7 +26,7 @@ public class ShoppingListController {
     //region GET
 
     @GetMapping("/{id}")
-    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal) or hasAuthority('ADMIN')")
+    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<List<ProductItemResponse>> getAllItemOfAList(@PathVariable Long id){
         ShoppingList shoppingList = shoppingListService.findById(id);
         return ResponseEntity.ok(shoppingList.getProducts().stream()
@@ -39,7 +39,7 @@ public class ShoppingListController {
     //region POST
 
     @PostMapping("/{id}/add")
-    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal) or hasAuthority('ADMIN')")
+    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<ShoppingListResponse> addItemToShoppingList(@PathVariable Long id,
                                                                       @RequestBody @Valid ProductItemRequest request){
         shoppingListService.addProductFromList(id, request.name(), request.quantity());
@@ -53,14 +53,14 @@ public class ShoppingListController {
     //region DELETE
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("@homeSecurity.isOwner(#id, authentication.principal) or hasAuthority('ADMIN')")
+    @PreAuthorize("@homeSecurity.isOwner(#id, authentication.principal)")
     public ResponseEntity<?> deleteShoppingList(@PathVariable Long id){
         shoppingListService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}/remove")
-    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal) or hasAuthority('ADMIN')")
+    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<?> removeItemFromToShoppingList(@PathVariable Long id,
                                                           @RequestParam String name){
         shoppingListService.removeProductFromList(id, name);

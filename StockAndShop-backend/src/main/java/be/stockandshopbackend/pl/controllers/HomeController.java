@@ -51,7 +51,7 @@ public class HomeController {
     }
 
     @GetMapping("/{id}/shopping-list")
-    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal) or hasAuthority('ADMIN')")
+    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<List<ShoppingListResponse>> getShoppingList(@PathVariable UUID id){
         return ResponseEntity.ok(homeService.findAllShoppingListsByHomeId(id).stream()
                 .map(ShoppingListResponse::fromShoppingList)
@@ -59,7 +59,7 @@ public class HomeController {
     }
 
     @GetMapping("/{id}/stock")
-    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal) or hasAuthority('ADMIN')")
+    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<List<ProductItemResponse>> getStock(@PathVariable UUID id){
         return ResponseEntity.ok(homeService.findAllProductStockHomeByHomeId(id).stream()
                 .map(ProductItemResponse::fromProductStockHome)
@@ -67,7 +67,7 @@ public class HomeController {
     }
 
     @GetMapping("/{id}/user")
-    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal) or hasAuthority('ADMIN')")
+    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<List<UserHomeResponse>> getUser(@PathVariable UUID id){
         return ResponseEntity.ok(homeService.findAllUserHomeByHomeId(id).stream()
                 .map(UserHomeResponse::fromUserHome)
@@ -79,7 +79,7 @@ public class HomeController {
     //region POST
 
     @PostMapping("/{id}/add-stock-product")
-    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal) or hasAuthority('ADMIN')")
+    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<ProductItemResponse> addProductStock(
             @PathVariable UUID id,
             @RequestBody @Valid ProductItemRequest productItemRequest
@@ -95,7 +95,7 @@ public class HomeController {
     }
 
     @PostMapping("/{id}/add-user")
-    @PreAuthorize("@homeSecurity.isOwner(#id, authentication.principal) or hasAuthority('ADMIN')")
+    @PreAuthorize("@homeSecurity.isOwner(#id, authentication.principal)")
     public ResponseEntity<UserHomeResponse> addUser(@PathVariable UUID id,
                                      @RequestParam UUID userId){
         UserHome userHome = new UserHome(userService.findById(userId), HomeRole.USER);
@@ -115,7 +115,7 @@ public class HomeController {
     }
 
     @PostMapping("/{id}/shopping-list")
-    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal) or hasAuthority('ADMIN')")
+    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<HomeResponse> createShoppingList(@PathVariable UUID id,
                                                            @RequestBody @Valid ShoppingListRequest shoppingList){
         return ResponseEntity.status(HttpStatus.CREATED).body(HomeResponse.fromHome(
@@ -133,14 +133,14 @@ public class HomeController {
     //region DELETE
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("@homeSecurity.isOwner(#id, authentication.principal) or hasAuthority('ADMIN')")
+    @PreAuthorize("@homeSecurity.isOwner(#id, authentication.principal)")
     public ResponseEntity<?> deleteHome(@PathVariable UUID id){
         homeService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}/delete-user")
-    @PreAuthorize("@homeSecurity.isOwner(#id, authentication.principal) or hasAuthority('ADMIN')")
+    @PreAuthorize("@homeSecurity.isOwner(#id, authentication.principal)")
     public ResponseEntity<?> deleteUserHome(@PathVariable UUID id, @RequestParam UUID userId){
         homeService.deleteUserHome(id, userId);
         return ResponseEntity.noContent().build();
@@ -151,7 +151,7 @@ public class HomeController {
     //region PUT
 
     @PutMapping("/{id}")
-    @PreAuthorize("@homeSecurity.isOwner(#id, authentication.principal) or hasAuthority('ADMIN')")
+    @PreAuthorize("@homeSecurity.isOwner(#id, authentication.principal)")
     public ResponseEntity<HomeResponse> updateHome(@PathVariable UUID id,
                                                    @RequestBody @Valid HomeRequest h
     ){
@@ -163,7 +163,7 @@ public class HomeController {
     }
 
     @PutMapping("/{id}/decrease-stock")
-    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal) or hasAuthority('ADMIN')")
+    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<?> decreaseStock(@PathVariable UUID id,
                                            @RequestBody @Valid ProductItemRequest productItemRequest
     ){
