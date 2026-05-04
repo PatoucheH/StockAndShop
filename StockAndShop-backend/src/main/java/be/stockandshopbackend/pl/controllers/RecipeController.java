@@ -1,7 +1,6 @@
 package be.stockandshopbackend.pl.controllers;
 
 import be.stockandshopbackend.bll.services.RecipeService;
-import be.stockandshopbackend.dl.entities.Recipe;
 import be.stockandshopbackend.pl.DTOs.Response.RecipeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,22 +13,22 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/home")
+@RequestMapping("/recipe")
 public class RecipeController {
 
     private final RecipeService recipeService;
 
-    @GetMapping("/{id}/recipe")
+    @GetMapping("/{id}/suggestions")
     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
-    public ResponseEntity<List<RecipeResponse>> getRecipes(@PathVariable UUID id) {
+    public ResponseEntity<List<RecipeResponse>> getSuggestions(@PathVariable UUID id) {
         return ResponseEntity.ok(
-                recipeService.findAllByHomeId(id).stream()
+                recipeService.getSuggestions(id).stream()
                         .map(RecipeResponse::fromRecipe)
                         .toList()
         );
     }
 
-    @PostMapping("/{id}/recipe/generate")
+    @PostMapping("/{id}/generate")
     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<RecipeResponse> generateRecipe(@PathVariable UUID id) {
         return ResponseEntity.status(HttpStatus.CREATED)

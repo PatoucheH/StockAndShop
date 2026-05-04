@@ -28,7 +28,4 @@ public class Recipe extends UuidBaseEntity {
     @OrderColumn(name = "step_order")
     private List<String> steps = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "home_id", nullable = false)
-    private Home home;
 }
