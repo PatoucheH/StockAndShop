@@ -1,0 +1,39 @@
+services:
+
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: stockandshop
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d stockandshop"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./StockAndShop-backend
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/stockandshop
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ANTHROPIC_SECRET_KEY: ${ANTHROPIC_SECRET_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build: ./StockAndShop-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
