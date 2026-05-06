@@ -1,0 +1,60 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50">
+  <div class="w-full max-w-sm bg-white rounded-2xl shadow-md p-8">
+    <h1 class="text-2xl font-semibold text-center text-gray-800 mb-6">Créer un compte</h1>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-gray-600" for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          required
+          class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="email@example.com"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-gray-600" for="username">Pseudo</label>
+        <input
+          id="username"
+          type="text"
+          formControlName="username"
+          required
+          class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="Votre pseudo"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-gray-600" for="password">Mot de passe</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          required
+          class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="*******"
+        />
+      </div>
+
+      @if (error()) {
+        <p class="text-sm text-red-500 text-center">{{ error() }}</p>
+      }
+
+      <button
+        type="submit"
+        [disabled]="loading()"
+        class="w-full bg-green-700 text-white rounded-lg py-2 text-sm font-medium border
+               hover:bg-green-200 hover:text-green-700 hover:border-green-700 disabled:opacity-50 transition-colors">
+        {{ loading() ? 'Création...' : "S'enregistrer" }}
+      </button>
+    </form>
+
+    <p class="text-center text-sm text-gray-500 mt-5">
+      Déjà un compte ?
+      <a routerLink="/auth/login" class="text-green-600 hover:underline">Se connecter</a>
+    </p>
+  </div>
+</div>
