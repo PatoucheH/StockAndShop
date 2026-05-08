@@ -32,7 +32,7 @@ export class RegisterComponent {
 
     this.authService.register(request).subscribe({
       next: (response) => {
-        this.authService.saveToken(response.token);
+        this.authService.saveToken(response.token, response.email);
         this.router.navigate(['/']);
         this.loading.set(false);
       },

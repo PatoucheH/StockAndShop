@@ -1,19 +1,22 @@
 package be.stockandshopbackend.pl.controllers;
 
-import be.stockandshopbackend.bll.services.HomeService;
-import be.stockandshopbackend.bll.services.ShoppingListService;
+import be.stockandshopbackend.bll.services.shoppingList.ShoppingListService;
 import be.stockandshopbackend.dl.entities.ShoppingList;
+import be.stockandshopbackend.pl.DTOs.Response.HomeResponse;
 import be.stockandshopbackend.pl.DTOs.Response.ProductItemResponse;
 import be.stockandshopbackend.pl.DTOs.Response.ShoppingListResponse;
 import be.stockandshopbackend.pl.DTOs.requests.ProductItemRequest;
+import be.stockandshopbackend.pl.DTOs.requests.ShoppingListRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,11 +24,16 @@ import java.util.List;
 public class ShoppingListController {
 
     private final ShoppingListService shoppingListService;
-    private final HomeService homeService;
 
     //region GET
-
     @GetMapping("/{id}")
+    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
+    public ResponseEntity<ShoppingListResponse> getShoppingListById(@PathVariable Long id){
+       return ResponseEntity.ok(ShoppingListResponse.fromShoppingList(shoppingListService.findById(id)));
+    }
+
+
+    @GetMapping("/{id}/product")
     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<List<ProductItemResponse>> getAllItemOfAList(@PathVariable Long id){
         ShoppingList shoppingList = shoppingListService.findById(id);
@@ -37,6 +45,20 @@ public class ShoppingListController {
     //endregion
 
     //region POST
+
+    @PostMapping("/{id}")
+    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
+    public ResponseEntity<HomeResponse> createShoppingList(@PathVariable UUID id,
+                                                           @RequestBody @Valid ShoppingListRequest shoppingList){
+        return ResponseEntity.status(HttpStatus.CREATED).body(HomeResponse.fromHome(
+                        shoppingListService.createShoppingList(
+                                id,
+                                shoppingList.name(),
+                                shoppingList.description()
+                        )
+                )
+        );
+    }
 
     @PostMapping("/{id}/add")
     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
@@ -68,5 +90,4 @@ public class ShoppingListController {
     }
 
     //endregion
-
 }

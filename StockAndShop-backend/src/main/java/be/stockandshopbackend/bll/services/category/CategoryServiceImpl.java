@@ -1,4 +1,4 @@
-package be.stockandshopbackend.bll.services;
+package be.stockandshopbackend.bll.services.category;
 
 import be.stockandshopbackend.bll.services.base.BaseCRUDService;
 import be.stockandshopbackend.dal.repositories.CategoryRepository;
@@ -9,9 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CategoryService extends BaseCRUDService<Category, Long, CategoryRepository> {
+public class CategoryServiceImpl extends BaseCRUDService<Category, Long, CategoryRepository>
+                                implements CategoryService {
 
-    protected CategoryService(CategoryRepository repository) {
+    protected CategoryServiceImpl(CategoryRepository repository) {
         super(repository);
     }
 

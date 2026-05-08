@@ -1,5 +1,6 @@
-package be.stockandshopbackend.bll.services;
+package be.stockandshopbackend.bll.services.home;
 
+import be.stockandshopbackend.bll.services.product.ProductService;
 import be.stockandshopbackend.bll.services.base.BaseCRUDService;
 import be.stockandshopbackend.dal.repositories.HomeRepository;
 import be.stockandshopbackend.dl.entities.*;
@@ -11,11 +12,12 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class HomeService extends BaseCRUDService<Home, UUID, HomeRepository> {
+public class HomeServiceImpl extends BaseCRUDService<Home, UUID, HomeRepository>
+                            implements HomeService {
 
     private final ProductService productService;
 
-    public HomeService(HomeRepository homeRepository, ProductService productService) {
+    public HomeServiceImpl(HomeRepository homeRepository, ProductService productService) {
         super(homeRepository);
         this.productService = productService;
     }
@@ -24,6 +26,10 @@ public class HomeService extends BaseCRUDService<Home, UUID, HomeRepository> {
 
     public List<Home> findAllByUser(User user) {
         return repository.findByUsers_User(user);
+    }
+
+    public Home findHomeById(UUID id) {
+        return repository.findById(id).orElseThrow(() -> new NotFoundException("Home with id: " + id));
     }
 
     public List<ShoppingList> findAllShoppingListsByHomeId(UUID homeId) {
@@ -47,16 +53,6 @@ public class HomeService extends BaseCRUDService<Home, UUID, HomeRepository> {
     //endregion
 
     //region CREATE / ADD
-
-    @Transactional
-    public Home createShoppingList(UUID homeId, String name, String description){
-        Home home = repository.findById(homeId).orElseThrow(
-                ()->new NotFoundException("Home not found with the id : " + homeId)
-        );
-        ShoppingList shoppingList = new ShoppingList(name, description);
-        home.addShoppingList(shoppingList);
-        return repository.save(home);
-    }
 
     @Transactional
     public void addProductStock(UUID homeId, ProductStockHome request){

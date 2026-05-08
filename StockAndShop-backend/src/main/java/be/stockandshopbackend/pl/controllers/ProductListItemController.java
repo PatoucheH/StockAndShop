@@ -1,6 +1,7 @@
 package be.stockandshopbackend.pl.controllers;
 
-import be.stockandshopbackend.bll.services.ProductListItemService;
+import be.stockandshopbackend.bll.services.productListItem.ProductListItemService;
+import be.stockandshopbackend.bll.services.productListItem.ProductListItemServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

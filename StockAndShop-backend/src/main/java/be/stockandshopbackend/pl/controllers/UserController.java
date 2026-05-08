@@ -1,7 +1,7 @@
 package be.stockandshopbackend.pl.controllers;
 
-import be.stockandshopbackend.bll.services.RoleService;
-import be.stockandshopbackend.bll.services.UserService;
+import be.stockandshopbackend.bll.services.role.RoleService;
+import be.stockandshopbackend.bll.services.userService.UserService;
 import be.stockandshopbackend.pl.DTOs.Response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package be.stockandshopbackend.bll.services;
+package be.stockandshopbackend.bll.services.role;
 
 import be.stockandshopbackend.bll.services.base.BaseCRUDService;
 import be.stockandshopbackend.dal.repositories.RoleRepository;
@@ -12,25 +12,27 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class RoleService extends BaseCRUDService<Role, Long, RoleRepository> {
+public class RoleServiceImpl extends BaseCRUDService<Role, Long, RoleRepository>
+                            implements RoleService {
 
     private final UserRepository userRepository;
 
-    protected RoleService(RoleRepository repository, UserRepository userRepository) {
+    protected RoleServiceImpl(RoleRepository repository, UserRepository userRepository) {
         super(repository);
         this.userRepository = userRepository;
     }
 
     //region GET
 
-    public Role createRole(String roleName){
-        Role role = new Role(roleName);
-        return repository.save(role);
-    }
 
     //endregion
 
     //region ADD / REMOVE roles
+
+    public Role createRole(String roleName){
+        Role role = new Role(roleName);
+        return repository.save(role);
+    }
 
     @Transactional
     public void addRoleToUser(UUID userId, String nameRole) {

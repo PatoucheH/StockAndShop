@@ -1,4 +1,4 @@
-package be.stockandshopbackend.bll.services;
+package be.stockandshopbackend.bll.services.userFavorite;
 
 import be.stockandshopbackend.bll.services.base.BaseCRUDService;
 import be.stockandshopbackend.dal.repositories.RecipeRepository;
@@ -14,12 +14,14 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class UserFavoriteRecipeService extends BaseCRUDService<UserFavoriteRecipe, Long, UserFavoriteRecipeRepository> {
+public class UserFavoriteRecipeServiceImpl
+        extends BaseCRUDService<UserFavoriteRecipe, Long, UserFavoriteRecipeRepository>
+        implements UserFavoriteRecipeService {
 
     private final RecipeRepository recipeRepository;
 
-    public UserFavoriteRecipeService(UserFavoriteRecipeRepository favoriteRepository,
-                                     RecipeRepository recipeRepository) {
+    public UserFavoriteRecipeServiceImpl(UserFavoriteRecipeRepository favoriteRepository,
+                                         RecipeRepository recipeRepository) {
         super(favoriteRepository);
         this.recipeRepository = recipeRepository;
     }

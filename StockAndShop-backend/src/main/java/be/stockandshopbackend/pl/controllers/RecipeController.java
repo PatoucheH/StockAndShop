@@ -1,6 +1,7 @@
 package be.stockandshopbackend.pl.controllers;
 
-import be.stockandshopbackend.bll.services.RecipeService;
+import be.stockandshopbackend.bll.services.recipe.RecipeService;
+import be.stockandshopbackend.bll.services.recipe.RecipeServiceImpl;
 import be.stockandshopbackend.pl.DTOs.Response.RecipeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

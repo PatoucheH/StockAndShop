@@ -1,6 +1,7 @@
-package be.stockandshopbackend.bll.services;
+package be.stockandshopbackend.bll.services.product;
 
 import be.stockandshopbackend.bll.services.base.BaseCRUDService;
+import be.stockandshopbackend.bll.services.category.CategoryService;
 import be.stockandshopbackend.dal.repositories.ProductRepository;
 import be.stockandshopbackend.dl.entities.Category;
 import be.stockandshopbackend.dl.entities.Product;
@@ -12,17 +13,23 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class ProductService extends BaseCRUDService<Product, Long, ProductRepository> {
+public class ProductServiceImpl extends BaseCRUDService<Product, Long, ProductRepository>
+                                implements ProductService {
 
     private final CategoryService categoryService;
 
-    public ProductService(ProductRepository repository, CategoryService categoryService) {
+    public ProductServiceImpl(ProductRepository repository, CategoryService categoryService) {
         super(repository);
         this.categoryService = categoryService;
     }
 
     public List<Product> findAllByName(String name){
         return  repository.findProductsByNameContaining(name);
+    }
+
+    public Product findOneByName(String name){
+        return repository.findByName(name)
+                .orElseThrow(() -> new NotFoundException("Product not found with name : " + name));
     }
 
     @Transactional
@@ -35,9 +42,5 @@ public class ProductService extends BaseCRUDService<Product, Long, ProductReposi
         return repository.save(product);
     }
 
-    public Product findOneByName(String name){
-        return repository.findByName(name)
-                .orElseThrow(() -> new NotFoundException("Product not found with name : " + name));
-    }
 
 }

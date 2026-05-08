@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { LayoutComponent } from './core/layout/layout';
+import { DetailShoppingListComponent } from './features/shopping-list/detail-shopping-list/detail-shopping-list';
 
 export const routes: Routes = [
   {
@@ -14,7 +15,19 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./features/home/home').then((m) => m.HomeComponent),
+        loadComponent: () => import('./features/home/home/home').then((m) => m.HomeComponent),
+      },
+      {
+        path: 'home/:id',
+        loadComponent: () =>
+          import('./features/home/details-home/details-home').then((m) => m.DetailsHomeComponent),
+      },
+      {
+        path: 'shopping-list/:id',
+        loadComponent: () =>
+          import('./features/shopping-list/detail-shopping-list/detail-shopping-list').then(
+            (m) => m.DetailShoppingListComponent,
+          ),
       },
     ],
   },

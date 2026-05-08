@@ -17,16 +17,22 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, body);
   }
 
-  saveToken(token: string) {
+  saveToken(token: string, email: string) {
     localStorage.setItem('token', token);
+    localStorage.setItem('userEmail', email);
   }
 
   getToken() {
     return localStorage.getItem('token');
   }
 
+  getUserEmail(): string | null {
+    return localStorage.getItem('userEmail');
+  }
+
   logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('userEmail');
   }
 
   isLoggedIn() {

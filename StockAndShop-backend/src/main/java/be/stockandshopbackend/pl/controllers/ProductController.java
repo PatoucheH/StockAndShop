@@ -1,7 +1,7 @@
 package be.stockandshopbackend.pl.controllers;
 
-import be.stockandshopbackend.bll.services.CategoryService;
-import be.stockandshopbackend.bll.services.ProductService;
+import be.stockandshopbackend.bll.services.category.CategoryService;
+import be.stockandshopbackend.bll.services.product.ProductService;
 import be.stockandshopbackend.dl.entities.Category;
 import be.stockandshopbackend.dl.entities.Product;
 import be.stockandshopbackend.dl.enums.Unity;

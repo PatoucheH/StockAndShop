@@ -1,1 +1,61 @@
-<p>details-home works!</p>
+@if (home()) {
+  <div class="flex flex-col items-center p-8">
+    <h2 class="text-3xl mx-10 text-center italic">{{ home()!.name }}</h2>
+    <p class="text-xs">{{ home()!.description }}</p>
+    @if (isOwner()) {
+      <button (click)="deleteHome()"
+              class="mt-2 px-4 py-1 rounded-full bg-gradient-to-tr from-red-700 to-red-500 text-white text-sm
+                     hover:scale-105 transition-all duration-200 shadow-md">
+        Supprimer la maison
+      </button>
+    }
+  </div>
+  <div class="flex flex-row justify-around items-center w-[100%] h-[50px] bg-gradient-to-tr from-green-700 to-teal-900 text-white
+              px-6">
+      <div class="hover:scale-105 cursor-pointer" (click)="changeView('list')">
+        Listes de courses
+      </div>
+      <div class="hover:scale-105 cursor-pointer" (click)="changeView('stock')">
+        Stock
+      </div>
+      <div class="hover:scale-105 cursor-pointer" (click)="changeView('user')">
+        User
+      </div>
+  </div>
+  <div class="w-full">
+    @if(view == "user"){
+      @if(users().length > 0){
+        @for(user of users(); track user.id){
+          <p>{{ user.name }} | {{ user.email }}</p>
+        }
+      }@else{
+        <p class="text-center">Pas d'utilisateur disponible dans cette maison</p>
+      }
+    }@else if(view == "stock"){
+      @if(stock().length > 0){
+        @for(s of stock(); track s.id){
+          <p>{{ s.nameProduct }} | {{ s.quantity }} </p>
+        }
+      }@else{
+        <p class="text-center">Pas de stock disponible dans cette maison</p>
+      }
+    }@else{
+      @if(shoppingLists().length > 0){
+        <app-list-shopping-list></app-list-shopping-list>
+      }@else{
+        <p class="text-center">Pas de liste des courses dans cette maison</p>
+      }
+    }
+  </div>
+} @else {
+  <p class="text-center mt-10">Chargement...</p>
+}
+
+@if (showConfirmDelete()) {
+  <app-confirm-modal
+    [message]="'Supprimer \'' + home()?.name + '\' ? Cette action est irréversible.'"
+    confirmLabel="Supprimer"
+    (confirmed)="onDeleteConfirmed()"
+    (cancelled)="showConfirmDelete.set(false)"
+  />
+}

@@ -1,0 +1,22 @@
+<div class="fixed inset-0 z-40 bg-black/50 flex items-center justify-center"
+     (click)="cancelled.emit()">
+  <div class="flex flex-col items-center z-50 bg-white border shadow-xl rounded-2xl p-8 w-[90%] max-w-sm"
+       (click)="$event.stopPropagation()">
+
+    <p class="text-center text-gray-700 text-sm mb-8">{{ message() }}</p>
+
+    <div class="flex gap-4 w-full justify-center">
+      <button (click)="cancelled.emit()"
+              class="px-5 py-2 rounded-full border border-gray-300 text-gray-600 text-sm
+                     hover:bg-gray-100 transition-all duration-200">
+        {{ cancelLabel() }}
+      </button>
+      <button (click)="confirmed.emit()"
+              class="px-5 py-2 rounded-full bg-gradient-to-tr from-green-800 to-teal-700 text-white text-sm
+                     hover:scale-105 transition-all duration-200 shadow-md">
+        {{ confirmLabel() }}
+      </button>
+    </div>
+
+  </div>
+</div>

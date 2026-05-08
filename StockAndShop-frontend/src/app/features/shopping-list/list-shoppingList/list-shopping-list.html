@@ -1,0 +1,23 @@
+<div class="w-full">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4 ">
+    @for (sl of shoppingList(); track sl.id) {
+      <div [routerLink]="['/shopping-list', sl.id]" class="p-6 rounded-xl shadow-md text-center bg-white hover:shadow-xl transition cursor-pointer">
+        <p class="text-lg font-semibold">{{ sl.name }}</p>
+        <p class="text-xs text-gray-500 mt-1">{{ sl.description }}</p>
+        <button (click)="deleteShoppingList(sl.id)" class="mt-4 text-sm text-red-600 hover:underline">
+          Supprimer
+        </button>
+      </div>
+    }
+  </div>
+  <div class="flex justify-center pb-6">
+    <button (click)="openModal()" class="bg-gradient-to-tr from-green-800 to-green-600
+    text-white px-5 py-2 rounded-full hover:scale-105 transition-all duration-200 shadow-md">
+      Créer une nouvelle liste
+    </button>
+  </div>
+</div>
+
+@if(modalIsOpen()){
+  <app-add-shopping-list (closeModal)="closeModal()"></app-add-shopping-list>
+}

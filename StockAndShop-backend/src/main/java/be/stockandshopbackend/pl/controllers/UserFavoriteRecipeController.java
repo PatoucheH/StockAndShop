@@ -1,6 +1,7 @@
 package be.stockandshopbackend.pl.controllers;
 
-import be.stockandshopbackend.bll.services.UserFavoriteRecipeService;
+import be.stockandshopbackend.bll.services.userFavorite.UserFavoriteRecipeService;
+import be.stockandshopbackend.bll.services.userFavorite.UserFavoriteRecipeServiceImpl;
 import be.stockandshopbackend.dl.entities.User;
 import be.stockandshopbackend.pl.DTOs.Response.RecipeResponse;
 import lombok.RequiredArgsConstructor;

@@ -2,8 +2,9 @@
   <h2 class=" text-3xl m-10 italic">TES MAISONS</h2>
     <div class="flex flex-wrap justify-center gap-8 w-full">
     @for(home of homes(); track home.id){
-      <div class="flex flex-col justify-center items-center border border-black rounded-xl p-4 w-64 h-32
-                  hover:bg-green-200 hover:scale-105 transistion all duration-300 cursor-pointer">
+      <div [routerLink]="['/home', home.id]"
+           class="flex flex-col justify-center items-center border border-black rounded-xl p-4 w-64 h-32
+                  hover:bg-green-200 hover:scale-105 transistion all duration-300 cursor-pointer shadow-xl">
         <p class="text-lg">{{ home.name }}</p>
         <p class="text-sm">{{ home.description }}</p>
       </div>

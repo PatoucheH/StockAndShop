@@ -1,7 +1,8 @@
 export interface Home{
-  id: number,
+  id: string,
   name: string,
   description: string,
+  ownerEmail: string,
 }
 
 export interface HomeRequest{

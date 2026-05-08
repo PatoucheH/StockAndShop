@@ -1,4 +1,4 @@
-package be.stockandshopbackend.bll.services;
+package be.stockandshopbackend.bll.services.productListItem;
 
 import be.stockandshopbackend.bll.services.base.BaseCRUDService;
 import be.stockandshopbackend.dal.repositories.ProductListItemRepository;
@@ -9,9 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 import be.stockandshopbackend.exceptions.NotFoundException;
 
 @Service
-public class ProductListItemService extends BaseCRUDService<ProductListItem, Long, ProductListItemRepository> {
+public class ProductListItemServiceImpl extends BaseCRUDService<ProductListItem, Long, ProductListItemRepository>
+                                        implements ProductListItemService {
 
-    public ProductListItemService(ProductListItemRepository repository) {
+    public ProductListItemServiceImpl(ProductListItemRepository repository) {
         super(repository);
     }
 

@@ -1,6 +1,6 @@
 package be.stockandshopbackend.pl.controllers;
 
-import be.stockandshopbackend.bll.services.CategoryService;
+import be.stockandshopbackend.bll.services.category.CategoryService;
 import be.stockandshopbackend.pl.DTOs.Response.CategoryResponse;
 import be.stockandshopbackend.pl.DTOs.requests.CategoryRequest;
 import jakarta.validation.Valid;

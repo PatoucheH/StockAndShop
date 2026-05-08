@@ -1,0 +1,24 @@
+<div class="fixed inset-0 z-40 bg-black/50 flex items-center justify-center" (click)="closeModal.emit()">
+  <div class="flex flex-col justify-center items-center z-50 bg-green-100 border shadow-lg rounded-xl
+            p-6 w-[90%] max-w-md" (click)="$event.stopPropagation()">
+    <h1 class="text-xl font-semibold mb-4 text-center">Ajouter une nouvelle liste de course</h1>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col items-center text-center">
+      <label for="name" class="mb-2">
+        Entrez le nom de la nouvelle liste :
+      </label>
+      <input type="text" id="name" formControlName="name" required
+             class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none
+             focus:ring-2 focus:ring-green-500">
+      <label for="description" class="my-2">
+        Entrez une description :
+      </label>
+      <textarea type="description" id="description" formControlName="description"
+                class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none
+                focus:ring-2 focus:ring-green-500">
+    </textarea>
+      <button type="submit" class="bg-green-600 text-white rounded-full
+      px-6 py-2 mt-4 hover:scale-105 transition-all duration-200">Créer</button>
+      <button type="button" (click)="closeModal.emit()" class="text-xs text-red-700">Annuler</button>
+    </form>
+  </div>
+</div>

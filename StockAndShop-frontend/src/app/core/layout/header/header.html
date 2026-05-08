@@ -1,14 +1,16 @@
-<header class="sticky top-0 z-50 flex flex-row justify-between items-center bg-gradient-to-tl from-teal-900 to-green-700 h-[75px] ">
-  <nav class="ml-2">
+<header class="md:sticky top-0 z-50 flex flex-row justify-between items-center bg-gradient-to-tl from-teal-900 to-green-700 h-[75px] ">
+  <nav class="ml-2 hidden sm:block">
     <ul class="text-white">
       <li><a href="/">Home</a></li>
     </ul>
   </nav>
-  <h1 class="font-bold text-white text-xl">
-    STOCK AND SHOP
-  </h1>
-  <button (click)="disconnect()" class="mr-1 font-bold bg-green-50 text-green-800 lg:px-6 lg:py-3 px-2 py-2 rounded-3xl text-sm
-                                        hover:scale-105 transition-all duration-200">
+  <a href="/">
+    <h1 class="font-bold text-white text-xl text-center ml-6">
+      STOCK AND SHOP
+    </h1>
+  </a>
+  <button (click)="disconnect()" class="mr-1 font-bold bg-green-50 text-green-800 lg:px-6 lg:py-3 px-2 py-2
+   rounded-3xl text-sm hover:scale-105 transition-all duration-200">
     Déconnecter
   </button>
 </header>

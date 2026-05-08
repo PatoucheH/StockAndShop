@@ -1,8 +1,8 @@
 package be.stockandshopbackend.pl.controllers;
 
-import be.stockandshopbackend.bll.services.HomeService;
-import be.stockandshopbackend.bll.services.ProductService;
-import be.stockandshopbackend.bll.services.UserService;
+import be.stockandshopbackend.bll.services.home.HomeService;
+import be.stockandshopbackend.bll.services.product.ProductService;
+import be.stockandshopbackend.bll.services.userService.UserService;
 import be.stockandshopbackend.dl.entities.Home;
 import be.stockandshopbackend.dl.entities.ProductStockHome;
 import be.stockandshopbackend.dl.entities.User;
@@ -20,9 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,6 +46,11 @@ public class HomeController {
         return ResponseEntity.ok(homeService.findAllByUser((User) userDetails).stream()
                 .map(HomeResponse::fromHome)
                 .toList());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<HomeResponse> getHomeById(@PathVariable UUID id){
+        return ResponseEntity.ok(HomeResponse.fromHome(homeService.findById(id)));
     }
 
     @GetMapping("/{id}/shopping-list")
@@ -112,20 +115,6 @@ public class HomeController {
         UserHome userHome = new UserHome((User) user, HomeRole.OWNER);
         home.addUserHome(userHome);
         return ResponseEntity.status(HttpStatus.CREATED).body(HomeResponse.fromHome(homeService.save(home)));
-    }
-
-    @PostMapping("/{id}/shopping-list")
-    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
-    public ResponseEntity<HomeResponse> createShoppingList(@PathVariable UUID id,
-                                                           @RequestBody @Valid ShoppingListRequest shoppingList){
-        return ResponseEntity.status(HttpStatus.CREATED).body(HomeResponse.fromHome(
-                    homeService.createShoppingList(
-                            id,
-                            shoppingList.name(),
-                            shoppingList.description()
-                    )
-                )
-        );
     }
 
     //endregion

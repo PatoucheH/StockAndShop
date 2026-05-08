@@ -1,0 +1,19 @@
+@if(loading()){
+  <p>Chargement...</p>
+}
+@else if(selectedShoppingList(); as list){
+
+  <h2>{{ list.name }}</h2>
+  @for(item of list.products; track item.id){
+    <p>{{ item.nameProduct }}</p>
+  }
+
+
+  <div>
+    <button (click)="openModal()">Ajouter produit</button>
+  </div>
+
+}
+@else{
+  <p>Pas d'informations pour cette liste</p>
+}

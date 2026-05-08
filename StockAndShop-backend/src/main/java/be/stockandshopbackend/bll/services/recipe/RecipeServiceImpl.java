@@ -1,4 +1,4 @@
-package be.stockandshopbackend.bll.services;
+package be.stockandshopbackend.bll.services.recipe;
 
 import be.stockandshopbackend.dal.repositories.HomeRepository;
 import be.stockandshopbackend.dal.repositories.ProductRepository;
@@ -23,13 +23,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class RecipeService {
+public class RecipeServiceImpl implements RecipeService {
 
     private final AnthropicClient anthropicClient;
     private final RecipeRepository recipeRepository;
     private final HomeRepository homeRepository;
     private final ProductRepository productRepository;
 
+    @Transactional
     public List<Recipe> getSuggestions(UUID homeId) {
         Home home = homeRepository.findById(homeId).orElseThrow(
                 () -> new NotFoundException("Home not found with id: " + homeId)

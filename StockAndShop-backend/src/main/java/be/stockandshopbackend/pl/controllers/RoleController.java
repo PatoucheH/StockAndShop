@@ -1,7 +1,7 @@
 package be.stockandshopbackend.pl.controllers;
 
-import be.stockandshopbackend.bll.services.RoleService;
-import be.stockandshopbackend.dal.repositories.RoleRepository;
+import be.stockandshopbackend.bll.services.role.RoleService;
+import be.stockandshopbackend.bll.services.role.RoleServiceImpl;
 import be.stockandshopbackend.dl.entities.Role;
 import be.stockandshopbackend.pl.DTOs.Response.RoleResponse;
 import lombok.RequiredArgsConstructor;
