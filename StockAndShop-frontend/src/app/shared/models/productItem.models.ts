@@ -1,5 +1,5 @@
 export interface ProductItem {
-  id: string,
+  id: number,
   nameProduct: string,
   quantity: number,
   unityProduct: string,

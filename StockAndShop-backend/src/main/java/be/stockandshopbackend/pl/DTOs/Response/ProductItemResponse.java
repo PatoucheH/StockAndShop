@@ -2,6 +2,7 @@ package be.stockandshopbackend.pl.DTOs.Response;
 
 import be.stockandshopbackend.dl.entities.ProductListItem;
 import be.stockandshopbackend.dl.entities.ProductStockHome;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ public class ProductItemResponse {
     private String nameProduct;
     private String unityProduct;
     private int quantity;
+    @JsonProperty("isChecked")
     private boolean isChecked;
 
     public static ProductItemResponse fromProductListItem(ProductListItem productListItem){

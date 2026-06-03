@@ -20,4 +20,8 @@ export class ProductService {
   createProduct(product: ProductRequest){
     return this.http.post(`${this.apiUrl}`, product);
   }
+
+  checkedItemOnList(id: number){
+    return this.http.patch(`${this.apiUrl}-list-item/${id}/check`, {});
+  }
 }

@@ -31,6 +31,7 @@ export class DetailShoppingListComponent {
 
   openModal() {
     this.modalIsOpen.set(true);
+    console.log(this.selectedShoppingList());
   }
 
   closeModal() {
