@@ -9,6 +9,7 @@ import be.stockandshopbackend.dl.entities.*;
 import be.stockandshopbackend.exceptions.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +27,12 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
         this.productService = productService;
         this.productListItemRepository = productListItemRepository;
         this.homeRepository = homeRepository;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ShoppingList findById(Long id) {
+        return super.findById(id);
     }
 
     @Override

@@ -6,6 +6,7 @@ import be.stockandshopbackend.dal.repositories.ProductRepository;
 import be.stockandshopbackend.dl.entities.Category;
 import be.stockandshopbackend.dl.entities.Product;
 import be.stockandshopbackend.dl.enums.Unity;
+import be.stockandshopbackend.exceptions.AlreadyExistsException;
 import be.stockandshopbackend.exceptions.NotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ public class ProductServiceImpl extends BaseCRUDService<Product, Long, ProductRe
 
     @Transactional
     public Product createProduct(String name, String unity, String categoryName){
+        if(repository.existsByName(name)) throw new AlreadyExistsException("This product exists already");
         Category category = categoryService.findByNameOrCreate(categoryName);
         Product product = new Product();
         product.setName(name.toLowerCase());

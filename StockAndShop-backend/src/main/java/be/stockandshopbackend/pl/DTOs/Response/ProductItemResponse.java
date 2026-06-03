@@ -17,8 +17,17 @@ public class ProductItemResponse {
     private String nameProduct;
     private String unityProduct;
     private int quantity;
+    private String category;
     @JsonProperty("isChecked")
     private boolean isChecked;
+
+    public ProductItemResponse(Long id, String name, String value, int quantity, boolean b) {
+        this.id = id;
+        this.nameProduct = name;
+        this.unityProduct = value;
+        this.quantity = quantity;
+        this.isChecked = b;
+    }
 
     public static ProductItemResponse fromProductListItem(ProductListItem productListItem){
         return new ProductItemResponse(
@@ -26,6 +35,7 @@ public class ProductItemResponse {
                 productListItem.getProduct().getName(),
                 productListItem.getProduct().getUnity().getValue(),
                 productListItem.getQuantity(),
+                productListItem.getProduct().getCategory().getName(),
                 productListItem.isChecked()
         );
     }

@@ -3,6 +3,7 @@ export interface ProductItem {
   nameProduct: string,
   quantity: number,
   unityProduct: string,
+  category: string,
   isChecked: boolean
 }
 

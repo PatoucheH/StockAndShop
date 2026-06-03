@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Getter @Setter
@@ -25,6 +26,7 @@ public class ShoppingListResponse {
                 shoppingList.getDescription(),
                 shoppingList.getProducts().stream()
                         .map(ProductItemResponse::fromProductListItem)
+                        .sorted(Comparator.comparing(ProductItemResponse::getCategory))
                         .toList()
         );
     }

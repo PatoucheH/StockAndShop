@@ -1,12 +1,15 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ShoppingListService } from '../shopping-list.service';
 import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 import { AddProductListDb } from '../add-product-list-db/add-product-list-db';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { startWith } from 'rxjs';
 import { ItemShoppingList } from '../item-shopping-list/item-shopping-list';
 import { FormAddProductShoppingList } from '../form-add-product-shopping-list/form-add-product-shopping-list';
+import {HomeService} from '../../home/home.service';
+import {Category} from '../../../shared/models/category.models';
 
 @Component({
   selector: 'app-detail-shopping-list',
@@ -16,11 +19,24 @@ import { FormAddProductShoppingList } from '../form-add-product-shopping-list/fo
 })
 export class DetailShoppingListComponent {
   shoppingListService = inject(ShoppingListService);
+  homeService = inject(HomeService);
   route = inject(ActivatedRoute);
+  location = inject(Location);
 
   id = this.route.snapshot.paramMap.get('id');
   selectedShoppingList = this.shoppingListService.selectedShoppingList;
   loading = this.shoppingListService.loading;
+
+  groupedProducts = computed(() => {
+    const products = this.selectedShoppingList()?.products ?? [];
+    const map = new Map<string, typeof products>();
+    for (const product of products) {
+      const group = map.get(product.category) ?? [];
+      group.push(product);
+      map.set(product.category, group);
+    }
+    return Array.from(map.entries()).map(([category, items]) => ({ category, items }));
+  });
 
   modalIsOpen = signal<boolean>(false);
 
@@ -31,10 +47,17 @@ export class DetailShoppingListComponent {
 
   openModal() {
     this.modalIsOpen.set(true);
-    console.log(this.selectedShoppingList());
   }
 
   closeModal() {
     this.modalIsOpen.set(false);
   }
+
+  addToStockItemChecked(){
+    const homeId : string = this.homeService.selectedHome()!.id;
+    this.shoppingListService.addToStockItemCheckedofShoppingList(homeId).subscribe({
+      next: data => {},
+      error: (e) => console.error('Erreur lors de la mise à jour de la liste et du stock', e)
+    });
+  };
 }

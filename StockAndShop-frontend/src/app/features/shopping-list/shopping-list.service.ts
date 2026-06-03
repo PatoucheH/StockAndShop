@@ -14,15 +14,12 @@ export class ShoppingListService {
 
   private _selectedListId = signal<number | undefined>(undefined);
 
-  readonly selectedShoppingListResource = httpResource<ShoppingList>(
-    () =>
-      this._selectedListId() !== undefined
-        ? `${this.apiUrl}/${this._selectedListId()}`
-        : undefined,
+  readonly selectedShoppingListResource = httpResource<ShoppingList>(() =>
+    this._selectedListId() !== undefined ? `${this.apiUrl}/${this._selectedListId()}` : undefined,
   );
 
   readonly selectedShoppingList = computed(
-    () => this.selectedShoppingListResource.value() ?? null,
+    () => this.selectedShoppingListResource.value() ?? null
   );
   readonly loading = this.selectedShoppingListResource.isLoading;
 
@@ -49,4 +46,10 @@ export class ShoppingListService {
       .post<ShoppingList>(`${this.apiUrl}/${id}/add-product`, product)
       .pipe(tap((updatedList) => this.selectedShoppingListResource.update(() => updatedList)));
   }
+
+  addToStockItemCheckedofShoppingList(homeId: string) {
+    return this.http.patch<ShoppingList>(
+      `${this.apiUrl}/${this._selectedListId()}/home/${homeId}/checked-list`, {}
+    ).pipe(tap((updatedList) => this.selectedShoppingListResource.update(() => updatedList)));
+  };
 }
