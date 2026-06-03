@@ -7,6 +7,6 @@ export interface ProductItem {
 }
 
 export interface ProductItemRequest {
-  nameProduct: string,
+  name: string,
   quantity: number,
 }

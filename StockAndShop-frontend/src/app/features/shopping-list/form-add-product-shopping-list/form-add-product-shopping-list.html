@@ -1,0 +1,25 @@
+<form [formGroup]="form" (ngSubmit)="addProduct()" class="bg-white border border-dashed border-green-300
+               rounded-2xl px-4 py-3 flex items-center gap-3 shadow-sm">
+  <input type="text" formControlName="nameProduct" list="productsList" placeholder="Ajouter un produit..."
+         class="flex-1 bg-transparent outline-none text-sm w-8" />
+  <datalist id="productsList">
+    @for (product of filteredProducts(); track product.id) {
+      <option [value]="product.name"></option>
+    }
+  </datalist>
+  @let currentProduct = selectedProduct();
+  @if (currentProduct) {
+    <div class="flex items-center gap-1">
+      <input type="number" formControlName="quantity" min="1"
+             class="w-12 border border-green-200 rounded-lg px-2 py-1 text-sm outline-none" />
+      <span class="text-xs text-gray-500 whitespace-nowrap">
+              {{ currentProduct.unity }}
+            </span>
+    </div>
+  }
+  <button type="submit" [disabled]="form.invalid || !currentProduct"
+          class="bg-gradient-to-r from-teal-900 to-green-700 text-white px-4 py-2
+                 rounded-xl text-sm font-semibold hover:scale-105 transition-all disabled:opacity-50">
+    +
+  </button>
+</form>

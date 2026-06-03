@@ -9,6 +9,7 @@ import be.stockandshopbackend.pl.DTOs.Response.AuthResponse;
 import be.stockandshopbackend.pl.DTOs.requests.LoginRequest;
 import be.stockandshopbackend.pl.DTOs.requests.RegisterRequest;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,7 +30,7 @@ public class AuthService implements UserDetailsService {
 
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(@NonNull String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found : " + email));
     }

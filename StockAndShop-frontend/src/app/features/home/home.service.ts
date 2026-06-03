@@ -1,8 +1,8 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { HttpClient, httpResource } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Home, HomeRequest } from './home.model';
-import { finalize, tap } from 'rxjs';
+import { tap } from 'rxjs';
 import { ShoppingList } from '../shopping-list/shopping-list.models';
 import { User } from '../../shared/models/user.models';
 import { ProductStock } from '../../shared/models/productStock.models';
@@ -14,96 +14,47 @@ export class HomeService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/home`;
 
-  private _homes = signal<Home[]>([]);
-  private _selectedHome = signal<Home | null>(null);
-  private _loading = signal<boolean>(false);
-  private _shoppingLists = signal<ShoppingList[]>([]);
-  private _users = signal<User[]>([]);
-  private _stock = signal<ProductStock[]>([]);
+  private _selectedHomeId = signal<string | undefined>(undefined);
+  readonly homesResource = httpResource<Home[]>(() => `${this.apiUrl}`);
 
-  public homes = this._homes.asReadonly();
-  public selectedHome = this._selectedHome.asReadonly();
-  public loading = this._loading.asReadonly();
-  public shoppingLists = this._shoppingLists.asReadonly();
-  public users = this._users.asReadonly();
-  public stock = this._stock.asReadonly();
+  readonly selectedHomeResource = httpResource<Home>(
+    () => this._selectedHomeId() ? `${this.apiUrl}/${this._selectedHomeId()}` : undefined,
+  );
 
-  // LOAD DATA
+  readonly shoppingListsResource = httpResource<ShoppingList[]>(
+    () =>
+      this._selectedHomeId()
+        ? `${this.apiUrl}/${this._selectedHomeId()}/shopping-list`
+        : undefined,
+  );
 
-  loadHomes() {
-    this._loading.set(true);
-    this.http
-      .get<Home[]>(`${this.apiUrl}`)
-      .pipe(
-        tap((data) => this._homes.set(data)),
-        finalize(() => this._loading.set(false)),
-      )
-      .subscribe();
+  readonly usersResource = httpResource<User[]>(
+    () =>
+      this._selectedHomeId() ? `${this.apiUrl}/${this._selectedHomeId()}/user` : undefined,
+  );
+
+  readonly stockResource = httpResource<ProductStock[]>(
+    () =>
+      this._selectedHomeId() ? `${this.apiUrl}/${this._selectedHomeId()}/stock` : undefined,
+  );
+
+  readonly homes = computed(() => this.homesResource.value() ?? []);
+  readonly selectedHome = computed(() => this.selectedHomeResource.value() ?? null);
+  readonly shoppingLists = computed(() => this.shoppingListsResource.value() ?? []);
+  readonly users = computed(() => this.usersResource.value() ?? []);
+  readonly stock = computed(() => this.stockResource.value() ?? []);
+
+  selectHome(id: string) {
+    this._selectedHomeId.set(id);
   }
 
-  loadHomeById(id: string) {
-    this._loading.set(true);
-    this._selectedHome.set(null);
-    this.http
-      .get<Home>(`${this.apiUrl}/${id}`)
-      .pipe(
-        tap((data) => this._selectedHome.set(data)),
-        finalize(() => this._loading.set(false)),
-      )
-      .subscribe();
-  }
-
-  loadShoppingListHomeById(id: string) {
-    this._loading.set(true);
-    this.http
-      .get<ShoppingList[]>(`${this.apiUrl}/${id}/shopping-list`)
-      .pipe(
-        tap((data) => this._shoppingLists.set(data)),
-        finalize(() => this._loading.set(false)),
-      )
-      .subscribe();
-  }
-
-  reloadShoppingList() {
-    const home = this.selectedHome();
-    if (!home) return;
-    this.http
-      .get<ShoppingList[]>(`${this.apiUrl}/${home.id}/shopping-list`)
-      .pipe(tap((data) => this._shoppingLists.set(data)))
-      .subscribe();
-  }
-
-  loadUserHomeById(id: string) {
-    this._loading.set(true);
-    this.http
-      .get<User[]>(`${this.apiUrl}/${id}/user`)
-      .pipe(
-        tap((data) => this._users.set(data)),
-        finalize(() => this._loading.set(false)),
-      )
-      .subscribe();
-  }
-
-  loadStockHomeById(id: string) {
-    this._loading.set(true);
-    this.http
-      .get<ProductStock[]>(`${this.apiUrl}/${id}/stock`)
-      .pipe(
-        tap((data) => this._stock.set(data)),
-        finalize(() => this._loading.set(false)),
-      )
-      .subscribe();
-  }
-
-  // CREATE
   createNewHome(data: HomeRequest) {
     this.http
       .post<Home>(`${this.apiUrl}`, data)
-      .pipe(tap((home) => this._homes.update((homes) => [...homes, home])))
+      .pipe(tap((home) => this.homesResource.update((homes) => [...(homes ?? []), home])))
       .subscribe();
   }
 
-  // DELETE
   deleteHome(id: string) {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }

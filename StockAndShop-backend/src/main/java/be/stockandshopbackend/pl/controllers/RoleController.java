@@ -4,6 +4,8 @@ import be.stockandshopbackend.bll.services.role.RoleService;
 import be.stockandshopbackend.bll.services.role.RoleServiceImpl;
 import be.stockandshopbackend.dl.entities.Role;
 import be.stockandshopbackend.pl.DTOs.Response.RoleResponse;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +37,9 @@ public class RoleController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<RoleResponse> createRole(@RequestParam String roleName){
+    public ResponseEntity<RoleResponse> createRole(
+            @RequestParam @Size(min = 2, max = 30) @Pattern(regexp = "^[A-Z_]+$") String roleName
+    ){
         Role role = roleService.createRole(roleName);
         return ResponseEntity.status(HttpStatus.CREATED).body(RoleResponse.fromRole(role));
     }

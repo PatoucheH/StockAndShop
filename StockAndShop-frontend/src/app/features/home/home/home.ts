@@ -16,10 +16,6 @@ export class HomeComponent {
 
   modalIsOpen = signal(false);
 
-  ngOnInit() {
-    this.homeService.loadHomes();
-  }
-
   openModal() {
     this.modalIsOpen.set(true);
   }

@@ -15,6 +15,8 @@ public interface ShoppingListService {
     void addProductFromList(Long shoppingListId, String productName, int quantity);
 
 
+    /// DELETE CHECK ADD STOCK
+    ShoppingList deleteProductCheckedAndAddStock(Long shoppingListId, UUID homeId);
 
 
     /// DELETE

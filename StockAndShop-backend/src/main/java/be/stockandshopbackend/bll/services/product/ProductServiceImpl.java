@@ -32,6 +32,10 @@ public class ProductServiceImpl extends BaseCRUDService<Product, Long, ProductRe
                 .orElseThrow(() -> new NotFoundException("Product not found with name : " + name));
     }
 
+    public Unity[] findAllUnities(){
+        return Unity.values();
+    }
+
     @Transactional
     public Product createProduct(String name, String unity, String categoryName){
         Category category = categoryService.findByNameOrCreate(categoryName);
@@ -41,6 +45,4 @@ public class ProductServiceImpl extends BaseCRUDService<Product, Long, ProductRe
         product.setCategory(category);
         return repository.save(product);
     }
-
-
 }

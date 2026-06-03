@@ -1,8 +1,8 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { ProductItem, ProductItemRequest } from '../../shared/models/productItem.models';
-import { HttpClient } from '@angular/common/http';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { HttpClient, httpResource } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { finalize, tap } from 'rxjs';
+import { ProductItemRequest } from '../../shared/models/productItem.models';
+import { tap } from 'rxjs';
 import { ShoppingList, ShoppingListRequest } from './shopping-list.models';
 
 @Injectable({
@@ -12,35 +12,41 @@ export class ShoppingListService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/shopping-list`;
 
-  private _loading = signal<boolean>(false);
-  private _selectedShoppingList = signal<ShoppingList | null>(null);
+  private _selectedListId = signal<number | undefined>(undefined);
 
-  public loading = this._loading.asReadonly();
-  public selectedShoppingList = this._selectedShoppingList.asReadonly();
+  readonly selectedShoppingListResource = httpResource<ShoppingList>(
+    () =>
+      this._selectedListId() !== undefined
+        ? `${this.apiUrl}/${this._selectedListId()}`
+        : undefined,
+  );
 
-  // LOAD DATA
+  readonly selectedShoppingList = computed(
+    () => this.selectedShoppingListResource.value() ?? null,
+  );
+  readonly loading = this.selectedShoppingListResource.isLoading;
 
-  loadSelectedShoppingList(id: number) {
-    this._loading.set(true);
-    this.http.get<ShoppingList>(`${this.apiUrl}/${id}`).pipe(
-      tap((data) => this._selectedShoppingList.set(data)),
-      finalize(() => this._loading.set(false)),
-    ).subscribe();
+  selectShoppingList(id: number) {
+    this._selectedListId.set(id);
   }
-
-  // CREATE
 
   createShoppingList(shoppingList: ShoppingListRequest, homeId: string) {
     return this.http.post(`${this.apiUrl}/${homeId}`, shoppingList);
   }
 
-  /// DELETE
   deleteShoppingList(id: number) {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    return this.http.delete(`${this.apiUrl}/${id}`).pipe(
+      tap(() => {
+        if (this._selectedListId() === id) {
+          this._selectedListId.set(undefined);
+        }
+      }),
+    );
   }
 
-  // ADD PRODUCT
   addProductToShoppingList(product: ProductItemRequest, id: number) {
-    return this.http.post(`${this.apiUrl}/${id}/add`, product);
+    return this.http
+      .post<ShoppingList>(`${this.apiUrl}/${id}/add-product`, product)
+      .pipe(tap((updatedList) => this.selectedShoppingListResource.update(() => updatedList)));
   }
 }

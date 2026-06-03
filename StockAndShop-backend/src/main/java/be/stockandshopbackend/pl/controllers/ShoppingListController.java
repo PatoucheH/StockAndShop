@@ -60,7 +60,7 @@ public class ShoppingListController {
         );
     }
 
-    @PostMapping("/{id}/add")
+    @PostMapping("/{id}/add-product")
     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<ShoppingListResponse> addItemToShoppingList(@PathVariable Long id,
                                                                       @RequestBody @Valid ProductItemRequest request){
@@ -81,12 +81,27 @@ public class ShoppingListController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{id}/remove")
+    @DeleteMapping("/{id}/remove-product")
     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<?> removeItemFromToShoppingList(@PathVariable Long id,
                                                           @RequestParam String name){
         shoppingListService.removeProductFromList(id, name);
         return ResponseEntity.noContent().build();
+    }
+
+    //endregion
+
+    //region OTHER
+
+    @PatchMapping("/{id}/home/{homeId}/checked-list")
+    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
+    public ResponseEntity<ShoppingListResponse> checkedProductAndAddStock(@PathVariable Long id,
+                                                                          @PathVariable UUID homeId){
+        return ResponseEntity.ok(
+                ShoppingListResponse.fromShoppingList(
+                        shoppingListService.deleteProductCheckedAndAddStock(id, homeId)
+                )
+        );
     }
 
     //endregion

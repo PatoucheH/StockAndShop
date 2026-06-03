@@ -2,6 +2,11 @@ export interface Product{
   id: number,
   name: string,
   unity: string,
-  quantity: number,
-  checked: boolean
+  category: string,
+}
+
+export interface ProductRequest {
+  name: string,
+  unity: string,
+  category: string,
 }

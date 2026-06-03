@@ -37,7 +37,7 @@ export class AddShoppingListComponent {
     if (!this.homeId) return;
     const request: ShoppingListRequest = this.form.getRawValue() as ShoppingListRequest;
     this.shoppingListService.createShoppingList(request, this.homeId).subscribe(() => {
-      this.homeService.reloadShoppingList();
+      this.homeService.shoppingListsResource.reload();
     });
     this.closeModal.emit();
   }

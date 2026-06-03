@@ -1,7 +1,12 @@
-@if (home()) {
+@if (home(); as currentHome) {
   <div class="flex flex-col items-center p-8">
-    <h2 class="text-3xl mx-10 text-center italic">{{ home()!.name }}</h2>
-    <p class="text-xs">{{ home()!.description }}</p>
+    <h2 class="text-3xl mx-10 text-center italic">{{ currentHome.name }}</h2>
+    <p class="text-xs">{{ currentHome.description }}</p>
+    <button (click)="toggleAddShoppingListModal()"
+            class="mt-2 px-4 py-1 rounded-full bg-gradient-to-tr from-green-700 to-teal-900 text-white text-sm
+                     hover:scale-105 transition-all duration-200 shadow-md">
+      Ajouter une liste de courses
+    </button>
     @if (isOwner()) {
       <button (click)="deleteHome()"
               class="mt-2 px-4 py-1 rounded-full bg-gradient-to-tr from-red-700 to-red-500 text-white text-sm
@@ -12,43 +17,52 @@
   </div>
   <div class="flex flex-row justify-around items-center w-[100%] h-[50px] bg-gradient-to-tr from-green-700 to-teal-900 text-white
               px-6">
-      <div class="hover:scale-105 cursor-pointer" (click)="changeView('list')">
-        Listes de courses
-      </div>
-      <div class="hover:scale-105 cursor-pointer" (click)="changeView('stock')">
-        Stock
-      </div>
-      <div class="hover:scale-105 cursor-pointer" (click)="changeView('user')">
-        User
-      </div>
+    <div class="hover:scale-105 cursor-pointer" (click)="changeView('list')">
+      Listes de courses
+    </div>
+    <div class="hover:scale-105 cursor-pointer" (click)="changeView('stock')">
+      Stock
+    </div>
+    <div class="hover:scale-105 cursor-pointer" (click)="changeView('user')">
+      User
+    </div>
   </div>
   <div class="w-full">
-    @if(view == "user"){
-      @if(users().length > 0){
-        @for(user of users(); track user.id){
+    @let userList = users();
+    @let stockList = stock();
+    @let shoppingListData = shoppingLists();
+    @if (view() == "user") {
+      @if (userList.length > 0) {
+        @for (user of userList; track user.id) {
           <p>{{ user.name }} | {{ user.email }}</p>
         }
-      }@else{
+      } @else {
         <p class="text-center">Pas d'utilisateur disponible dans cette maison</p>
       }
-    }@else if(view == "stock"){
-      @if(stock().length > 0){
-        @for(s of stock(); track s.id){
-          <p>{{ s.nameProduct }} | {{ s.quantity }} </p>
+    } @else if (view() == "stock") {
+      @if (stockList.length > 0) {
+        @for (s of stockList; track s.id) {
+          <p>{{ s.nameProduct }} | {{ s.quantity }}</p>
         }
-      }@else{
+      } @else {
         <p class="text-center">Pas de stock disponible dans cette maison</p>
       }
-    }@else{
-      @if(shoppingLists().length > 0){
+    } @else {
+      @if (shoppingListData.length > 0) {
         <app-list-shopping-list></app-list-shopping-list>
-      }@else{
+      } @else {
         <p class="text-center">Pas de liste des courses dans cette maison</p>
       }
     }
   </div>
 } @else {
   <p class="text-center mt-10">Chargement...</p>
+}
+
+@if(showAddList()){
+  <app-add-shopping-list
+    (closeModal)="toggleAddShoppingListModal()">
+  </app-add-shopping-list>
 }
 
 @if (showConfirmDelete()) {

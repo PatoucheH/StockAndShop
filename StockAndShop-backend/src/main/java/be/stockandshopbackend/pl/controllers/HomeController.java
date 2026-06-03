@@ -99,8 +99,10 @@ public class HomeController {
 
     @PostMapping("/{id}/add-user")
     @PreAuthorize("@homeSecurity.isOwner(#id, authentication.principal)")
-    public ResponseEntity<UserHomeResponse> addUser(@PathVariable UUID id,
-                                     @RequestParam UUID userId){
+    public ResponseEntity<UserHomeResponse> addUser(
+            @PathVariable UUID id,
+            @RequestParam UUID userId
+    ){
         UserHome userHome = new UserHome(userService.findById(userId), HomeRole.USER);
         homeService.addUserHome(id, userHome);
         return ResponseEntity.status(HttpStatus.CREATED).body(

@@ -1,0 +1,26 @@
+@let isChecked = item().isChecked;
+<div class="bg-white border border-green-100 rounded-2xl px-4 py-3 flex items-center justify-between
+                 shadow-sm hover:shadow-md transition-all duration-200">
+  <div class="flex items-center gap-3">
+    <button
+      class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
+      [class.bg-green-600]="isChecked"
+      [class.border-green-600]="isChecked"
+      [class.border-gray-300]="!isChecked">
+      @if (isChecked) {
+        <i class="fa-solid fa-check text-white text-[10px]"></i>
+      }
+    </button>
+    <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-medium text-sm"
+                    [class.line-through]="isChecked"
+                    [class.text-gray-400]="isChecked">
+                {{ item().nameProduct }}
+              </span>
+      <span class="text-xs text-gray-500">
+        {{ item().quantity }}
+        {{ item().unityProduct }}
+      </span>
+    </div>
+  </div>
+</div>

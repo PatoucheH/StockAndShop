@@ -6,6 +6,4 @@ public record ProductRequest(
         @NotBlank String name,
         @NotBlank String unity,
         @NotBlank String category
-) {
-
-}
+) {}

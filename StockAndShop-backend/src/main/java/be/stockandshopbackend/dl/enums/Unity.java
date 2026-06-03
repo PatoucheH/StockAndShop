@@ -1,6 +1,11 @@
 package be.stockandshopbackend.dl.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum Unity {
+    OTHER("other"),
+    PIECE("piece"),
     MILLILITERS("milliliters"),
     LITER("liter"),
     GRAMS("grams"),
@@ -15,10 +20,6 @@ public enum Unity {
 
     Unity(String value) {
         this.value = value;
-    }
-
-    public String getValue() {
-        return value;
     }
 
     public static Unity fromValue(String value) {

@@ -43,12 +43,13 @@
         <p class="text-sm text-red-500 text-center">{{ error() }}</p>
       }
 
+      @let isLoading = loading();
       <button
         type="submit"
-        [disabled]="loading()"
+        [disabled]="isLoading"
         class="w-full bg-green-700 text-white rounded-lg py-2 text-sm font-medium border
                hover:bg-green-200 hover:text-green-700 hover:border-green-700 disabled:opacity-50 transition-colors">
-        {{ loading() ? 'Création...' : "S'enregistrer" }}
+        {{ isLoading ? 'Création...' : "S'enregistrer" }}
       </button>
     </form>
 

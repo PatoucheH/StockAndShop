@@ -15,18 +15,20 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./features/home/home/home').then((m) => m.HomeComponent),
+        loadComponent: () => import('./features/home/home/home')
+          .then((m) => m.HomeComponent),
       },
       {
         path: 'home/:id',
         loadComponent: () =>
-          import('./features/home/details-home/details-home').then((m) => m.DetailsHomeComponent),
+          import('./features/home/details-home/details-home')
+            .then((m) => m.DetailsHomeComponent),
       },
       {
         path: 'shopping-list/:id',
         loadComponent: () =>
-          import('./features/shopping-list/detail-shopping-list/detail-shopping-list').then(
-            (m) => m.DetailShoppingListComponent,
+          import('./features/shopping-list/detail-shopping-list/detail-shopping-list')
+            .then((m) => m.DetailShoppingListComponent,
           ),
       },
     ],

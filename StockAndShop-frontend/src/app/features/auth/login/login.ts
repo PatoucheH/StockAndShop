@@ -28,9 +28,7 @@ export class LoginComponent {
     if (this.form.invalid) return;
     this.loading.set(true);
     this.error.set(null);
-
     const request: LoginRequest = this.form.getRawValue() as LoginRequest;
-
     this.authService.login(request).subscribe({
       next: (response) => {
         this.authService.saveToken(response.token, response.email);

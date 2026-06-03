@@ -43,6 +43,11 @@ public class ProductController {
         return ResponseEntity.ok(ProductResponse.fromProduct(productService.findById(id)));
     }
 
+    @GetMapping("/unity")
+    public ResponseEntity<Unity[]> getUnities(){
+        return ResponseEntity.ok(productService.findAllUnities());
+    }
+
     //endregion
 
     //region POST

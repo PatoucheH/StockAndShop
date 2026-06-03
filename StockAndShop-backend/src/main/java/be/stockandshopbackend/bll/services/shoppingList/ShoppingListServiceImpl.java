@@ -5,13 +5,12 @@ import be.stockandshopbackend.bll.services.product.ProductService;
 import be.stockandshopbackend.dal.repositories.HomeRepository;
 import be.stockandshopbackend.dal.repositories.ProductListItemRepository;
 import be.stockandshopbackend.dal.repositories.ShoppingListRepository;
-import be.stockandshopbackend.dl.entities.Home;
-import be.stockandshopbackend.dl.entities.ProductListItem;
-import be.stockandshopbackend.dl.entities.ShoppingList;
+import be.stockandshopbackend.dl.entities.*;
 import be.stockandshopbackend.exceptions.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -69,5 +68,24 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
     }
 
     //endregion
+
+    public ShoppingList deleteProductCheckedAndAddStock(Long shoppingListId, UUID homeId) {
+        ShoppingList shoppingList = repository.findById(shoppingListId).orElseThrow(
+                () -> new NotFoundException("ShoppingList with id " + shoppingListId + " not found")
+        );
+        Home home = homeRepository.findById(homeId).orElseThrow(
+                () -> new NotFoundException("Home not found with the id : " + homeId)
+        );
+        List<ProductListItem> checkedItems = shoppingList.getProducts().stream()
+                .filter(ProductListItem::isChecked)
+                .toList();
+        for (ProductListItem item : checkedItems) {
+            home.addProductStock(new ProductStockHome(item.getProduct(), item.getQuantity()));
+            shoppingList.getProducts().remove(item);
+        }
+        homeRepository.save(home);
+        repository.save(shoppingList);
+        return shoppingList;
+    }
 
 }
