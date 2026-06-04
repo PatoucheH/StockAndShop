@@ -1,11 +1,10 @@
-import { Component, computed, inject, Input, signal } from '@angular/core';
+import { Component, computed, inject, output } from '@angular/core';
 import { HomeService } from '../../../shared/services/home.service';
-import { ProductStockDecrese } from '../../../shared/models/productStock.models';
-import { form, FormField } from '@angular/forms/signals';
+import { ProductStock } from '../../../shared/models/productStock.models';
 
 @Component({
   selector: 'app-list-stock',
-  imports: [FormField],
+  imports: [],
   templateUrl: './list-stock.html',
   styleUrl: './list-stock.scss',
 })
@@ -14,24 +13,33 @@ export class ListStock {
 
   groupedStock = computed(() => {
     const stock = this.homeService.stock();
-    const map = new Map<string, typeof stock>();
+    const map = new Map<string, ProductStock[]>();
     for (const s of stock) {
       const group = map.get(s.category) ?? [];
       group.push(s);
       map.set(s.category, group);
     }
-    return Array.from(map.entries()).map(([category, items]) => ({ category, items }));
+    return Array.from(map.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([category, items]) => ({ category, items }));
   });
 
-  productStockForm = form(
-    signal<ProductStockDecrese>({
-      name: '',
-      quantity: 1,
-    }),
-  );
+  decreaseAmounts: Record<number, number> = {};
 
-  // decreseStock() {
-  //
-  //   this.homeService.decreseStock();
-  // }
+  findRecipes = output<void>();
+
+  getAmount(id: number): number {
+    return this.decreaseAmounts[id] ?? 1;
+  }
+
+  setAmount(id: number, val: number) {
+    this.decreaseAmounts = { ...this.decreaseAmounts, [id]: Math.max(1, val) };
+  }
+
+  retirer(item: ProductStock) {
+    const quantity = this.getAmount(item.id);
+    this.homeService.decreseStock({ name: item.nameProduct, quantity }).subscribe(() => {
+      this.homeService.stockResource.reload();
+    });
+  }
 }

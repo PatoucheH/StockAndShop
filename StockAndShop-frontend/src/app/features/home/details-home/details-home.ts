@@ -66,4 +66,8 @@ export class DetailsHomeComponent implements OnInit {
   toggleAddShoppingListModal() {
     this.showAddList.update((value) => !value);
   }
+
+  onFindRecipes() {
+    // TODO: implement recipe finder
+  }
 }

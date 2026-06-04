@@ -60,6 +60,6 @@ export class HomeService {
   }
 
   decreseStock(productStock: ProductStockDecrese){
-    return this.http.put(`${this.apiUrl}/${this._selectedHomeId}/decrease-stock`, productStock);
+    return this.http.put(`${this.apiUrl}/${this._selectedHomeId()}/decrease-stock`, productStock);
   }
 }
