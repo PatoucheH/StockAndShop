@@ -8,7 +8,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { startWith } from 'rxjs';
 import { ItemShoppingList } from '../item-shopping-list/item-shopping-list';
 import { FormAddProductShoppingList } from '../form-add-product-shopping-list/form-add-product-shopping-list';
-import {HomeService} from '../../home/home.service';
+import {HomeService} from '../../../shared/services/home.service';
 import {Category} from '../../../shared/models/category.models';
 
 @Component({
@@ -35,7 +35,9 @@ export class DetailShoppingListComponent {
       group.push(product);
       map.set(product.category, group);
     }
-    return Array.from(map.entries()).map(([category, items]) => ({ category, items }));
+    return Array.from(map.entries()).map(
+      ([category, items]) => ({ category, items })
+    );
   });
 
   modalIsOpen = signal<boolean>(false);

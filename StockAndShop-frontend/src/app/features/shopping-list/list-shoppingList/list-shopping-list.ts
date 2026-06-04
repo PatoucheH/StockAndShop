@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ShoppingListService } from '../shopping-list.service';
 import { RouterLink } from '@angular/router';
-import { HomeService } from '../../home/home.service';
+import { HomeService } from '../../../shared/services/home.service';
 
 @Component({
   selector: 'app-list-shopping-list',

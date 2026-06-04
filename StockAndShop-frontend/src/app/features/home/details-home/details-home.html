@@ -41,9 +41,7 @@
       }
     } @else if (view() == "stock") {
       @if (stockList.length > 0) {
-        @for (s of stockList; track s.id) {
-          <p>{{ s.nameProduct }} | {{ s.quantity }}</p>
-        }
+        <app-list-stock></app-list-stock>
       } @else {
         <p class="text-center">Pas de stock disponible dans cette maison</p>
       }

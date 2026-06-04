@@ -1,5 +1,5 @@
 import { Component, inject, output } from '@angular/core';
-import { HomeService } from '../home.service';
+import { HomeService } from '../../../shared/services/home.service';
 import { HomeRequest } from '../home.model';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 

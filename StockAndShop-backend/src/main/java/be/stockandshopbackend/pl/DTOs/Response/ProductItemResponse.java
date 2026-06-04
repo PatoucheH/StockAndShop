@@ -21,10 +21,11 @@ public class ProductItemResponse {
     @JsonProperty("isChecked")
     private boolean isChecked;
 
-    public ProductItemResponse(Long id, String name, String value, int quantity, boolean b) {
+    public ProductItemResponse(Long id, String name, String unity, String category, int quantity, boolean b) {
         this.id = id;
         this.nameProduct = name;
-        this.unityProduct = value;
+        this.unityProduct = unity;
+        this.category = category;
         this.quantity = quantity;
         this.isChecked = b;
     }
@@ -45,6 +46,7 @@ public class ProductItemResponse {
                 productStockHome.getId(),
                 productStockHome.getProduct().getName(),
                 productStockHome.getProduct().getUnity().getValue(),
+                productStockHome.getProduct().getCategory().getName(),
                 productStockHome.getQuantity(),
                 false
         );

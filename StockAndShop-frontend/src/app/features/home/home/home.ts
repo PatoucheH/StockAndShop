@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { HomeService } from '../home.service';
+import { HomeService } from '../../../shared/services/home.service';
 import { AddHomeComponent } from '../add-home/add-home';
 import { RouterLink } from '@angular/router';
 

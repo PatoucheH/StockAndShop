@@ -9,7 +9,7 @@ import {
 
 import { ShoppingListService } from '../shopping-list.service';
 import { ShoppingListRequest } from '../shopping-list.models';
-import { HomeService } from '../../home/home.service';
+import { HomeService } from '../../../shared/services/home.service';
 
 @Component({
   selector: 'app-add-shopping-list',

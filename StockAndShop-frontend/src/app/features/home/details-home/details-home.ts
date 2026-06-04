@@ -1,14 +1,15 @@
 import { Component, computed, effect, inject, linkedSignal, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HomeService } from '../home.service';
+import { HomeService } from '../../../shared/services/home.service';
 import { AuthService } from '../../auth/auth.service';
 import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal';
 import { ListShoppingListComponent } from '../../shopping-list/list-shoppingList/list-shopping-list';
 import { AddShoppingListComponent } from '../../shopping-list/add-shopping-list/add-shopping-list';
+import { ListStock } from '../list-stock/list-stock';
 
 @Component({
   selector: 'app-details-home',
-  imports: [ConfirmModalComponent, ListShoppingListComponent, AddShoppingListComponent],
+  imports: [ConfirmModalComponent, ListShoppingListComponent, AddShoppingListComponent, ListStock],
   templateUrl: './details-home.html',
   styleUrl: './details-home.scss',
 })
@@ -63,6 +64,6 @@ export class DetailsHomeComponent implements OnInit {
   }
 
   toggleAddShoppingListModal() {
-    this.showAddList.update(value => !value);
+    this.showAddList.update((value) => !value);
   }
 }

@@ -12,13 +12,14 @@
     <div class="flex flex-row justify-between mb-6">
       <div class="flex items-center sm:gap-3">
         <button (click)="location.back()"
-          class="text-xl text-green-800 hover:text-green-600 transition-colors"
+          class="min-[350px]:text-xs text-[10px] bg-gradient-to-r to-teal-900 from-green-700 text-white font-semibold
+               py-2 px-4 rounded-2xl hover:scale-[1.01] transition-all duration-200"
           title="Retour">
-          &#8592;
+          Retour
         </button>
       </div>
       <button class="min-[350px]:text-xs text-[10px] bg-gradient-to-r from-teal-900 to-green-700 text-white font-semibold
-               py-3 px-2 rounded-2xl hover:scale-[1.01] transition-all duration-200"
+               py-2 px-4 rounded-2xl hover:scale-[1.01] transition-all duration-200"
         (click)="addToStockItemChecked()">
         Ajouter au stock les produits check
       </button>
