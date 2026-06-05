@@ -1,15 +1,23 @@
-import { Component, computed, inject, output } from '@angular/core';
+import { Component, computed, inject, output, signal } from '@angular/core';
 import { HomeService } from '../../../shared/services/home.service';
 import { ProductStock } from '../../../shared/models/productStock.models';
+import { RecipeService } from '../../recipe/recipe.service';
+import { RecipeCardComponent } from '../../../shared/components/recipe-card/recipe-card';
+import { Recipe } from '../../../shared/models/recipe.models';
 
 @Component({
   selector: 'app-list-stock',
-  imports: [],
+  imports: [RecipeCardComponent],
   templateUrl: './list-stock.html',
   styleUrl: './list-stock.scss',
 })
 export class ListStock {
   homeService = inject(HomeService);
+  recipeService = inject(RecipeService);
+
+  newRecipe: Recipe[] = [];
+
+  modalRecipe = signal(false);
 
   groupedStock = computed(() => {
     const stock = this.homeService.stock();
@@ -26,8 +34,6 @@ export class ListStock {
 
   decreaseAmounts: Record<number, number> = {};
 
-  findRecipes = output<void>();
-
   getAmount(id: number): number {
     return this.decreaseAmounts[id] ?? 1;
   }
@@ -41,5 +47,14 @@ export class ListStock {
     this.homeService.decreseStock({ name: item.nameProduct, quantity }).subscribe(() => {
       this.homeService.stockResource.reload();
     });
+  }
+
+  getRecipes() {
+    this.recipeService.generateRecipe(this.homeService.selectedHome()!.id);
+    this.modalRecipe.set(true);
+  }
+
+  closeModalRecipe(){
+    this.modalRecipe.set(false);
   }
 }

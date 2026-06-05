@@ -41,7 +41,7 @@
       }
     } @else if (view() == "stock") {
       @if (stockList.length > 0) {
-        <app-list-stock (findRecipes)="onFindRecipes()"></app-list-stock>
+        <app-list-stock></app-list-stock>
       } @else {
         <p class="text-center">Pas de stock disponible dans cette maison</p>
       }

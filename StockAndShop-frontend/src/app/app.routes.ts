@@ -1,13 +1,14 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { LayoutComponent } from './core/layout/layout';
-import { DetailShoppingListComponent } from './features/shopping-list/detail-shopping-list/detail-shopping-list';
 
 export const routes: Routes = [
   {
     path: 'auth',
     loadChildren: () => import('./features/auth/auth.routes').then((m) => m.authRoutes),
   },
+  { path: '**', redirectTo: 'auth/login' },
+
   {
     path: '',
     component: LayoutComponent,
@@ -39,5 +40,4 @@ export const routes: Routes = [
       },
     ],
   },
-  { path: '**', redirectTo: 'auth/login' },
 ];
