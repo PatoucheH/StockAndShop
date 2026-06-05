@@ -1,12 +1,10 @@
 <div class="p-4">
   <div class="flex justify-end mb-4">
-    <button (click)="findRecipes.emit()"
-            class="px-4 py-2 rounded-full bg-gradient-to-tr from-amber-500 to-orange-600 text-white text-sm font-medium
-                   hover:scale-105 transition-all duration-200 shadow-md">
+    <button (click)="findRecipes.emit()" class="px-4 py-2 rounded-full bg-gradient-to-tr from-amber-500
+     to-orange-600 text-white text-sm font-medium hover:scale-105 transition-all duration-200 shadow-md">
       Trouver des recettes avec le stock
     </button>
   </div>
-
   <div class="grid gap-3 md:grid-cols-2">
     @for (group of groupedStock(); track group.category) {
       <div class="border rounded-lg overflow-hidden bg-white shadow-sm">
@@ -20,17 +18,11 @@
               <div class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-md whitespace-nowrap">
                 {{ s.quantity }} {{ s.unityProduct }}
               </div>
-              <input
-                type="number"
-                [value]="getAmount(s.id)"
-                (input)="setAmount(s.id, +$any($event.target).value)"
-                min="1"
-                class="w-14 border rounded px-1 py-1 text-center text-xs focus:outline-none focus:ring-1 focus:ring-green-400"
-              />
-              <button
-                (click)="retirer(s)"
-                class="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded transition whitespace-nowrap"
-              >
+              <input type="number" [value]="getAmount(s.id)" (input)="setAmount(s.id, +$any($event.target).value)"
+                     min="1" class="w-14 border rounded px-1 py-1 text-center text-xs focus:outline-none focus:ring-1
+                     focus:ring-green-400"/>
+              <button (click)="remove(s)" class="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1
+              rounded transition whitespace-nowrap">
                 Retirer
               </button>
             </div>

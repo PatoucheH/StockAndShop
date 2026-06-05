@@ -19,6 +19,15 @@ public class RecipeController {
 
     private final RecipeService recipeService;
 
+    @GetMapping
+    public ResponseEntity<List<RecipeResponse>> getAllRecipes() {
+        return ResponseEntity.ok(
+                recipeService.getAllRecipes().stream()
+                        .map(RecipeResponse::fromRecipe)
+                        .toList()
+        );
+    }
+
     @GetMapping("/{id}/suggestions")
     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<List<RecipeResponse>> getSuggestions(@PathVariable UUID id) {

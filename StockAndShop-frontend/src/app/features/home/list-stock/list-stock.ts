@@ -36,7 +36,7 @@ export class ListStock {
     this.decreaseAmounts = { ...this.decreaseAmounts, [id]: Math.max(1, val) };
   }
 
-  retirer(item: ProductStock) {
+  remove(item: ProductStock) {
     const quantity = this.getAmount(item.id);
     this.homeService.decreseStock({ name: item.nameProduct, quantity }).subscribe(() => {
       this.homeService.stockResource.reload();

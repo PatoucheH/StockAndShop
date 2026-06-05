@@ -1,25 +1,31 @@
 <header class="md:sticky top-0 z-50 flex justify-between items-center
                 bg-gradient-to-tl from-teal-900 to-green-700 h-[75px] px-2 relative">
   <nav class="hidden sm:block">
-    <ul class="text-white flex gap-4">
-      <li><a href="/">Home</a></li>
+    <ul class="text-white flex gap-6">
+      <li><a routerLink="/" class="hover:text-green-200 transition-colors">Accueil</a></li>
+      <li><a routerLink="/recipes" class="hover:text-green-200 transition-colors">Recettes</a></li>
     </ul>
   </nav>
+
   <button class="sm:hidden text-white text-3xl" (click)="isMenuOpen.update(v => !v)">
     ☰
   </button>
+
   @if (isMenuOpen()) {
-    <nav class="absolute top-[75px] left-0 w-full bg-gradient-to-bl from-teal-900 to-green-700 sm:hidden">
+    <nav class="absolute top-[75px] left-0 w-full bg-gradient-to-bl from-teal-900 to-green-700 sm:hidden z-50">
       <ul class="flex flex-col text-white p-4 gap-4">
-        <li><a href="/">Home</a></li>
+        <li><a routerLink="/" (click)="isMenuOpen.set(false)" class="hover:text-green-200 transition-colors">Accueil</a></li>
+        <li><a routerLink="/recipes" (click)="isMenuOpen.set(false)" class="hover:text-green-200 transition-colors">Recettes</a></li>
       </ul>
     </nav>
   }
-  <a href="/">
+
+  <a routerLink="/">
     <h1 class="font-bold text-white text-xl text-center">
       STOCK AND SHOP
     </h1>
   </a>
+
   <button (click)="disconnect()" class="hidden sm:block font-bold bg-green-50 text-green-800
                 lg:px-6 lg:py-3 px-4 py-2 rounded-3xl text-sm hover:scale-105 transition-all duration-200">
     Déconnecter

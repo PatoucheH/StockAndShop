@@ -30,6 +30,10 @@ public class RecipeServiceImpl implements RecipeService {
     private final HomeRepository homeRepository;
     private final ProductRepository productRepository;
 
+    public List<Recipe> getAllRecipes() {
+        return recipeRepository.findAll();
+    }
+
     @Transactional
     public List<Recipe> getSuggestions(UUID homeId) {
         Home home = homeRepository.findById(homeId).orElseThrow(

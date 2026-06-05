@@ -8,6 +8,7 @@ import java.util.UUID;
 public interface RecipeService {
 
     /// GET
+    List<Recipe> getAllRecipes();
     List<Recipe> getSuggestions(UUID homeId);
 
     /// ADD / GENERATE

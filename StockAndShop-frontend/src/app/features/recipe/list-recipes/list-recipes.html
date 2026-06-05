@@ -1,0 +1,77 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="bg-gradient-to-tr from-green-700 to-teal-900 text-white px-4 py-4">
+    <h1 class="text-xl font-bold">Toutes les recettes</h1>
+  </div>
+  <div class="p-4 max-w-2xl mx-auto">
+    @if (isLoading()) {
+      <div class="flex justify-center mt-16">
+        <p class="text-gray-400 text-sm">Chargement des recettes...</p>
+      </div>
+    } @else if (hasError()) {
+      <div class="flex flex-col items-center mt-16 gap-2 text-center">
+        <p class="text-red-500 text-sm">Aucune recette à charger</p>
+      </div>
+    } @else if (filteredRecipes().length === 0) {
+      <div class="flex flex-col items-center mt-16 gap-2 text-center">
+        @if (ingredientFilter().trim()) {
+          <p class="text-gray-500">Aucune recette ne contient "{{ ingredientFilter() }}".</p>
+          <button (click)="ingredientFilter.set('')"
+                  class="text-xs text-green-600 hover:underline">
+            Effacer le filtre
+          </button>
+        } @else {
+          <p class="text-gray-500">Aucune recette disponible pour le moment.</p>
+        }
+      </div>
+    } @else {
+      <div class="mb-4">
+        <input type="text" [(ngModel)]="ingredientFilter" placeholder="Filtrer par ingrédient..."
+          class="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm bg-white shadow-sm
+               focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
+        />
+      </div>
+      <p class="text-xs text-gray-400 mb-3">
+        {{ filteredRecipes().length }} recette{{ filteredRecipes().length > 1 ? 's' : '' }}
+        @if (ingredientFilter().trim()) {
+          · filtrée{{ filteredRecipes().length > 1 ? 's' : '' }} par "{{ ingredientFilter() }}"
+        }
+      </p>
+      <ul class="space-y-3">
+        @for (recipe of filteredRecipes(); track recipe.id) {
+          <li (click)="openRecipe(recipe)" class="bg-white rounded-xl border border-gray-200 shadow-sm px-4 py-4
+              cursor-pointer hover:shadow-md hover:border-green-300 transition-all duration-200 group">
+            <div class="flex items-center justify-between gap-2">
+              <h2 class="font-semibold text-gray-800 capitalize group-hover:text-green-700 transition-colors">
+                {{ recipe.title }}
+              </h2>
+              <span class="text-gray-300 group-hover:text-green-500 transition-colors text-lg">›</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">
+              {{ recipe.steps.length }} étape{{ recipe.steps.length > 1 ? 's' : '' }}
+              · {{ recipe.ingredients.length }} ingrédient{{ recipe.ingredients.length > 1 ? 's' : '' }}
+            </p>
+            <div class="flex flex-wrap gap-1.5 mt-2">
+              @for (ingredient of recipe.ingredients.slice(0, 4); track ingredient.productId) {
+                <span class="text-xs rounded-full px-2 py-0.5 border transition-colors"
+                  [class]="ingredient.productName.toLowerCase().includes(ingredientFilter().toLowerCase()) &&
+                   ingredientFilter().trim()? 'bg-green-100 text-green-800 border-green-300'
+                   : 'bg-green-50 text-green-700 border-green-100'">
+                  {{ ingredient.productName }}
+                </span>
+              }
+              @if (recipe.ingredients.length > 4) {
+                <span class="text-xs text-gray-400 px-1 py-0.5">
+                  +{{ recipe.ingredients.length - 4 }} autres
+                </span>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</div>
+
+@if (selectedRecipe()) {
+  <app-recipe-card [recipe]="selectedRecipe()!" (close)="closeRecipe()"></app-recipe-card>
+}
