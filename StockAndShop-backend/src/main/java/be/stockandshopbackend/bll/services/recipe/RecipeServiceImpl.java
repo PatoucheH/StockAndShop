@@ -11,6 +11,8 @@ import com.anthropic.models.messages.MessageCreateParams;
 import com.anthropic.models.messages.Model;
 import com.anthropic.models.messages.TextBlock;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,8 +32,8 @@ public class RecipeServiceImpl implements RecipeService {
     private final HomeRepository homeRepository;
     private final ProductRepository productRepository;
 
-    public List<Recipe> getAllRecipes() {
-        return recipeRepository.findAll();
+    public Page<Recipe> getAllRecipes(Pageable pageable) {
+        return recipeRepository.findAll(pageable);
     }
 
     @Transactional

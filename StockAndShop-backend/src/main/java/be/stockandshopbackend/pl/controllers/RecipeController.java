@@ -1,9 +1,12 @@
 package be.stockandshopbackend.pl.controllers;
 
 import be.stockandshopbackend.bll.services.recipe.RecipeService;
-import be.stockandshopbackend.bll.services.recipe.RecipeServiceImpl;
+import be.stockandshopbackend.dl.entities.Recipe;
+import be.stockandshopbackend.pl.DTOs.Response.PagedRecipeResponse;
 import be.stockandshopbackend.pl.DTOs.Response.RecipeResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,12 +23,21 @@ public class RecipeController {
     private final RecipeService recipeService;
 
     @GetMapping
-    public ResponseEntity<List<RecipeResponse>> getAllRecipes() {
-        return ResponseEntity.ok(
-                recipeService.getAllRecipes().stream()
-                        .map(RecipeResponse::fromRecipe)
-                        .toList()
-        );
+    public ResponseEntity<PagedRecipeResponse> getAllRecipes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size
+    ) {
+        Page<Recipe> recipePage = recipeService.getAllRecipes(PageRequest.of(page, size));
+        List<RecipeResponse> recipes = recipePage.getContent().stream()
+                .map(RecipeResponse::fromRecipe)
+                .toList();
+        return ResponseEntity.ok(new PagedRecipeResponse(
+                recipes,
+                recipePage.getTotalElements(),
+                page,
+                size,
+                recipePage.hasNext()
+        ));
     }
 
     @GetMapping("/{id}/suggestions")

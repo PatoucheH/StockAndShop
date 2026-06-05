@@ -1,18 +1,44 @@
-import { computed, Injectable } from '@angular/core';
+import { computed, effect, Injectable, signal, untracked } from '@angular/core';
 import { httpResource } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Recipe } from '../../shared/models/recipe.models';
+import { PagedRecipeResponse, Recipe } from '../../shared/models/recipe.models';
 
 @Injectable({ providedIn: 'root' })
 export class RecipeService {
   private apiUrl = `${environment.apiUrl}/recipe`;
+  private readonly pageSize = 50;
 
-  readonly recipesResource = httpResource<Recipe[]>(() => this.apiUrl);
+  private _page = signal(0);
+  private _allRecipes = signal<Recipe[]>([]);
 
-  readonly isLoading = computed(() => this.recipesResource.isLoading());
+  private _resource = httpResource<PagedRecipeResponse>(() =>
+    `${this.apiUrl}?page=${this._page()}&size=${this.pageSize}`,
+  );
 
-  readonly recipes = computed(() => {
-    if (this.recipesResource.error()) return [];
-    return this.recipesResource.value() ?? [];
-  });
+  constructor() {
+    effect(
+      () => {
+        if (this._resource.isLoading()) return;
+        const response = this._resource.value();
+        if (!response) return;
+        const page = untracked(() => this._page());
+        if (page === 0) {
+          this._allRecipes.set(response.recipes);
+        } else {
+          this._allRecipes.update((prev) => [...prev, ...response.recipes]);
+        }
+      },
+      { allowSignalWrites: true },
+    );
+  }
+
+  readonly isLoading = computed(() => this._resource.isLoading());
+  readonly hasError = computed(() => !!this._resource.error());
+  readonly recipes = computed(() => this._allRecipes());
+  readonly hasMore = computed(() => this._resource.value()?.hasMore ?? false);
+
+  loadNextPage() {
+    if (!this.hasMore() || this.isLoading()) return;
+    this._page.update((p) => p + 1);
+  }
 }

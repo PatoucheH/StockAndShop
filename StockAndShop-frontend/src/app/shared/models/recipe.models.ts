@@ -12,3 +12,11 @@ export interface Recipe {
   steps: string[];
   createdAt: string;
 }
+
+export interface PagedRecipeResponse {
+  recipes: Recipe[];
+  total: number;
+  page: number;
+  size: number;
+  hasMore: boolean;
+}
