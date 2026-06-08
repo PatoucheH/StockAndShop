@@ -5,6 +5,7 @@ import { ProductService } from '../../../shared/services/product.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { startWith } from 'rxjs';
 import { ShoppingListService } from '../shopping-list.service';
+import { UnitConversionService } from '../../../shared/services/unit-conversion.service';
 
 @Component({
   selector: 'app-form-add-product-shopping-list',
@@ -15,6 +16,7 @@ import { ShoppingListService } from '../shopping-list.service';
 export class FormAddProductShoppingList {
   productService = inject(ProductService);
   shoppingListService = inject(ShoppingListService);
+  unitConversion = inject(UnitConversionService);
 
   products = this.productService.allProducts;
 
@@ -43,19 +45,18 @@ export class FormAddProductShoppingList {
   });
 
   isWeightOrVolume = computed(() => {
-    const u = this.selectedProduct()?.unity?.toLowerCase() ?? '';
-    return u === 'grams' || u === 'milliliter';
+    const unity = this.selectedProduct()?.unity ?? '';
+    return this.unitConversion.isWeightOrVolume(unity);
   });
 
   _ = effect(() => {
-    const u = this.selectedProduct()?.unity?.toLowerCase() ?? '';
-    this.subUnit.set(u === 'milliliter' ? 'ml' : 'g');
+    const unity = this.selectedProduct()?.unity ?? '';
+    this.subUnit.set(this.unitConversion.getDefaultSubUnit(unity));
   });
 
   addProduct() {
     if (this.form.invalid || !this.selectedProduct()) return;
-    let quantity = Number(this.form.value.quantity);
-    if (this.subUnit() === 'kg' || this.subUnit() === 'L') quantity = Math.round(quantity * 1000);
+    const quantity = this.unitConversion.toBaseUnit(Number(this.form.value.quantity), this.subUnit());
     const payload: ProductItemRequest = {
       name: this.form.value.nameProduct!,
       quantity,

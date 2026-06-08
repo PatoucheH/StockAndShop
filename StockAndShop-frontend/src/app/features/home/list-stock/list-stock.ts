@@ -5,6 +5,7 @@ import { RecipeService } from '../../recipe/recipe.service';
 import { RecipeCardComponent } from '../../../shared/components/recipe-card/recipe-card';
 import { Recipe } from '../../../shared/models/recipe.models';
 import { SmartUnitPipe } from '../../../shared/pipes/smart-unit.pipe';
+import { UnitConversionService } from '../../../shared/services/unit-conversion.service';
 
 @Component({
   selector: 'app-list-stock',
@@ -15,6 +16,7 @@ import { SmartUnitPipe } from '../../../shared/pipes/smart-unit.pipe';
 export class ListStock {
   homeService = inject(HomeService);
   recipeService = inject(RecipeService);
+  unitConversion = inject(UnitConversionService);
 
   newRecipe: Recipe[] = [];
 
@@ -37,8 +39,7 @@ export class ListStock {
   decreaseUnits: Record<number, string> = {};
 
   isWeightOrVolume(unity: string): boolean {
-    const u = unity.toLowerCase();
-    return u === 'grams' || u === 'milliliter';
+    return this.unitConversion.isWeightOrVolume(unity);
   }
 
   getAmount(id: number): number {
@@ -50,7 +51,7 @@ export class ListStock {
   }
 
   getUnit(id: number, unity: string): string {
-    return this.decreaseUnits[id] ?? (unity.toLowerCase() === 'grams' ? 'g' : 'ml');
+    return this.decreaseUnits[id] ?? this.unitConversion.getDefaultSubUnit(unity);
   }
 
   setUnit(id: number, unit: string) {
@@ -58,9 +59,8 @@ export class ListStock {
   }
 
   remove(item: ProductStock) {
-    let quantity = this.getAmount(item.id);
     const unit = this.getUnit(item.id, item.unityProduct);
-    if (unit === 'kg' || unit === 'L') quantity = Math.round(quantity * 1000);
+    const quantity = this.unitConversion.toBaseUnit(this.getAmount(item.id), unit);
     this.homeService.decreseStock({ name: item.nameProduct, quantity }).subscribe(() => {
       this.homeService.stockResource.reload();
     });

@@ -3,13 +3,10 @@ import { ShoppingListService } from '../shopping-list.service';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { AddProductListDb } from '../add-product-list-db/add-product-list-db';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { startWith } from 'rxjs';
+import { ReactiveFormsModule } from '@angular/forms';
 import { ItemShoppingList } from '../item-shopping-list/item-shopping-list';
 import { FormAddProductShoppingList } from '../form-add-product-shopping-list/form-add-product-shopping-list';
 import {HomeService} from '../../../shared/services/home.service';
-import {Category} from '../../../shared/models/category.models';
 
 @Component({
   selector: 'app-detail-shopping-list',

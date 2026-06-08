@@ -11,11 +11,10 @@
         {{ list.name }}
       </h2>
       @if (list.id) {
-      <button
-        (click)="toggleFavorite(list.id)"
-        class="min-[350px]:text-xs text-[10px] font-semibold py-2 px-4 rounded-2xl hover:scale-[1.01] transition-all duration-200"
-        [class]="shoppingListService.isFavorited(list.id)
-                ? 'bg-yellow-400 text-white'
+      <button (click)="toggleFavorite(list.id)"
+        class="min-[350px]:text-xs text-[10px] font-semibold py-2 px-4 rounded-2xl hover:scale-[1.01] transition-all
+              duration-200"
+        [class]="shoppingListService.isFavorited(list.id) ? 'bg-yellow-400 text-white'
                 : 'bg-white text-yellow-500 border border-yellow-400'">
         {{ shoppingListService.isFavorited(list.id) ? '★ ' : '☆ ' }}
       </button>

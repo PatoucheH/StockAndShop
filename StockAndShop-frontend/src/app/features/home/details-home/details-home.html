@@ -15,8 +15,8 @@
       </button>
     }
   </div>
-  <div class="flex flex-row justify-around items-center w-[100%] h-[50px] bg-gradient-to-tr from-green-700 to-teal-900 text-white
-              px-6">
+  <div class="flex flex-row justify-around items-center w-[100%] h-[50px] bg-gradient-to-tr from-green-700
+    to-teal-900 text-white px-6">
     <div class="hover:scale-105 cursor-pointer" (click)="changeView('list')">
       Listes de courses
     </div>
@@ -49,18 +49,12 @@
 } @else {
   <p class="text-center mt-10">Chargement...</p>
 }
-
 @if(showAddList()){
   <app-add-shopping-list
     (closeModal)="toggleAddShoppingListModal()">
   </app-add-shopping-list>
 }
-
 @if (showConfirmDelete()) {
-  <app-confirm-modal
-    [message]="'Supprimer \'' + home()?.name + '\' ? Cette action est irréversible.'"
-    confirmLabel="Supprimer"
-    (confirmed)="onDeleteConfirmed()"
-    (cancelled)="showConfirmDelete.set(false)"
-  />
+  <app-confirm-modal [message]="'Supprimer \'' + home()?.name + '\' ? Cette action est irréversible.'"
+    confirmLabel="Supprimer" (confirmed)="onDeleteConfirmed()" (cancelled)="showConfirmDelete.set(false)"/>
 }

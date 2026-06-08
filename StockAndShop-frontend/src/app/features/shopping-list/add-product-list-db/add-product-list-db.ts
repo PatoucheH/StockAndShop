@@ -7,6 +7,7 @@ import { CategoryService } from '../../../shared/services/category.service';
 import { ProductRequest } from '../../../shared/models/product.models';
 import { ProductItemRequest } from '../../../shared/models/productItem.models';
 import { ShoppingListService } from '../shopping-list.service';
+import { UnitConversionService } from '../../../shared/services/unit-conversion.service';
 
 @Component({
   selector: 'app-add-product-to-list',
@@ -19,6 +20,7 @@ export class AddProductListDb {
   productService = inject(ProductService);
   categoryService = inject(CategoryService);
   shoppingListService = inject(ShoppingListService);
+  unitConversion = inject(UnitConversionService);
 
   id = input.required<string>();
   closeModal = output<void>();
@@ -39,14 +41,10 @@ export class AddProductListDb {
     initialValue: '',
   });
 
-  isWeightOrVolume = computed(() => {
-    const u = this.selectedUnity().toLowerCase();
-    return u === 'grams' || u === 'milliliter';
-  });
+  isWeightOrVolume = computed(() => this.unitConversion.isWeightOrVolume(this.selectedUnity()));
 
   _ = effect(() => {
-    const u = this.selectedUnity().toLowerCase();
-    this.subUnit.set(u === 'milliliter' ? 'ml' : 'g');
+    this.subUnit.set(this.unitConversion.getDefaultSubUnit(this.selectedUnity()));
   });
 
   submit() {
@@ -61,8 +59,7 @@ export class AddProductListDb {
 
     this.productService.createProduct(productToCreate).subscribe({
       next: () => {
-        let quantity = Number(formValue.quantity);
-        if (this.subUnit() === 'kg' || this.subUnit() === 'L') quantity = Math.round(quantity * 1000);
+        const quantity = this.unitConversion.toBaseUnit(Number(formValue.quantity), this.subUnit());
         const productToAdd: ProductItemRequest = {
           name: formValue.name.toLowerCase(),
           quantity,
