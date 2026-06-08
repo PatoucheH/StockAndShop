@@ -1,8 +1,16 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { RegisterRequest } from '../../../core/models/auth.model';
+
+function passwordMatchValidator(): ValidatorFn {
+  return (group: AbstractControl): ValidationErrors | null => {
+    const password = group.get('password')?.value;
+    const confirm = group.get('confirmPassword')?.value;
+    return password === confirm ? null : { passwordMismatch: true };
+  };
+}
 
 @Component({
   selector: 'app-register',
@@ -15,20 +23,27 @@ export class RegisterComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  form = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    username: ['', Validators.required],
-    password: ['', Validators.required],
-  });
+  form = this.fb.group(
+    {
+      email: ['', [Validators.required, Validators.email]],
+      username: ['', Validators.required],
+      password: ['', Validators.required],
+      confirmPassword: ['', Validators.required],
+    },
+    { validators: passwordMatchValidator() }
+  );
 
   loading = signal(false);
   error = signal<string | null>(null);
+  showPassword = signal(false);
+  showConfirmPassword = signal(false);
 
   onSubmit() {
     if (this.form.invalid) return;
     this.loading.set(true);
     this.error.set(null);
-    const request: RegisterRequest = this.form.getRawValue() as RegisterRequest;
+    const { confirmPassword: _confirm, ...requestData } = this.form.getRawValue();
+    const request = requestData as RegisterRequest;
 
     this.authService.register(request).subscribe({
       next: (response) => {

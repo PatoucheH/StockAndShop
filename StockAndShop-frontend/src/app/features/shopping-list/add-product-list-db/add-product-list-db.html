@@ -14,20 +14,12 @@
         <select id="unity" name="unity" formControlName="unity" required>
           @for(unity of unities(); track $index){
             @switch (unity){
-              @case ("LITER"){
-                <option [ngValue]="unity">Litres</option>
-              }@case ("MILLILITERS"){
+              @case ("MILLILITER"){
                 <option [ngValue]="unity">Millilitres</option>
-              }@case ("LITER"){
-                <option [ngValue]="unity">Litres</option>
               }@case ("GRAMS"){
                 <option [ngValue]="unity">Grammes</option>
-              }@case ("KILOGRAMS"){
-                <option [ngValue]="unity">Kilogrammes</option>
               }@case ("JAR"){
                 <option [ngValue]="unity">Pot</option>
-              }@case ("TUB"){
-                <option [ngValue]="unity">Tube</option>
               }@case ("BOTTLE"){
                 <option [ngValue]="unity">Bouteille</option>
               }@case ("PACKET"){

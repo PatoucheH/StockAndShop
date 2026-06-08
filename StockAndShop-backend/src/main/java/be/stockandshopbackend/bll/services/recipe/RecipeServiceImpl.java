@@ -83,19 +83,20 @@ public class RecipeServiceImpl implements RecipeService {
             existingTitles.forEach(title -> sb.append("- ").append(title).append("\n"));
         }
         sb.append("""
-   
+
                   Suggest a NEW recipe using these ingredients.
                   Please reply ONLY in this format, in FRENCH, without any additional text:
-   
-                  TITLE: [name of the recipe]
+
+                  TITLE: name of the recipe
                   INGREDIENTS:
-                  [exact_product_name]:[quantity as a whole number]
+                  exact_product_name:quantity_as_integer
                   STEPS:
-                  [step 1]
-                  [step 2]
-                  [etc.]
-   
+                  First step description.
+                  Second step description.
+                  Third step description.
+
                   Important: product names must match EXACTLY the names provided in the stock list.
+                  Do NOT use brackets [] around any text.
                   """);
         return sb.toString();
     }
@@ -139,7 +140,7 @@ public class RecipeServiceImpl implements RecipeService {
                         });
                     }
                 } else if (currentSection.equals("STEPS")) {
-                    steps.add(line);
+                    steps.add(line.replaceAll("^\\[|\\]$", "").trim());
                 }
             }
         }

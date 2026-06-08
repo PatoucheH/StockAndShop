@@ -42,6 +42,7 @@ export class RecipeService {
   readonly recipes = computed(() => this._allRecipes());
   readonly newRecipes = computed(() => this._newRecipes());
   readonly hasMore = computed(() => this._resource.value()?.hasMore ?? false);
+  readonly isGeneratingRecipe = signal(false);
 
   readonly favoriteRecipes = computed(() => this._favoritesResource.value() ?? []);
   readonly isFavoritesLoading = computed(() => this._favoritesResource.isLoading());
@@ -57,8 +58,15 @@ export class RecipeService {
   }
 
   generateRecipe(homeId: string) {
-    this.http.get<Recipe[]>(`${this.apiUrl}/${homeId}/suggestions`).subscribe((recipes) => {
-      this._newRecipes.set(recipes);
+    this.isGeneratingRecipe.set(true);
+    this.http.get<Recipe[]>(`${this.apiUrl}/${homeId}/suggestions`).subscribe({
+      next: (recipes) => {
+        this._newRecipes.set(recipes);
+        this.isGeneratingRecipe.set(false);
+      },
+      error: () => {
+        this.isGeneratingRecipe.set(false);
+      },
     });
   }
 
