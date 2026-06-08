@@ -1,15 +1,19 @@
-import { Component, computed, inject, output, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { HomeService } from '../../../shared/services/home.service';
 import { ProductStock } from '../../../shared/models/productStock.models';
 import { RecipeService } from '../../recipe/recipe.service';
-import { RecipeCardComponent } from '../../../shared/components/recipe-card/recipe-card';
-import { Recipe } from '../../../shared/models/recipe.models';
 import { SmartUnitPipe } from '../../../shared/pipes/smart-unit.pipe';
 import { UnitConversionService } from '../../../shared/services/unit-conversion.service';
+import { StockRecipeModalComponent } from './stock-recipe-modal/stock-recipe-modal';
+
+interface DecreaseEntry {
+  amount: number;
+  unit: string;
+}
 
 @Component({
   selector: 'app-list-stock',
-  imports: [RecipeCardComponent, SmartUnitPipe],
+  imports: [SmartUnitPipe, StockRecipeModalComponent],
   templateUrl: './list-stock.html',
   styleUrl: './list-stock.scss',
 })
@@ -17,8 +21,6 @@ export class ListStock {
   homeService = inject(HomeService);
   recipeService = inject(RecipeService);
   unitConversion = inject(UnitConversionService);
-
-  newRecipe: Recipe[] = [];
 
   modalRecipe = signal(false);
 
@@ -35,27 +37,32 @@ export class ListStock {
       .map(([category, items]) => ({ category, items }));
   });
 
-  decreaseAmounts: Record<number, number> = {};
-  decreaseUnits: Record<number, string> = {};
-
-  isWeightOrVolume(unity: string): boolean {
-    return this.unitConversion.isWeightOrVolume(unity);
-  }
+  private decreaseState = signal<Record<number, DecreaseEntry>>({});
 
   getAmount(id: number): number {
-    return this.decreaseAmounts[id] ?? 1;
+    return this.decreaseState()[id]?.amount ?? 1;
   }
 
   setAmount(id: number, val: number) {
-    this.decreaseAmounts = { ...this.decreaseAmounts, [id]: Math.max(0.001, val) };
+    this.decreaseState.update(state => ({
+      ...state,
+      [id]: { ...state[id], amount: Math.max(0.001, val) },
+    }));
   }
 
   getUnit(id: number, unity: string): string {
-    return this.decreaseUnits[id] ?? this.unitConversion.getDefaultSubUnit(unity);
+    return this.decreaseState()[id]?.unit ?? this.unitConversion.getDefaultSubUnit(unity);
   }
 
   setUnit(id: number, unit: string) {
-    this.decreaseUnits = { ...this.decreaseUnits, [id]: unit };
+    this.decreaseState.update(state => ({
+      ...state,
+      [id]: { ...state[id], unit },
+    }));
+  }
+
+  isWeightOrVolume(unity: string): boolean {
+    return this.unitConversion.isWeightOrVolume(unity);
   }
 
   remove(item: ProductStock) {
@@ -69,9 +76,5 @@ export class ListStock {
   getRecipes() {
     this.recipeService.generateRecipe(this.homeService.selectedHome()!.id);
     this.modalRecipe.set(true);
-  }
-
-  closeModalRecipe(){
-    this.modalRecipe.set(false);
   }
 }
