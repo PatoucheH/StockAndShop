@@ -15,7 +15,7 @@ interface DecreaseEntry {
   selector: 'app-list-stock',
   imports: [SmartUnitPipe, StockRecipeModalComponent],
   templateUrl: './list-stock.html',
-  styleUrl: './list-stock.scss',
+
 })
 export class ListStock {
   homeService = inject(HomeService);

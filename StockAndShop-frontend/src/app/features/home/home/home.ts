@@ -7,7 +7,7 @@ import { RouterLink } from '@angular/router';
   selector: 'app-home',
   imports: [AddHomeComponent, RouterLink],
   templateUrl: './home.html',
-  styleUrl: './home.scss',
+
 })
 export class HomeComponent {
   homeService = inject(HomeService);

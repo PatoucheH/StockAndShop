@@ -3,13 +3,9 @@
     <h1 class="text-xl font-bold">Listes de courses favorites</h1>
   </div>
   @if (isLoading()) {
-    <div class="flex justify-center items-center py-20">
-      <p class="text-green-800 font-semibold animate-pulse">Chargement...</p>
-    </div>
+    <app-loading />
   } @else if (hasError()) {
-    <div class="flex justify-center items-center py-20">
-      <p class="text-red-500">Erreur lors du chargement des favoris.</p>
-    </div>
+    <app-error message="Erreur lors du chargement des favoris." />
   } @else if (favoriteShoppingLists().length === 0) {
     <div class="flex justify-center items-center py-20">
       <p class="text-gray-500">Aucune liste de courses en favori.</p>

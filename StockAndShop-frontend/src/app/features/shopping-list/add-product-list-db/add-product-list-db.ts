@@ -14,7 +14,7 @@ import { UnityLabelPipe } from '../../../shared/pipes/unity-label.pipe';
   selector: 'app-add-product-to-list',
   imports: [ReactiveFormsModule, UnityLabelPipe],
   templateUrl: './add-product-list-db.html',
-  styleUrl: './add-product-list-db.scss',
+
 })
 export class AddProductListDb {
   fb = inject(FormBuilder);

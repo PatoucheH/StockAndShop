@@ -11,7 +11,7 @@ import { UnitConversionService } from '../../../shared/services/unit-conversion.
   selector: 'app-form-add-product-shopping-list',
   imports: [ReactiveFormsModule],
   templateUrl: './form-add-product-shopping-list.html',
-  styleUrl: './form-add-product-shopping-list.scss',
+
 })
 export class FormAddProductShoppingList {
   productService = inject(ProductService);

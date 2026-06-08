@@ -7,12 +7,13 @@ import { ListShoppingListComponent } from '../../shopping-list/list-shoppingList
 import { AddShoppingListComponent } from '../../shopping-list/add-shopping-list/add-shopping-list';
 import { ListStock } from '../list-stock/list-stock';
 import { ManageUsersHomeComponent } from '../manage-users-home/manage-users-home';
+import { LoadingComponent } from '../../../shared/components/loading/loading';
 
 @Component({
   selector: 'app-details-home',
-  imports: [ConfirmModalComponent, ListShoppingListComponent, AddShoppingListComponent, ListStock, ManageUsersHomeComponent],
+  imports: [ConfirmModalComponent, ListShoppingListComponent, AddShoppingListComponent, ListStock, ManageUsersHomeComponent, LoadingComponent],
   templateUrl: './details-home.html',
-  styleUrl: './details-home.scss',
+
 })
 export class DetailsHomeComponent implements OnInit {
   authService = inject(AuthService);

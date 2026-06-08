@@ -9,7 +9,7 @@ import { HomeMemberListComponent } from './home-member-list/home-member-list';
   selector: 'app-manage-users-home',
   imports: [UserSearchInputComponent, HomeMemberListComponent],
   templateUrl: './manage-users-home.html',
-  styleUrl: './manage-users-home.scss',
+
 })
 export class ManageUsersHomeComponent {
   private homeService = inject(HomeService);

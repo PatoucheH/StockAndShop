@@ -15,7 +15,7 @@ import { HomeService } from '../../../shared/services/home.service';
   selector: 'app-add-shopping-list',
   imports: [FormsModule, ReactiveFormsModule],
   templateUrl: './add-shopping-list.html',
-  styleUrl: './add-shopping-list.scss',
+
 })
 export class AddShoppingListComponent {
   fb = inject(FormBuilder);

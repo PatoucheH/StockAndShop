@@ -7,7 +7,7 @@ import { HomeService } from '../../../shared/services/home.service';
   selector: 'app-list-shopping-list',
   imports: [RouterLink],
   templateUrl: './list-shopping-list.html',
-  styleUrl: './list-shopping-list.scss',
+
 })
 export class ListShoppingListComponent implements OnInit {
   shoppingListService = inject(ShoppingListService);

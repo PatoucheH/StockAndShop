@@ -6,13 +6,14 @@ import { AddProductListDb } from '../add-product-list-db/add-product-list-db';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ItemShoppingList } from '../item-shopping-list/item-shopping-list';
 import { FormAddProductShoppingList } from '../form-add-product-shopping-list/form-add-product-shopping-list';
-import {HomeService} from '../../../shared/services/home.service';
+import { HomeService } from '../../../shared/services/home.service';
+import { LoadingComponent } from '../../../shared/components/loading/loading';
 
 @Component({
   selector: 'app-detail-shopping-list',
-  imports: [AddProductListDb, ReactiveFormsModule, ItemShoppingList, FormAddProductShoppingList],
+  imports: [AddProductListDb, ReactiveFormsModule, ItemShoppingList, FormAddProductShoppingList, LoadingComponent],
   templateUrl: './detail-shopping-list.html',
-  styleUrl: './detail-shopping-list.scss',
+
 })
 export class DetailShoppingListComponent {
   shoppingListService = inject(ShoppingListService);

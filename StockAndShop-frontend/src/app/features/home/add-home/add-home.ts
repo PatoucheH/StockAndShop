@@ -7,7 +7,7 @@ import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angu
   selector: 'app-add-home',
   imports: [ReactiveFormsModule],
   templateUrl: './add-home.html',
-  styleUrl: './add-home.scss',
+
 })
 export class AddHomeComponent {
 

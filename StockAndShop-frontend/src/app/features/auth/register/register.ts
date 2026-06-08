@@ -16,7 +16,7 @@ function passwordMatchValidator(): ValidatorFn {
   selector: 'app-register',
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.html',
-  styleUrl: './register.scss',
+
 })
 export class RegisterComponent {
   private fb = inject(FormBuilder);

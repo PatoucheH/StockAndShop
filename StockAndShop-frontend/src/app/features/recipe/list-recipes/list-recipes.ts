@@ -3,10 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { RecipeCardComponent } from '../../../shared/components/recipe-card/recipe-card';
 import { Recipe } from '../../../shared/models/recipe.models';
 import { ProductService } from '../../../shared/services/product.service';
+import { LoadingComponent } from '../../../shared/components/loading/loading';
+import { ErrorComponent } from '../../../shared/components/error/error';
 
 @Component({
   selector: 'app-list-recipes',
-  imports: [RecipeCardComponent, FormsModule],
+  imports: [RecipeCardComponent, FormsModule, LoadingComponent, ErrorComponent],
   templateUrl: './list-recipes.html',
 })
 export class ListRecipesComponent {

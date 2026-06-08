@@ -6,6 +6,6 @@ import { RouterOutlet } from '@angular/router';
   selector: 'app-layout',
   imports: [HeaderComponent, RouterOutlet],
   templateUrl: './layout.html',
-  styleUrl: './layout.scss',
+
 })
 export class LayoutComponent {}

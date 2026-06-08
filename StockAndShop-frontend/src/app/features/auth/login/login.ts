@@ -8,7 +8,7 @@ import { LoginRequest } from '../../../core/models/auth.model';
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
-  styleUrl: './login.scss',
+
 })
 export class LoginComponent {
 

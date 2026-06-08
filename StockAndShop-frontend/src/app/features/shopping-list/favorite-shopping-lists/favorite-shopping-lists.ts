@@ -1,10 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ShoppingListService } from '../shopping-list.service';
+import { LoadingComponent } from '../../../shared/components/loading/loading';
+import { ErrorComponent } from '../../../shared/components/error/error';
 
 @Component({
   selector: 'app-favorite-shopping-lists',
-  imports: [RouterLink],
+  imports: [RouterLink, LoadingComponent, ErrorComponent],
   templateUrl: './favorite-shopping-lists.html',
 })
 export class FavoriteShoppingListsComponent {

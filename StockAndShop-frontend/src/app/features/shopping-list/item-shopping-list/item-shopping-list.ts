@@ -9,7 +9,7 @@ import { SmartUnitPipe } from '../../../shared/pipes/smart-unit.pipe';
   selector: 'app-item-shopping-list',
   imports: [ReactiveFormsModule, SmartUnitPipe],
   templateUrl: './item-shopping-list.html',
-  styleUrl: './item-shopping-list.scss',
+
 })
 export class ItemShoppingList {
 
