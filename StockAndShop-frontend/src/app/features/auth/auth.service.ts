@@ -2,11 +2,13 @@ import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../../core/models/auth.model';
 import { environment } from '../../../environments/environment';
+import { StorageService } from '../../core/services/storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
   private http = inject(HttpClient);
+  private storage = inject(StorageService);
   private apiUrl = `${environment.apiUrl}/auth`;
 
   readonly authVersion = signal(0);
@@ -20,22 +22,22 @@ export class AuthService {
   }
 
   saveToken(token: string, email: string) {
-    localStorage.setItem('token', token);
-    localStorage.setItem('userEmail', email);
+    this.storage.set('token', token);
+    this.storage.set('userEmail', email);
     this.authVersion.update(v => v + 1);
   }
 
   getToken() {
-    return localStorage.getItem('token');
+    return this.storage.get('token');
   }
 
   getUserEmail(): string | null {
-    return localStorage.getItem('userEmail');
+    return this.storage.get('userEmail');
   }
 
   logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userEmail');
+    this.storage.remove('token');
+    this.storage.remove('userEmail');
     this.authVersion.update(v => v + 1);
   }
 
