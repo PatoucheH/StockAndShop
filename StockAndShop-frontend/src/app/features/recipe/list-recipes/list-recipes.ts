@@ -1,19 +1,17 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { RecipeCardComponent } from '../../../shared/components/recipe-card/recipe-card';
 import { Recipe } from '../../../shared/models/recipe.models';
-import { ProductService } from '../../../shared/services/product.service';
 import { LoadingComponent } from '../../../shared/components/loading/loading';
 import { ErrorComponent } from '../../../shared/components/error/error';
+import { RecipeFilterBarComponent } from './recipe-filter-bar/recipe-filter-bar';
+import { RecipeListItemComponent } from './recipe-list-item/recipe-list-item';
 
 @Component({
   selector: 'app-list-recipes',
-  imports: [RecipeCardComponent, FormsModule, LoadingComponent, ErrorComponent],
+  imports: [RecipeCardComponent, LoadingComponent, ErrorComponent, RecipeFilterBarComponent, RecipeListItemComponent],
   templateUrl: './list-recipes.html',
 })
 export class ListRecipesComponent {
-  productService = inject(ProductService);
-
   recipes = input<Recipe[]>([]);
   isLoading = input(false);
   hasError = input(false);
@@ -21,41 +19,28 @@ export class ListRecipesComponent {
   loadMore = output<void>();
 
   selectedRecipe = signal<Recipe | null>(null);
-  filterInput = signal('');
   activeFilters = signal<string[]>([]);
-
-  filteredSuggestions = computed(() => {
-    const search = this.filterInput().toLowerCase();
-    if (!search) return [];
-    return this.productService.allProducts().filter((p) =>
-      p.name.toLowerCase().includes(search),
-    );
-  });
 
   filteredRecipes = computed(() => {
     const filters = this.activeFilters();
     if (filters.length === 0) return this.recipes();
     return this.recipes().filter((r) =>
-      filters.every((filter) =>
-        r.ingredients.some((i) => i.productName.toLowerCase().includes(filter)),
+      filters.every((f) =>
+        r.ingredients.some((i) => i.productName.toLowerCase().includes(f)),
       ),
     );
   });
 
-  addFilter() {
-    const val = this.filterInput().trim().toLowerCase();
-    if (!val || this.activeFilters().includes(val)) return;
-    this.activeFilters.update((f) => [...f, val]);
-    this.filterInput.set('');
+  onFilterAdded(filter: string) {
+    this.activeFilters.update((f) => [...f, filter]);
   }
 
-  removeFilter(filter: string) {
+  onFilterRemoved(filter: string) {
     this.activeFilters.update((f) => f.filter((x) => x !== filter));
   }
 
-  clearFilters() {
+  onFiltersCleared() {
     this.activeFilters.set([]);
-    this.filterInput.set('');
   }
 
   openRecipe(recipe: Recipe) {

@@ -1,0 +1,44 @@
+<div class="mb-4 space-y-2">
+  <div class="flex gap-2">
+    <input type="text" [ngModel]="filterInput()" (ngModelChange)="filterInput.set($event)"
+      (keydown.enter)="addFilter()" list="ingredientsList" placeholder="Filtrer par ingrédient..."
+      class="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-sm bg-white shadow-sm
+             focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"/>
+    <datalist id="ingredientsList">
+      @for (product of filteredSuggestions(); track product.id) {
+        <option [value]="product.name"></option>
+      }
+    </datalist>
+    <button type="button" (click)="addFilter()" [disabled]="!filterInput().trim()"
+      class="px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold
+             hover:bg-green-700 transition disabled:opacity-40">
+      +
+    </button>
+  </div>
+  @if (activeFilters().length > 0) {
+    <div class="flex flex-wrap gap-1.5 items-center">
+      @for (filter of activeFilters(); track filter) {
+        <span class="flex items-center gap-1 bg-green-100 text-green-800 border border-green-300
+                     rounded-full px-3 py-0.5 text-xs font-medium">
+          {{ filter }}
+          <button type="button" (click)="removeFilter(filter)"
+                  class="text-green-600 hover:text-green-900 leading-none">✕</button>
+        </span>
+      }
+      <button type="button" (click)="clearFilters()"
+              class="text-xs text-gray-400 hover:text-red-500 ml-1 transition-colors">
+        Tout effacer
+      </button>
+    </div>
+  }
+</div>
+<p class="text-xs text-gray-400 mb-3">
+  {{ resultCount() }} recette{{ resultCount() > 1 ? 's' : '' }}
+  @if (activeFilters().length > 0) {
+    · filtrée{{ resultCount() > 1 ? 's' : '' }}
+    par
+    @for (filter of activeFilters(); track filter; let last = $last) {
+      <span class="font-medium text-green-600">"{{ filter }}"</span>{{ last ? '' : ', ' }}
+    }
+  }
+</p>
