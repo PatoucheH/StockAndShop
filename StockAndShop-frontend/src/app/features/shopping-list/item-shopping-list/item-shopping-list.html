@@ -1,6 +1,6 @@
 <div class="bg-white border border-green-100 rounded-2xl px-4 py-1.5 flex items-center justify-between
                  shadow-sm hover:shadow-md transition-all duration-200"
-     [class.bg-gray-200]="isChecked()"
+     [class.bg-gray-400]="isChecked()"
      (click)="checkedItem()">
   <div class="flex items-center gap-2" >
     <button class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
@@ -13,7 +13,7 @@
     </button>
     <div class="flex items-center gap-2 flex-wrap"
          [class.line-through]="isChecked()"
-         [class.text-gray-400]="isChecked()">
+         [class.text-gray-500]="isChecked()">
               <span class="font-medium text-sm">
                 {{ item().nameProduct }}
               </span>
