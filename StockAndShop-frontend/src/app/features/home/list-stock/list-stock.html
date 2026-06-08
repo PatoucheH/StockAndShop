@@ -31,7 +31,7 @@
                   }
                 </select>
               }
-              <button (click)="remove(s)" class="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1
+              <button (click)="confirmRemove(s)" class="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1
                 rounded transition whitespace-nowrap">
                 Retirer
               </button>
@@ -45,4 +45,12 @@
 
 @if (modalRecipe()) {
   <app-stock-recipe-modal (closed)="modalRecipe.set(false)"/>
+}
+
+@if (pendingRemoveItem()) {
+  <app-confirm-modal
+    [message]="'Retirer ' + pendingRemoveItem()!.nameProduct + ' du stock ?'"
+    confirmLabel="Retirer"
+    (confirmed)="onRemoveConfirmed()"
+    (cancelled)="pendingRemoveItem.set(null)"/>
 }

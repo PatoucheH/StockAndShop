@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { AuthResponse, LoginRequest, RegisterRequest } from '../../core/models/auth.model';
+import { AuthResponse, LoginRequest, RegisterRequest } from '../../core/models/auth.models';
 import { environment } from '../../../environments/environment';
 import { StorageService } from '../../core/services/storage.service';
 

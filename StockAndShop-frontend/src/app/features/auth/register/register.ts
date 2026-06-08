@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Router, RouterLink } from '@angular/router';
-import { RegisterRequest } from '../../../core/models/auth.model';
+import { RegisterRequest } from '../../../core/models/auth.models';
 
 function passwordMatchValidator(): ValidatorFn {
   return (group: AbstractControl): ValidationErrors | null => {

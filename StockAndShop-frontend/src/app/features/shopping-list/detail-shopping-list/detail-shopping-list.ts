@@ -8,6 +8,7 @@ import { ItemShoppingList } from '../item-shopping-list/item-shopping-list';
 import { FormAddProductShoppingList } from '../form-add-product-shopping-list/form-add-product-shopping-list';
 import { HomeService } from '../../../shared/services/home.service';
 import { LoadingComponent } from '../../../shared/components/loading/loading';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-detail-shopping-list',
@@ -20,6 +21,7 @@ export class DetailShoppingListComponent {
   homeService = inject(HomeService);
   route = inject(ActivatedRoute);
   location = inject(Location);
+  toast = inject(ToastService);
 
   id = this.route.snapshot.paramMap.get('id');
   selectedShoppingList = this.shoppingListService.selectedShoppingList;
@@ -57,8 +59,11 @@ export class DetailShoppingListComponent {
     const home = this.homeService.selectedHome();
     if (!home) return;
     this.shoppingListService.addToStockItemCheckedofShoppingList(home.id).subscribe({
-      next: () => this.homeService.stockResource.reload(),
-      error: (e) => console.error('Erreur lors de la mise à jour de la liste et du stock', e)
+      next: () => {
+        this.homeService.stockResource.reload();
+        this.toast.success('Produits ajoutés au stock');
+      },
+      error: () => this.toast.error('Impossible de mettre à jour le stock'),
     });
   }
 

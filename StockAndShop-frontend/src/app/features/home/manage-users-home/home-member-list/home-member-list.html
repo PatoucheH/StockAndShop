@@ -14,7 +14,7 @@
             {{ user.homeRole === 'OWNER' ? 'Propriétaire' : user.homeRole === 'VIEWER' ? 'Lecteur' : 'Utilisateur' }}
           </span>
           @if (isOwner() && user.homeRole !== 'OWNER') {
-            <button (click)="userRemoved.emit(user.id)"
+            <button (click)="confirmRemove(user.id)"
                     class="text-xs text-red-500 hover:text-red-700 hover:scale-110 transition-all duration-150">
               Retirer
             </button>
@@ -25,4 +25,12 @@
   </ul>
 } @else {
   <p class="text-center text-sm text-gray-400 mt-4">Aucun membre dans cette maison</p>
+}
+
+@if (pendingUserId()) {
+  <app-confirm-modal
+    message="Retirer ce membre de la maison ?"
+    confirmLabel="Retirer"
+    (confirmed)="onRemoveConfirmed()"
+    (cancelled)="pendingUserId.set(null)"/>
 }

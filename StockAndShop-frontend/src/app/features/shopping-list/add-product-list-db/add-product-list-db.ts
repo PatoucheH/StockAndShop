@@ -9,6 +9,7 @@ import { ProductItemRequest } from '../../../shared/models/productItem.models';
 import { ShoppingListService } from '../shopping-list.service';
 import { UnitConversionService } from '../../../shared/services/unit-conversion.service';
 import { UnityLabelPipe } from '../../../shared/pipes/unity-label.pipe';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-add-product-to-list',
@@ -21,6 +22,7 @@ export class AddProductListDb {
   categoryService = inject(CategoryService);
   shoppingListService = inject(ShoppingListService);
   unitConversion = inject(UnitConversionService);
+  toast = inject(ToastService);
 
   id = input.required<string>();
   closeModal = output<void>();
@@ -63,11 +65,14 @@ export class AddProductListDb {
         this.shoppingListService
           .addProductToShoppingList(productToAdd, Number(this.id()))
           .subscribe({
-            next: () => this.closeModal.emit(),
-            error: () => {},
+            next: () => {
+              this.toast.success('Produit créé et ajouté à la liste');
+              this.closeModal.emit();
+            },
+            error: () => this.toast.error("Produit créé mais impossible de l'ajouter à la liste"),
           });
       },
-      error: () => {},
+      error: () => this.toast.error('Impossible de créer le produit'),
     });
   }
 }

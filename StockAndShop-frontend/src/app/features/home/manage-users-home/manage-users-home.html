@@ -10,6 +10,7 @@
     @if (showAddForm()) {
       <app-user-search-input
         [errorMessage]="errorMessage()"
+        [excludedEmails]="existingEmails()"
         (submitted)="onUserSubmitted($event)"/>
     }
   }

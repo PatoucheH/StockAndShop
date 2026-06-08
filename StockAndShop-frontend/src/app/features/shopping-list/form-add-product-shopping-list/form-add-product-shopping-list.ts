@@ -6,6 +6,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { startWith } from 'rxjs';
 import { ShoppingListService } from '../shopping-list.service';
 import { UnitConversionService } from '../../../shared/services/unit-conversion.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-form-add-product-shopping-list',
@@ -16,6 +17,7 @@ export class FormAddProductShoppingList {
   productService = inject(ProductService);
   shoppingListService = inject(ShoppingListService);
   unitConversion = inject(UnitConversionService);
+  toast = inject(ToastService);
 
   products = this.productService.allProducts;
   id = input.required<string>();
@@ -57,6 +59,12 @@ export class FormAddProductShoppingList {
     };
     this.shoppingListService
       .addProductToShoppingList(payload, Number(this.id()))
-      .subscribe(() => this.form.reset());
+      .subscribe({
+        next: () => {
+          this.form.reset();
+          this.toast.success('Produit ajouté à la liste');
+        },
+        error: () => this.toast.error("Impossible d'ajouter le produit"),
+      });
   }
 }

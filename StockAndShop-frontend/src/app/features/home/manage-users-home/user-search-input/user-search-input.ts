@@ -19,6 +19,7 @@ export class UserSearchInputComponent {
   private homeService = inject(HomeService);
 
   errorMessage = input<string | null>(null);
+  excludedEmails = input<string[]>([]);
   submitted = output<{ user: UserSearchResult; role: 'USER' | 'VIEWER' }>();
 
   searchQuery = signal('');
@@ -42,7 +43,10 @@ export class UserSearchInputComponent {
     { initialValue: { users: [], searching: false } as SearchState }
   );
 
-  suggestions = computed(() => this.showSuggestions() ? this.searchState().users : []);
+  suggestions = computed(() => {
+    if (!this.showSuggestions()) return [];
+    return this.searchState().users.filter(u => !this.excludedEmails().includes(u.email));
+  });
   isSearching = computed(() => this.searchState().searching);
 
   onSearchInput(value: string) {

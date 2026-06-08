@@ -4,6 +4,7 @@ import { AuthService } from '../../auth/auth.service';
 import { UserSearchResult } from '../../../shared/models/user.models';
 import { UserSearchInputComponent } from './user-search-input/user-search-input';
 import { HomeMemberListComponent } from './home-member-list/home-member-list';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-manage-users-home',
@@ -14,10 +15,12 @@ import { HomeMemberListComponent } from './home-member-list/home-member-list';
 export class ManageUsersHomeComponent {
   private homeService = inject(HomeService);
   private authService = inject(AuthService);
+  private toast = inject(ToastService);
 
   users = this.homeService.users;
   home = this.homeService.selectedHome;
   isOwner = computed(() => this.home()?.ownerEmail === this.authService.getUserEmail());
+  existingEmails = computed(() => this.users().map(u => u.email));
 
   showAddForm = signal(false);
   errorMessage = signal<string | null>(null);
@@ -34,6 +37,7 @@ export class ManageUsersHomeComponent {
       next: () => {
         this.showAddForm.set(false);
         this.errorMessage.set(null);
+        this.toast.success('Utilisateur ajouté');
       },
       error: () => this.errorMessage.set("Impossible d'ajouter cet utilisateur."),
     });
@@ -42,6 +46,9 @@ export class ManageUsersHomeComponent {
   onUserRemoved(userId: string) {
     const homeId = this.home()?.id;
     if (!homeId) return;
-    this.homeService.removeUser(homeId, userId).subscribe();
+    this.homeService.removeUser(homeId, userId).subscribe({
+      next: () => this.toast.success('Membre retiré'),
+      error: () => this.toast.error('Impossible de retirer ce membre'),
+    });
   }
 }

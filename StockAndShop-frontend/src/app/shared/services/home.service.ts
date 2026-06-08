@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, linkedSignal } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Home, HomeRequest } from '../../features/home/home.model';
+import { Home, HomeRequest } from '../../features/home/home.models';
 import { Observable, skip, tap } from 'rxjs';
 import { ShoppingList } from '../../features/shopping-list/shopping-list.models';
 import { User, UserSearchResult } from '../models/user.models';

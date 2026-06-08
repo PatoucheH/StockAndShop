@@ -5,6 +5,8 @@ import { RecipeService } from '../../recipe/recipe.service';
 import { SmartUnitPipe } from '../../../shared/pipes/smart-unit.pipe';
 import { UnitConversionService } from '../../../shared/services/unit-conversion.service';
 import { StockRecipeModalComponent } from './stock-recipe-modal/stock-recipe-modal';
+import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal';
+import { ToastService } from '../../../core/services/toast.service';
 
 interface DecreaseEntry {
   amount: number;
@@ -13,16 +15,17 @@ interface DecreaseEntry {
 
 @Component({
   selector: 'app-list-stock',
-  imports: [SmartUnitPipe, StockRecipeModalComponent],
+  imports: [SmartUnitPipe, StockRecipeModalComponent, ConfirmModalComponent],
   templateUrl: './list-stock.html',
-
 })
 export class ListStock {
   homeService = inject(HomeService);
   recipeService = inject(RecipeService);
   unitConversion = inject(UnitConversionService);
+  toast = inject(ToastService);
 
   modalRecipe = signal(false);
+  pendingRemoveItem = signal<ProductStock | null>(null);
 
   groupedStock = computed(() => {
     const stock = this.homeService.stock();
@@ -65,12 +68,23 @@ export class ListStock {
     return this.unitConversion.isWeightOrVolume(unity);
   }
 
-  remove(item: ProductStock) {
+  confirmRemove(item: ProductStock) {
+    this.pendingRemoveItem.set(item);
+  }
+
+  onRemoveConfirmed() {
+    const item = this.pendingRemoveItem();
+    if (!item) return;
     const unit = this.getUnit(item.id, item.unityProduct);
     const quantity = this.unitConversion.toBaseUnit(this.getAmount(item.id), unit);
-    this.homeService.decreseStock({ name: item.nameProduct, quantity }).subscribe(() => {
-      this.homeService.stockResource.reload();
+    this.homeService.decreseStock({ name: item.nameProduct, quantity }).subscribe({
+      next: () => {
+        this.homeService.stockResource.reload();
+        this.toast.success('Stock mis à jour');
+      },
+      error: () => this.toast.error('Impossible de mettre à jour le stock'),
     });
+    this.pendingRemoveItem.set(null);
   }
 
   getRecipes() {
