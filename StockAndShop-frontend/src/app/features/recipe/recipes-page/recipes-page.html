@@ -1,0 +1,24 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="bg-gradient-to-tr from-green-700 to-teal-900 text-white px-4 py-4">
+    <h1 class="text-xl font-bold mb-3">Recettes</h1>
+    <div class="flex bg-white/20 rounded-xl p-0.5 gap-0.5">
+      <button type="button" (click)="showFavorites.set(true)"
+        class="flex-1 py-1.5 px-3 rounded-[10px] text-sm font-medium transition-all"
+        [class]="showFavorites() ? 'bg-white text-green-800' : 'text-white/80 hover:text-white'">
+        Mes favoris
+      </button>
+      <button type="button" (click)="showFavorites.set(false)"
+        class="flex-1 py-1.5 px-3 rounded-[10px] text-sm font-medium transition-all"
+        [class]="!showFavorites() ? 'bg-white text-green-800' : 'text-white/80 hover:text-white'">
+        Toutes les recettes
+      </button>
+    </div>
+  </div>
+  <app-list-recipes
+    [recipes]="currentRecipes()"
+    [isLoading]="currentIsLoading()"
+    [hasError]="currentHasError()"
+    [hasMore]="currentHasMore()"
+    (loadMore)="onLoadMore()">
+  </app-list-recipes>
+</div>

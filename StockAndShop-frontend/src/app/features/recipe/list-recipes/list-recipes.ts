@@ -1,6 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RecipeService } from '../recipe.service';
 import { RecipeCardComponent } from '../../../shared/components/recipe-card/recipe-card';
 import { Recipe } from '../../../shared/models/recipe.models';
 import { ProductService } from '../../../shared/services/product.service';
@@ -11,12 +10,13 @@ import { ProductService } from '../../../shared/services/product.service';
   templateUrl: './list-recipes.html',
 })
 export class ListRecipesComponent {
-  recipeService = inject(RecipeService);
   productService = inject(ProductService);
 
-  isLoading = this.recipeService.isLoading;
-  hasError = this.recipeService.hasError;
-  hasMore = this.recipeService.hasMore;
+  recipes = input<Recipe[]>([]);
+  isLoading = input(false);
+  hasError = input(false);
+  hasMore = input(false);
+  loadMore = output<void>();
 
   selectedRecipe = signal<Recipe | null>(null);
   filterInput = signal('');
@@ -32,8 +32,8 @@ export class ListRecipesComponent {
 
   filteredRecipes = computed(() => {
     const filters = this.activeFilters();
-    if (filters.length === 0) return this.recipeService.recipes();
-    return this.recipeService.recipes().filter((r) =>
+    if (filters.length === 0) return this.recipes();
+    return this.recipes().filter((r) =>
       filters.every((filter) =>
         r.ingredients.some((i) => i.productName.toLowerCase().includes(filter)),
       ),
@@ -54,10 +54,6 @@ export class ListRecipesComponent {
   clearFilters() {
     this.activeFilters.set([]);
     this.filterInput.set('');
-  }
-
-  loadMore() {
-    this.recipeService.loadNextPage();
   }
 
   openRecipe(recipe: Recipe) {

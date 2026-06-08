@@ -7,8 +7,6 @@ export const routes: Routes = [
     path: 'auth',
     loadChildren: () => import('./features/auth/auth.routes').then((m) => m.authRoutes),
   },
-  { path: '**', redirectTo: 'auth/login' },
-
   {
     path: '',
     component: LayoutComponent,
@@ -28,8 +26,8 @@ export const routes: Routes = [
       {
         path: 'recipes',
         loadComponent: () =>
-          import('./features/recipe/list-recipes/list-recipes')
-            .then((m) => m.ListRecipesComponent),
+          import('./features/recipe/recipes-page/recipes-page')
+            .then((m) => m.RecipesPageComponent),
       },
       {
         path: 'shopping-list/:id',
@@ -40,4 +38,5 @@ export const routes: Routes = [
       },
     ],
   },
+  { path: '**', redirectTo: 'auth/login' },
 ];

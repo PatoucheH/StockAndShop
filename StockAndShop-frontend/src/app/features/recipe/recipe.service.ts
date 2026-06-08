@@ -34,11 +34,17 @@ export class RecipeService {
     );
   }
 
+  private _favoritesResource = httpResource<Recipe[]>(() => `${this.apiUrl}/favorites`);
+
   readonly isLoading = computed(() => this._resource.isLoading());
   readonly hasError = computed(() => !!this._resource.error());
   readonly recipes = computed(() => this._allRecipes());
   readonly newRecipes = computed(() => this._newRecipes());
   readonly hasMore = computed(() => this._resource.value()?.hasMore ?? false);
+
+  readonly favoriteRecipes = computed(() => this._favoritesResource.value() ?? []);
+  readonly isFavoritesLoading = computed(() => this._favoritesResource.isLoading());
+  readonly hasFavoritesError = computed(() => !!this._favoritesResource.error());
 
   loadNextPage() {
     if (!this.hasMore() || this.isLoading()) return;
