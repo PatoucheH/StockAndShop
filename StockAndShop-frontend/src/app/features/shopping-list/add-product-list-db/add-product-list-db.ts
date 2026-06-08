@@ -8,10 +8,11 @@ import { ProductRequest } from '../../../shared/models/product.models';
 import { ProductItemRequest } from '../../../shared/models/productItem.models';
 import { ShoppingListService } from '../shopping-list.service';
 import { UnitConversionService } from '../../../shared/services/unit-conversion.service';
+import { UnityLabelPipe } from '../../../shared/pipes/unity-label.pipe';
 
 @Component({
   selector: 'app-add-product-to-list',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, UnityLabelPipe],
   templateUrl: './add-product-list-db.html',
   styleUrl: './add-product-list-db.scss',
 })

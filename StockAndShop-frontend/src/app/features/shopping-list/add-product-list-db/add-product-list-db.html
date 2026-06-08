@@ -12,26 +12,8 @@
       <label for="unity">
         Entrez l'unité de votre produit :
         <select id="unity" name="unity" formControlName="unity" required>
-          @for(unity of unities(); track $index){
-            @switch (unity){
-              @case ("MILLILITER"){
-                <option [ngValue]="unity">Millilitres</option>
-              }@case ("GRAMS"){
-                <option [ngValue]="unity">Grammes</option>
-              }@case ("JAR"){
-                <option [ngValue]="unity">Pot</option>
-              }@case ("BOTTLE"){
-                <option [ngValue]="unity">Bouteille</option>
-              }@case ("PACKET"){
-                <option [ngValue]="unity">Paquet</option>
-              }@case ("BOX"){
-                <option [ngValue]="unity">Boite</option>
-              }@case ("PIECE"){
-                <option [ngValue]="unity">Pièce</option>
-              }@default {
-                <option [ngValue]="unity">{{ unity }}</option>
-              }
-            }
+          @for (unity of unities(); track $index) {
+            <option [ngValue]="unity">{{ unity | unityLabel }}</option>
           }
         </select>
       </label>
@@ -46,12 +28,8 @@
           @if (isWeightOrVolume()) {
             <select (change)="subUnit.set($any($event.target).value)"
                     class="border border-gray-300 rounded-lg px-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-              @if (selectedUnity().toLowerCase() === 'grams') {
-                <option value="g">g</option>
-                <option value="kg">kg</option>
-              } @else {
-                <option value="ml">ml</option>
-                <option value="L">L</option>
+              @for (unit of unitConversion.getSubUnits(selectedUnity()); track unit) {
+                <option [value]="unit">{{ unit }}</option>
               }
             </select>
           }

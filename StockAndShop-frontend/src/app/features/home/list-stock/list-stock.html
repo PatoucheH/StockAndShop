@@ -26,12 +26,8 @@
               @if (isWeightOrVolume(s.unityProduct)) {
                 <select (change)="setUnit(s.id, $any($event.target).value)"
                         class="text-xs border rounded px-1 py-1 focus:outline-none focus:ring-1 focus:ring-green-400">
-                  @if (s.unityProduct.toLowerCase() === 'grams') {
-                    <option value="g">g</option>
-                    <option value="kg">kg</option>
-                  } @else {
-                    <option value="ml">ml</option>
-                    <option value="L">L</option>
+                  @for (unit of unitConversion.getSubUnits(s.unityProduct); track unit) {
+                    <option [value]="unit">{{ unit }}</option>
                   }
                 </select>
               }
