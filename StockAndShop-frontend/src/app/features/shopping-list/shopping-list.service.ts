@@ -23,8 +23,32 @@ export class ShoppingListService {
   );
   readonly loading = this.selectedShoppingListResource.isLoading;
 
+  private _favoritesResource = httpResource<ShoppingList[]>(() => `${this.apiUrl}/favorites`);
+
+  readonly favoriteShoppingLists = computed(() => this._favoritesResource.value() ?? []);
+  readonly isFavoritesLoading = computed(() => this._favoritesResource.isLoading());
+  readonly hasFavoritesError = computed(() => !!this._favoritesResource.error());
+
+  isFavorited(id: number): boolean {
+    return this.favoriteShoppingLists().some((sl) => sl.id === id);
+  }
+
   selectShoppingList(id: number) {
-    this._selectedListId.set(id);
+    if (this._selectedListId() === id) {
+      this.selectedShoppingListResource.reload();
+    } else {
+      this._selectedListId.set(id);
+    }
+  }
+
+  updateItemCheckedState(itemId: number, isChecked: boolean) {
+    this.selectedShoppingListResource.update(list => {
+      if (!list) return list;
+      return {
+        ...list,
+        products: list.products.map(p => p.id === itemId ? { ...p, isChecked } : p),
+      };
+    });
   }
 
   createShoppingList(shoppingList: ShoppingListRequest, homeId: string) {
@@ -51,5 +75,17 @@ export class ShoppingListService {
     return this.http.patch<ShoppingList>(
       `${this.apiUrl}/${this._selectedListId()}/home/${homeId}/checked-list`, {}
     ).pipe(tap((updatedList) => this.selectedShoppingListResource.update(() => updatedList)));
-  };
+  }
+
+  addToFavorite(id: number) {
+    return this.http.post(`${this.apiUrl}/${id}/favorite`, {}).pipe(
+      tap(() => this._favoritesResource.reload()),
+    );
+  }
+
+  removeFromFavorite(id: number) {
+    return this.http.delete(`${this.apiUrl}/${id}/favorite`).pipe(
+      tap(() => this._favoritesResource.reload()),
+    );
+  }
 }

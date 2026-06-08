@@ -45,9 +45,25 @@
       </label>
       <label for="quantity">
         Entrez la quantité de produit
-        <input type="number" id="quantity" name="quantity" formControlName="quantity" required
-               class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none
-             focus:ring-2 focus:ring-green-500">
+        <div class="flex gap-1 justify-center">
+          <input type="number" id="quantity" name="quantity" formControlName="quantity" required
+                 [attr.min]="isWeightOrVolume() ? '0.001' : '1'"
+                 [attr.step]="isWeightOrVolume() ? 'any' : '1'"
+                 class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none
+               focus:ring-2 focus:ring-green-500">
+          @if (isWeightOrVolume()) {
+            <select (change)="subUnit.set($any($event.target).value)"
+                    class="border border-gray-300 rounded-lg px-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+              @if (selectedUnity().toLowerCase() === 'grams') {
+                <option value="g">g</option>
+                <option value="kg">kg</option>
+              } @else {
+                <option value="ml">ml</option>
+                <option value="L">L</option>
+              }
+            </select>
+          }
+        </div>
       </label>
       <label for="category">
         Séléctionné la catégorie

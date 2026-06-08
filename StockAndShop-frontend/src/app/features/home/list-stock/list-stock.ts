@@ -4,10 +4,11 @@ import { ProductStock } from '../../../shared/models/productStock.models';
 import { RecipeService } from '../../recipe/recipe.service';
 import { RecipeCardComponent } from '../../../shared/components/recipe-card/recipe-card';
 import { Recipe } from '../../../shared/models/recipe.models';
+import { SmartUnitPipe } from '../../../shared/pipes/smart-unit.pipe';
 
 @Component({
   selector: 'app-list-stock',
-  imports: [RecipeCardComponent],
+  imports: [RecipeCardComponent, SmartUnitPipe],
   templateUrl: './list-stock.html',
   styleUrl: './list-stock.scss',
 })
@@ -33,17 +34,33 @@ export class ListStock {
   });
 
   decreaseAmounts: Record<number, number> = {};
+  decreaseUnits: Record<number, string> = {};
+
+  isWeightOrVolume(unity: string): boolean {
+    const u = unity.toLowerCase();
+    return u === 'grams' || u === 'milliliter';
+  }
 
   getAmount(id: number): number {
     return this.decreaseAmounts[id] ?? 1;
   }
 
   setAmount(id: number, val: number) {
-    this.decreaseAmounts = { ...this.decreaseAmounts, [id]: Math.max(1, val) };
+    this.decreaseAmounts = { ...this.decreaseAmounts, [id]: Math.max(0.001, val) };
+  }
+
+  getUnit(id: number, unity: string): string {
+    return this.decreaseUnits[id] ?? (unity.toLowerCase() === 'grams' ? 'g' : 'ml');
+  }
+
+  setUnit(id: number, unit: string) {
+    this.decreaseUnits = { ...this.decreaseUnits, [id]: unit };
   }
 
   remove(item: ProductStock) {
-    const quantity = this.getAmount(item.id);
+    let quantity = this.getAmount(item.id);
+    const unit = this.getUnit(item.id, item.unityProduct);
+    if (unit === 'kg' || unit === 'L') quantity = Math.round(quantity * 1000);
     this.homeService.decreseStock({ name: item.nameProduct, quantity }).subscribe(() => {
       this.homeService.stockResource.reload();
     });

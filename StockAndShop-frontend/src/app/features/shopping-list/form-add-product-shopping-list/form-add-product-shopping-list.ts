@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProductItemRequest } from '../../../shared/models/productItem.models';
 import { ProductService } from '../../../shared/services/product.service';
@@ -20,9 +20,11 @@ export class FormAddProductShoppingList {
 
   id = input.required<string>();
 
+  subUnit = signal<string>('g');
+
   form = new FormGroup({
     nameProduct: new FormControl('', Validators.required),
-    quantity: new FormControl<number | null>(null, [Validators.required, Validators.min(1)]),
+    quantity: new FormControl<number | null>(null, [Validators.required, Validators.min(0.001)]),
   });
 
   nameProduct = toSignal(this.form.controls.nameProduct.valueChanges.pipe(startWith('')), {
@@ -40,14 +42,26 @@ export class FormAddProductShoppingList {
     return this.products().filter((product) => product.name.toLowerCase().includes(search));
   });
 
+  isWeightOrVolume = computed(() => {
+    const u = this.selectedProduct()?.unity?.toLowerCase() ?? '';
+    return u === 'grams' || u === 'milliliter';
+  });
+
+  _ = effect(() => {
+    const u = this.selectedProduct()?.unity?.toLowerCase() ?? '';
+    this.subUnit.set(u === 'milliliter' ? 'ml' : 'g');
+  });
+
   addProduct() {
     if (this.form.invalid || !this.selectedProduct()) return;
-    const payload = {
-      name: this.form.value.nameProduct,
-      quantity: this.form.value.quantity,
+    let quantity = Number(this.form.value.quantity);
+    if (this.subUnit() === 'kg' || this.subUnit() === 'L') quantity = Math.round(quantity * 1000);
+    const payload: ProductItemRequest = {
+      name: this.form.value.nameProduct!,
+      quantity,
     };
     this.shoppingListService
-      .addProductToShoppingList(<ProductItemRequest>payload, Number(this.id()))
+      .addProductToShoppingList(payload, Number(this.id()))
       .subscribe(() => this.form.reset());
   }
 }

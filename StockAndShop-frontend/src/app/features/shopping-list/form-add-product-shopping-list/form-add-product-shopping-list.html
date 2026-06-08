@@ -10,11 +10,24 @@
   @let currentProduct = selectedProduct();
   @if (currentProduct) {
     <div class="flex items-center gap-1">
-      <input type="number" formControlName="quantity" min="1"
+      <input type="number" formControlName="quantity"
+             [attr.min]="isWeightOrVolume() ? '0.001' : '1'"
+             [attr.step]="isWeightOrVolume() ? 'any' : '1'"
              class="w-12 border border-green-200 rounded-lg px-2 py-1 text-sm outline-none" />
-      <span class="text-xs text-gray-500 whitespace-nowrap">
-              {{ currentProduct.unity }}
-      </span>
+      @if (isWeightOrVolume()) {
+        <select (change)="subUnit.set($any($event.target).value)"
+                class="text-xs border border-green-200 rounded px-1 py-1 outline-none">
+          @if (currentProduct.unity.toLowerCase() === 'grams') {
+            <option value="g">g</option>
+            <option value="kg">kg</option>
+          } @else {
+            <option value="ml">ml</option>
+            <option value="L">L</option>
+          }
+        </select>
+      } @else {
+        <span class="text-xs text-gray-500 whitespace-nowrap">{{ currentProduct.unity }}</span>
+      }
     </div>
   }
   <button type="submit" [disabled]="form.invalid || !currentProduct"

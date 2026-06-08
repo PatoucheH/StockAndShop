@@ -1,0 +1,34 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="bg-gradient-to-tr from-green-700 to-teal-900 text-white px-4 py-4">
+    <h1 class="text-xl font-bold">Listes de courses favorites</h1>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-20">
+      <p class="text-green-800 font-semibold animate-pulse">Chargement...</p>
+    </div>
+  } @else if (hasError()) {
+    <div class="flex justify-center items-center py-20">
+      <p class="text-red-500">Erreur lors du chargement des favoris.</p>
+    </div>
+  } @else if (favoriteShoppingLists().length === 0) {
+    <div class="flex justify-center items-center py-20">
+      <p class="text-gray-500">Aucune liste de courses en favori.</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+      @for (sl of favoriteShoppingLists(); track sl.id) {
+        <div class="p-6 rounded-xl shadow-md text-center bg-white hover:shadow-xl transition cursor-pointer"
+             [routerLink]="['/shopping-list', sl.id]">
+          <p class="text-lg font-semibold">{{ sl.name }}</p>
+          <p class="text-xs text-gray-500 mt-1">{{ sl.description }}</p>
+          <button
+            (click)="$event.stopPropagation(); removeFromFavorite(sl.id)"
+            class="mt-4 text-sm text-yellow-500 hover:text-yellow-700 hover:underline transition">
+            Retirer des favoris
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>

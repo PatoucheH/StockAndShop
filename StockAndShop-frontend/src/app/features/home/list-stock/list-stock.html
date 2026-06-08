@@ -16,11 +16,25 @@
             <div class="flex items-center gap-2 px-3 py-2 text-sm">
               <span class="flex-1 text-gray-800 font-medium">{{ s.nameProduct }}</span>
               <div class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-md whitespace-nowrap">
-                {{ s.quantity }} {{ s.unityProduct }}
+                {{ s.quantity | smartUnit:s.unityProduct }}
               </div>
               <input type="number" [value]="getAmount(s.id)" (input)="setAmount(s.id, +$any($event.target).value)"
-                     min="1" class="w-14 border rounded px-1 py-1 text-center text-xs focus:outline-none focus:ring-1
+                     [attr.min]="isWeightOrVolume(s.unityProduct) ? '0.001' : '1'"
+                     [attr.step]="isWeightOrVolume(s.unityProduct) ? 'any' : '1'"
+                     class="w-14 border rounded px-1 py-1 text-center text-xs focus:outline-none focus:ring-1
                      focus:ring-green-400"/>
+              @if (isWeightOrVolume(s.unityProduct)) {
+                <select (change)="setUnit(s.id, $any($event.target).value)"
+                        class="text-xs border rounded px-1 py-1 focus:outline-none focus:ring-1 focus:ring-green-400">
+                  @if (s.unityProduct.toLowerCase() === 'grams') {
+                    <option value="g">g</option>
+                    <option value="kg">kg</option>
+                  } @else {
+                    <option value="ml">ml</option>
+                    <option value="L">L</option>
+                  }
+                </select>
+              }
               <button (click)="remove(s)" class="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1
               rounded transition whitespace-nowrap">
                 Retirer

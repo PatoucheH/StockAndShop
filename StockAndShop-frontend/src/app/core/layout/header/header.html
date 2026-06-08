@@ -4,6 +4,11 @@
     <ul class="text-white flex gap-6">
       <li><a routerLink="/" class="hover:text-green-200 transition-colors">Accueil</a></li>
       <li><a routerLink="/recipes" class="hover:text-green-200 transition-colors">Recettes</a></li>
+      <li>
+        <a routerLink="/shopping-list/favorites" class="hover:text-green-200 transition-colors">
+          Mes listes de courses
+        </a>
+      </li>
     </ul>
   </nav>
 
@@ -14,8 +19,21 @@
   @if (isMenuOpen()) {
     <nav class="absolute top-[75px] left-0 w-full bg-gradient-to-bl from-teal-900 to-green-700 sm:hidden z-50">
       <ul class="flex flex-col text-white p-4 gap-4">
-        <li><a routerLink="/" (click)="isMenuOpen.set(false)" class="hover:text-green-200 transition-colors">Accueil</a></li>
-        <li><a routerLink="/recipes" (click)="isMenuOpen.set(false)" class="hover:text-green-200 transition-colors">Recettes</a></li>
+        <li>
+          <a routerLink="/" (click)="isMenuOpen.set(false)" class="hover:text-green-200 transition-colors">
+            Accueil
+          </a>
+        </li>
+        <li>
+          <a routerLink="/recipes" (click)="isMenuOpen.set(false)" class="hover:text-green-200 transition-colors">
+            Recettes
+          </a>
+        </li>
+        <li>
+          <a routerLink="/shopping-list/favorites" (click)="isMenuOpen.set(false)" class="hover:text-green-200 transition-colors">
+            Mes listes de courses
+          </a>
+        </li>
       </ul>
     </nav>
   }

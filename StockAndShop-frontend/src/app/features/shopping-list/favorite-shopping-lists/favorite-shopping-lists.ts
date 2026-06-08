@@ -1,0 +1,20 @@
+import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { ShoppingListService } from '../shopping-list.service';
+
+@Component({
+  selector: 'app-favorite-shopping-lists',
+  imports: [RouterLink],
+  templateUrl: './favorite-shopping-lists.html',
+})
+export class FavoriteShoppingListsComponent {
+  shoppingListService = inject(ShoppingListService);
+
+  favoriteShoppingLists = this.shoppingListService.favoriteShoppingLists;
+  isLoading = this.shoppingListService.isFavoritesLoading;
+  hasError = this.shoppingListService.hasFavoritesError;
+
+  removeFromFavorite(id: number) {
+    this.shoppingListService.removeFromFavorite(id).subscribe();
+  }
+}

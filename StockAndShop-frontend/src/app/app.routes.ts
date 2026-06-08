@@ -30,6 +30,12 @@ export const routes: Routes = [
             .then((m) => m.RecipesPageComponent),
       },
       {
+        path: 'shopping-list/favorites',
+        loadComponent: () =>
+          import('./features/shopping-list/favorite-shopping-lists/favorite-shopping-lists')
+            .then((m) => m.FavoriteShoppingListsComponent),
+      },
+      {
         path: 'shopping-list/:id',
         loadComponent: () =>
           import('./features/shopping-list/detail-shopping-list/detail-shopping-list')

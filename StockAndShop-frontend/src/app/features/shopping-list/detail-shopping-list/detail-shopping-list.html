@@ -6,9 +6,21 @@
   </div>
 } @else if (selectedShoppingList(); as list) {
   <section class="max-w-4xl mx-auto px-4 py-4">
-    <h2 class="text-2xl text-center mb-3 font-bold text-green-900">
-      {{ list.name }}
-    </h2>
+    <div class="flex flex-row justify-center items-center gap-4 mb-4">
+      <h2 class="text-2xl text-center font-bold text-green-900">
+        {{ list.name }}
+      </h2>
+      @if (list.id) {
+      <button
+        (click)="toggleFavorite(list.id)"
+        class="min-[350px]:text-xs text-[10px] font-semibold py-2 px-4 rounded-2xl hover:scale-[1.01] transition-all duration-200"
+        [class]="shoppingListService.isFavorited(list.id)
+                ? 'bg-yellow-400 text-white'
+                : 'bg-white text-yellow-500 border border-yellow-400'">
+        {{ shoppingListService.isFavorited(list.id) ? '★ ' : '☆ ' }}
+      </button>
+      }
+    </div>
     <div class="flex flex-row justify-between mb-6">
       <div class="flex items-center sm:gap-3">
         <button (click)="location.back()"
@@ -18,11 +30,13 @@
           Retour
         </button>
       </div>
-      <button class="min-[350px]:text-xs text-[10px] bg-gradient-to-r from-teal-900 to-green-700 text-white font-semibold
+      <div class="flex items-center gap-2">
+        <button class="min-[350px]:text-xs text-[10px] bg-gradient-to-r from-teal-900 to-green-700 text-white font-semibold
                py-2 px-4 rounded-2xl hover:scale-[1.01] transition-all duration-200"
-        (click)="addToStockItemChecked()">
-        Ajouter au stock les produits check
-      </button>
+          (click)="addToStockItemChecked()">
+          Ajouter au stock les produits check
+        </button>
+      </div>
     </div>
     <div class="flex flex-col gap-4">
       @for (group of groupedProducts(); track group.category) {

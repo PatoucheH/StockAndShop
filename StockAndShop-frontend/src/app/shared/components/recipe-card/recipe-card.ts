@@ -12,7 +12,10 @@ export class RecipeCardComponent {
   recipe = input.required<Recipe>();
   close = output<void>();
 
-  addToFavoriteRecipe(recipeId: string){
-    this.recipeService.addToFavoriteRecipe(recipeId);
+  toggleFavorite(recipeId: string) {
+    const action = this.recipeService.isFavorited(recipeId)
+      ? this.recipeService.removeFromFavoriteRecipe(recipeId)
+      : this.recipeService.addToFavoriteRecipe(recipeId);
+    action.subscribe();
   }
 }

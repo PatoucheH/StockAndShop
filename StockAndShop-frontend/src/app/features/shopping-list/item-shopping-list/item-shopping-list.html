@@ -19,8 +19,7 @@
                 {{ item().nameProduct }}
               </span>
       <span class="text-xs text-gray-500">
-        {{ item().quantity }}
-        {{ item().unityProduct }}
+        {{ item().quantity | smartUnit:item().unityProduct }}
       </span>
     </div>
   </div>

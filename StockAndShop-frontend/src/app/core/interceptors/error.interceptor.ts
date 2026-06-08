@@ -1,6 +1,8 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
+import { AuthService } from '../../features/auth/auth.service';
 import { ToastService } from '../services/toast.service';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
@@ -9,9 +11,16 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   const toast = inject(ToastService);
+  const auth = inject(AuthService);
+  const router = inject(Router);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        auth.logout();
+        router.navigate(['/auth/login']);
+        return throwError(() => error);
+      }
       toast.error(extractErrorMessage(error));
       return throwError(() => error);
     })

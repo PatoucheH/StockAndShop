@@ -56,10 +56,18 @@ export class DetailShoppingListComponent {
   }
 
   addToStockItemChecked(){
-    const homeId : string = this.homeService.selectedHome()!.id;
-    this.shoppingListService.addToStockItemCheckedofShoppingList(homeId).subscribe({
-      next: data => {},
+    const home = this.homeService.selectedHome();
+    if (!home) return;
+    this.shoppingListService.addToStockItemCheckedofShoppingList(home.id).subscribe({
+      next: () => this.homeService.stockResource.reload(),
       error: (e) => console.error('Erreur lors de la mise à jour de la liste et du stock', e)
     });
-  };
+  }
+
+  toggleFavorite(id: number) {
+    const action = this.shoppingListService.isFavorited(id)
+      ? this.shoppingListService.removeFromFavorite(id)
+      : this.shoppingListService.addToFavorite(id);
+    action.subscribe();
+  }
 }

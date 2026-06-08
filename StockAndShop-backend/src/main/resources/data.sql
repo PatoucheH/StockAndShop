@@ -29,12 +29,12 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Produits
 INSERT INTO product (id, name, unity, category_id, created_at, updated_at) VALUES
-    (1, 'lait',          'LITER',     1, NOW(), NOW()),
-    (2, 'farine',        'KILOGRAMS', 2, NOW(), NOW()),
-    (3, 'yaourt nature', 'TUB',       1, NOW(), NOW()),
-    (4, 'jus d''orange', 'LITER',     4, NOW(), NOW()),
+    (1, 'lait',          'MILLILITER',     1, NOW(), NOW()),
+    (2, 'farine',        'GRAMS', 2, NOW(), NOW()),
+    (3, 'yaourt nature', 'PACKET',       1, NOW(), NOW()),
+    (4, 'jus d''orange', 'MILLILITER',     4, NOW(), NOW()),
     (5, 'pâtes',         'PACKET',    2, NOW(), NOW()),
-    (6, 'riz',           'KILOGRAMS', 2, NOW(), NOW()),
+    (6, 'riz',           'GRAMS', 2, NOW(), NOW()),
     (7, 'sauce tomate',  'JAR',       3, NOW(), NOW()),
     (8, 'eau minérale',  'BOTTLE',    4, NOW(), NOW())
 ON CONFLICT (id) DO NOTHING;

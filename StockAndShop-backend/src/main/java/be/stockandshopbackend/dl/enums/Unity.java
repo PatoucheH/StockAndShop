@@ -6,12 +6,9 @@ import lombok.Getter;
 public enum Unity {
     OTHER("other"),
     PIECE("piece"),
-    MILLILITERS("milliliters"),
-    LITER("liter"),
+    MILLILITER("milliliter"),
     GRAMS("grams"),
-    KILOGRAMS("kilograms"),
     JAR("jar"),
-    TUB("tub"),
     BOTTLE("bottle"),
     PACKET("packet"),
     BOX("box");

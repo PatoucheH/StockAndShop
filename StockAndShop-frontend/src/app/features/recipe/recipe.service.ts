@@ -2,6 +2,7 @@ import { computed, effect, inject, Injectable, signal, untracked } from '@angula
 import { HttpClient, httpResource } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { PagedRecipeResponse, Recipe } from '../../shared/models/recipe.models';
+import { tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class RecipeService {
@@ -46,6 +47,10 @@ export class RecipeService {
   readonly isFavoritesLoading = computed(() => this._favoritesResource.isLoading());
   readonly hasFavoritesError = computed(() => !!this._favoritesResource.error());
 
+  isFavorited(id: string): boolean {
+    return this.favoriteRecipes().some((r) => r.id === id);
+  }
+
   loadNextPage() {
     if (!this.hasMore() || this.isLoading()) return;
     this._page.update((p) => p + 1);
@@ -57,9 +62,15 @@ export class RecipeService {
     });
   }
 
-  addToFavoriteRecipe(recipeId: string){
-    this.http.post(`${this.apiUrl}/${recipeId}/favorite`, {}).subscribe((recipe) => {
-      console.log(`add to favorite recipe ${recipeId}`);
-    });
+  addToFavoriteRecipe(recipeId: string) {
+    return this.http.post(`${this.apiUrl}/${recipeId}/favorite`, {}).pipe(
+      tap(() => this._favoritesResource.reload()),
+    );
+  }
+
+  removeFromFavoriteRecipe(recipeId: string) {
+    return this.http.delete(`${this.apiUrl}/${recipeId}/favorite`).pipe(
+      tap(() => this._favoritesResource.reload()),
+    );
   }
 }
