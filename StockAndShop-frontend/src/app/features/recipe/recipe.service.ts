@@ -1,4 +1,4 @@
-import { computed, effect, inject, Injectable, signal, untracked } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { PagedRecipeResponse, Recipe } from '../../shared/models/recipe.models';
@@ -30,8 +30,7 @@ export class RecipeService {
         if (this._resource.isLoading()) return;
         const response = this._resource.value();
         if (!response) return;
-        const page = untracked(() => this._page());
-        if (page === 0) {
+        if (this._page() === 0) {
           this._allRecipes.set(response.recipes);
         } else {
           this._allRecipes.update((prev) => [...prev, ...response.recipes]);

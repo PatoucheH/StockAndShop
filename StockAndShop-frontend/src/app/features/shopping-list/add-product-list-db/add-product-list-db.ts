@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { startWith } from 'rxjs';
@@ -14,7 +14,6 @@ import { UnityLabelPipe } from '../../../shared/pipes/unity-label.pipe';
   selector: 'app-add-product-to-list',
   imports: [ReactiveFormsModule, UnityLabelPipe],
   templateUrl: './add-product-list-db.html',
-
 })
 export class AddProductListDb {
   fb = inject(FormBuilder);
@@ -36,17 +35,13 @@ export class AddProductListDb {
     category: this.fb.nonNullable.control('', Validators.required),
   });
 
-  subUnit = signal<string>('g');
-
   selectedUnity = toSignal(this.form.controls.unity.valueChanges.pipe(startWith('')), {
     initialValue: '',
   });
 
   isWeightOrVolume = computed(() => this.unitConversion.isWeightOrVolume(this.selectedUnity()));
 
-  _ = effect(() => {
-    this.subUnit.set(this.unitConversion.getDefaultSubUnit(this.selectedUnity()));
-  });
+  subUnit = linkedSignal(() => this.unitConversion.getDefaultSubUnit(this.selectedUnity()));
 
   submit() {
     if (this.form.invalid) return;
