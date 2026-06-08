@@ -1,9 +1,11 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, linkedSignal } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { ProductItemRequest } from '../../shared/models/productItem.models';
-import { tap } from 'rxjs';
+import { skip, tap } from 'rxjs';
 import { ShoppingList, ShoppingListRequest } from './shopping-list.models';
+import { AuthService } from '../auth/auth.service';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root',
@@ -11,8 +13,12 @@ import { ShoppingList, ShoppingListRequest } from './shopping-list.models';
 export class ShoppingListService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/shopping-list`;
+  private authService = inject(AuthService);
 
-  private _selectedListId = signal<number | undefined>(undefined);
+  private _selectedListId = linkedSignal<number | undefined>(() => {
+    this.authService.authVersion();
+    return undefined;
+  });
 
   readonly selectedShoppingListResource = httpResource<ShoppingList>(() =>
     this._selectedListId() !== undefined ? `${this.apiUrl}/${this._selectedListId()}` : undefined,
@@ -23,7 +29,10 @@ export class ShoppingListService {
   );
   readonly loading = this.selectedShoppingListResource.isLoading;
 
-  private _favoritesResource = httpResource<ShoppingList[]>(() => `${this.apiUrl}/favorites`);
+  private _favoritesResource = httpResource<ShoppingList[]>(() => {
+    this.authService.authVersion();
+    return this.authService.isLoggedIn() ? `${this.apiUrl}/favorites` : undefined;
+  });
 
   readonly favoriteShoppingLists = computed(() => this._favoritesResource.value() ?? []);
   readonly isFavoritesLoading = computed(() => this._favoritesResource.isLoading());
@@ -31,6 +40,15 @@ export class ShoppingListService {
 
   isFavorited(id: number): boolean {
     return this.favoriteShoppingLists().some((sl) => sl.id === id);
+  }
+
+  constructor() {
+    toObservable(this.authService.authVersion).pipe(skip(1), takeUntilDestroyed()).subscribe(() => {
+      this._selectedListId.set(undefined);
+      if (this.authService.isLoggedIn()) {
+        this._favoritesResource.reload();
+      }
+    });
   }
 
   selectShoppingList(id: number) {

@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../../core/models/auth.model';
 import { environment } from '../../../environments/environment';
@@ -8,6 +8,8 @@ export class AuthService {
 
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/auth`;
+
+  readonly authVersion = signal(0);
 
   login(body: LoginRequest) {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, body);
@@ -20,6 +22,7 @@ export class AuthService {
   saveToken(token: string, email: string) {
     localStorage.setItem('token', token);
     localStorage.setItem('userEmail', email);
+    this.authVersion.update(v => v + 1);
   }
 
   getToken() {
@@ -33,6 +36,7 @@ export class AuthService {
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('userEmail');
+    this.authVersion.update(v => v + 1);
   }
 
   isLoggedIn() {

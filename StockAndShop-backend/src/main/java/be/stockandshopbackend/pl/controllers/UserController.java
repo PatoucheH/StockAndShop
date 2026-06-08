@@ -30,6 +30,14 @@ public class UserController {
         );
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<UserResponse>> search(@RequestParam String query){
+        return ResponseEntity.ok(userService.searchByQuery(query).stream()
+                .map(UserResponse::fromUser)
+                .toList()
+        );
+    }
+
     //endregion
 
     //region ADD / REMOVE

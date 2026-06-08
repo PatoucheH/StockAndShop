@@ -8,11 +8,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 public class UserHomeResponse {
+    UUID id;
     String name;
     String email;
     String homeRole;
@@ -20,6 +22,7 @@ public class UserHomeResponse {
 
     public static UserHomeResponse fromUserHome(UserHome u) {
         return new UserHomeResponse(
+                u.getUser().getId(),
                 u.getUser().getDisplayName(),
                 u.getUser().getUsername(),
                 u.getHomeRole().toString(),

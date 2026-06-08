@@ -1,11 +1,13 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, linkedSignal } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Home, HomeRequest } from '../../features/home/home.model';
-import { tap } from 'rxjs';
+import { Observable, skip, tap } from 'rxjs';
 import { ShoppingList } from '../../features/shopping-list/shopping-list.models';
-import { User } from '../models/user.models';
+import { User, UserSearchResult } from '../models/user.models';
 import { ProductStock, ProductStockDecrese } from '../models/productStock.models';
+import { AuthService } from '../../features/auth/auth.service';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root',
@@ -13,9 +15,17 @@ import { ProductStock, ProductStockDecrese } from '../models/productStock.models
 export class HomeService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/home`;
+  private authService = inject(AuthService);
 
-  private _selectedHomeId = signal<string | undefined>(undefined);
-  readonly homesResource = httpResource<Home[]>(() => `${this.apiUrl}`);
+  private _selectedHomeId = linkedSignal<string | undefined>(() => {
+    this.authService.authVersion();
+    return undefined;
+  });
+
+  readonly homesResource = httpResource<Home[]>(() => {
+    this.authService.authVersion();
+    return this.authService.isLoggedIn() ? `${this.apiUrl}` : undefined;
+  });
 
   readonly selectedHomeResource = httpResource<Home>(
     () => this._selectedHomeId() ? `${this.apiUrl}/${this._selectedHomeId()}` : undefined,
@@ -44,6 +54,15 @@ export class HomeService {
   readonly users = computed(() => this.usersResource.value() ?? []);
   readonly stock = computed(() => this.stockResource.value() ?? []);
 
+  constructor() {
+    toObservable(this.authService.authVersion).pipe(skip(1), takeUntilDestroyed()).subscribe(() => {
+      this._selectedHomeId.set(undefined);
+      if (this.authService.isLoggedIn()) {
+        this.homesResource.reload();
+      }
+    });
+  }
+
   selectHome(id: string) {
     this._selectedHomeId.set(id);
   }
@@ -63,7 +82,17 @@ export class HomeService {
     return this.http.put(`${this.apiUrl}/${this._selectedHomeId()}/decrease-stock`, productStock);
   }
 
-  addUser(){
+  searchUsers(query: string): Observable<UserSearchResult[]> {
+    return this.http.get<UserSearchResult[]>(`${environment.apiUrl}/user/search`, { params: { query } });
+  }
 
+  addUser(homeId: string, email: string, role: 'USER' | 'VIEWER') {
+    return this.http.post<User>(`${this.apiUrl}/${homeId}/add-user`, { email, role })
+      .pipe(tap(() => this.usersResource.reload()));
+  }
+
+  removeUser(homeId: string, userId: string) {
+    return this.http.delete(`${this.apiUrl}/${homeId}/delete-user`, { params: { userId } })
+      .pipe(tap(() => this.usersResource.reload()));
   }
 }

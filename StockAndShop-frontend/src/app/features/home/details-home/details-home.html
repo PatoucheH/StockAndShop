@@ -28,17 +28,10 @@
     </div>
   </div>
   <div class="w-full">
-    @let userList = users();
     @let stockList = stock();
     @let shoppingListData = shoppingLists();
     @if (view() == "user") {
-      @if (userList.length > 0) {
-        @for (user of userList; track user.id) {
-          <p>{{ user.name }} | {{ user.email }}</p>
-        }
-      } @else {
-        <p class="text-center">Pas d'utilisateur disponible dans cette maison</p>
-      }
+      <app-manage-users-home />
     } @else if (view() == "stock") {
       @if (stockList.length > 0) {
         <app-list-stock></app-list-stock>

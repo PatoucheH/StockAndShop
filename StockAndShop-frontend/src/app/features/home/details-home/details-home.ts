@@ -6,10 +6,11 @@ import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/
 import { ListShoppingListComponent } from '../../shopping-list/list-shoppingList/list-shopping-list';
 import { AddShoppingListComponent } from '../../shopping-list/add-shopping-list/add-shopping-list';
 import { ListStock } from '../list-stock/list-stock';
+import { ManageUsersHomeComponent } from '../manage-users-home/manage-users-home';
 
 @Component({
   selector: 'app-details-home',
-  imports: [ConfirmModalComponent, ListShoppingListComponent, AddShoppingListComponent, ListStock],
+  imports: [ConfirmModalComponent, ListShoppingListComponent, AddShoppingListComponent, ListStock, ManageUsersHomeComponent],
   templateUrl: './details-home.html',
   styleUrl: './details-home.scss',
 })
@@ -21,7 +22,6 @@ export class DetailsHomeComponent implements OnInit {
 
   home = this.homeService.selectedHome;
   shoppingLists = this.homeService.shoppingLists;
-  users = this.homeService.users;
   stock = this.homeService.stock;
 
   view = linkedSignal<'list' | 'stock' | 'user'>(() => {

@@ -9,6 +9,7 @@ import be.stockandshopbackend.dl.entities.User;
 import be.stockandshopbackend.dl.entities.UserHome;
 import be.stockandshopbackend.dl.enums.HomeRole;
 import be.stockandshopbackend.pl.DTOs.Response.*;
+import be.stockandshopbackend.pl.DTOs.requests.AddUserToHomeRequest;
 import be.stockandshopbackend.pl.DTOs.requests.HomeRequest;
 import be.stockandshopbackend.pl.DTOs.requests.ProductItemRequest;
 import be.stockandshopbackend.pl.DTOs.requests.ShoppingListRequest;
@@ -101,9 +102,10 @@ public class HomeController {
     @PreAuthorize("@homeSecurity.isOwner(#id, authentication.principal)")
     public ResponseEntity<UserHomeResponse> addUser(
             @PathVariable UUID id,
-            @RequestParam UUID userId
+            @RequestBody @Valid AddUserToHomeRequest req
     ){
-        UserHome userHome = new UserHome(userService.findById(userId), HomeRole.USER);
+        HomeRole role = (req.role() == null || req.role() == HomeRole.OWNER) ? HomeRole.USER : req.role();
+        UserHome userHome = new UserHome(userService.findByEmail(req.email()), role);
         homeService.addUserHome(id, userHome);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 UserHomeResponse.fromUserHome(userHome)

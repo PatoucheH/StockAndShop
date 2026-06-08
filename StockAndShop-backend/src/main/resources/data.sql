@@ -21,10 +21,14 @@ ON CONFLICT (user_id, role_id) DO NOTHING;
 
 -- Catégories
 INSERT INTO category (id, name, description, created_at, updated_at) VALUES
-    (1, 'produits laitiers', 'Lait, yaourts, fromages...', NOW(), NOW()),
+    (1, 'autres',          'Autres', NOW(), NOW()),
     (2, 'épicerie',          'Pâtes, riz, farine...', NOW(), NOW()),
     (3, 'conserves',         'Sauces, bocaux...', NOW(), NOW()),
-    (4, 'boissons',          'Eau, jus, sodas...', NOW(), NOW())
+    (4, 'boissons',          'Eau, jus, sodas...', NOW(), NOW()),
+    (5, 'boulangerie',          'Pain, viennoiseries, baguette, ...', NOW(), NOW()),
+    (6, 'produits laitiers', 'Lait, yaourts, fromages...', NOW(), NOW())
+
+
 ON CONFLICT (id) DO NOTHING;
 
 -- Produits

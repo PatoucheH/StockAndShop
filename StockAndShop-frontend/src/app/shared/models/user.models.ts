@@ -4,3 +4,9 @@ export interface User{
   email: string,
   homeRole: string | null
 }
+
+export interface UserSearchResult {
+  id: string,
+  name: string,
+  email: string,
+}

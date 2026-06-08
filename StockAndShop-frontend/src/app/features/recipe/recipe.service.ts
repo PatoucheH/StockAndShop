@@ -2,21 +2,27 @@ import { computed, effect, inject, Injectable, signal, untracked } from '@angula
 import { HttpClient, httpResource } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { PagedRecipeResponse, Recipe } from '../../shared/models/recipe.models';
-import { tap } from 'rxjs';
+import { skip, tap } from 'rxjs';
+import { AuthService } from '../auth/auth.service';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 
 @Injectable({ providedIn: 'root' })
 export class RecipeService {
   private apiUrl = `${environment.apiUrl}/recipe`;
   private http = inject(HttpClient);
+  private authService = inject(AuthService);
   private readonly pageSize = 50;
 
   private _page = signal(0);
   private _allRecipes = signal<Recipe[]>([]);
   private _newRecipes = signal<Recipe[]>([]);
 
-  private _resource = httpResource<PagedRecipeResponse>(() =>
-    `${this.apiUrl}?page=${this._page()}&size=${this.pageSize}`,
-  );
+  private _resource = httpResource<PagedRecipeResponse>(() => {
+    this.authService.authVersion();
+    return this.authService.isLoggedIn()
+      ? `${this.apiUrl}?page=${this._page()}&size=${this.pageSize}`
+      : undefined;
+  });
 
   constructor() {
     effect(
@@ -33,9 +39,18 @@ export class RecipeService {
       },
       { allowSignalWrites: true },
     );
+
+    toObservable(this.authService.authVersion).pipe(skip(1), takeUntilDestroyed()).subscribe(() => {
+      if (this.authService.isLoggedIn()) {
+        this._favoritesResource.reload();
+      }
+    });
   }
 
-  private _favoritesResource = httpResource<Recipe[]>(() => `${this.apiUrl}/favorites`);
+  private _favoritesResource = httpResource<Recipe[]>(() => {
+    this.authService.authVersion();
+    return this.authService.isLoggedIn() ? `${this.apiUrl}/favorites` : undefined;
+  });
 
   readonly isLoading = computed(() => this._resource.isLoading());
   readonly hasError = computed(() => !!this._resource.error());
