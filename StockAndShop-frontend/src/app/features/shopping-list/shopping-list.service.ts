@@ -89,6 +89,15 @@ export class ShoppingListService {
       .pipe(tap((updatedList) => this.selectedShoppingListResource.update(() => updatedList)));
   }
 
+  deleteProductFromShoppingList(productId: number) {
+    return this.http
+      .delete(`${this.apiUrl}/${this._selectedListId()}/remove-product/${productId}`)
+      .pipe(tap(() => this.selectedShoppingListResource.update(list => {
+        if (!list) return list;
+        return { ...list, products: list.products.filter(p => p.id !== productId) };
+      })));
+  }
+
   addToStockItemCheckedofShoppingList(homeId: string) {
     return this.http.patch<ShoppingList>(
       `${this.apiUrl}/${this._selectedListId()}/home/${homeId}/checked-list`, {}

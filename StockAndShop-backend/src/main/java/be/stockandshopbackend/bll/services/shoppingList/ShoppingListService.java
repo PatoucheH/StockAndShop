@@ -21,5 +21,5 @@ public interface ShoppingListService {
 
     /// DELETE
     void deleteById(Long id);
-    void removeProductFromList(Long shoppingListId, String productName);
+    void removeProductFromList(Long shoppingListId, int productId);
 }

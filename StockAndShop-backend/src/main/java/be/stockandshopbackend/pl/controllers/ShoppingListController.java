@@ -81,11 +81,11 @@ public class ShoppingListController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{id}/remove-product")
+    @DeleteMapping("/{id}/remove-product/{productId}")
     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
-    public ResponseEntity<?> removeItemFromToShoppingList(@PathVariable Long id,
-                                                          @RequestParam String name){
-        shoppingListService.removeProductFromList(id, name);
+    public ResponseEntity<?> removeItemFromShoppingList(@PathVariable Long id,
+                                                          @PathVariable int productId){
+        shoppingListService.removeProductFromList(id, productId);
         return ResponseEntity.noContent().build();
     }
 

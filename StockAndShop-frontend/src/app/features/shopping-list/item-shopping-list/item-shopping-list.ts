@@ -29,4 +29,9 @@ export class ItemShoppingList {
       error: (e) => console.error('Erreur lors de la mise à jour du product', e),
     });
   }
+
+  deleteItem(){
+    console.log(`delete item : ${this.item().id}`);
+    this.shoppingListService.deleteProductFromShoppingList(this.item().id).subscribe();
+  }
 }

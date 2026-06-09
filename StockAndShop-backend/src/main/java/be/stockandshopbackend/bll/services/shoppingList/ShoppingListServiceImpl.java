@@ -47,11 +47,12 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
         });
     }
 
-    public void removeProductFromList(Long shoppingListId, String productName){
+    @Transactional
+    public void removeProductFromList(Long shoppingListId, int itemId){
         if (!repository.existsById(shoppingListId)) {
             throw new NotFoundException("ShoppingList with id " + shoppingListId + " not found");
         }
-        productListItemRepository.deleteByShoppingListIdAndProductName(shoppingListId, productName);
+        productListItemRepository.deleteByIdAndShoppingListId(itemId, shoppingListId);
     }
 
     //region ADD

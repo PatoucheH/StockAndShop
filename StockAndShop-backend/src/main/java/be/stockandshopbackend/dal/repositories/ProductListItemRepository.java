@@ -13,8 +13,7 @@ public interface ProductListItemRepository extends JpaRepository<ProductListItem
 
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM product_list_item WHERE shopping_list_id = :listId " +
-                   "AND product_id = (SELECT id FROM product WHERE LOWER(name) = LOWER(:productName))",
+    @Query(value = "DELETE FROM product_list_item WHERE id = :itemId AND shopping_list_id = :listId",
             nativeQuery = true)
-    void deleteByShoppingListIdAndProductName(@Param("listId") Long listId, @Param("productName") String productName);
+    void deleteByIdAndShoppingListId(@Param("itemId") int itemId, @Param("listId") Long listId);
 }
