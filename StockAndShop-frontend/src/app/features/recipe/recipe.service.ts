@@ -84,6 +84,19 @@ export class RecipeService {
     });
   }
 
+  generateNewRecipe(homeId: string) {
+    this.isGeneratingRecipe.set(true);
+    this.http.post<Recipe>(`${this.apiUrl}/${homeId}/generate`, {}).subscribe({
+      next: (recipe) => {
+        this._newRecipes.update((prev) => [recipe, ...prev]);
+        this.isGeneratingRecipe.set(false);
+      },
+      error: () => {
+        this.isGeneratingRecipe.set(false);
+      },
+    });
+  }
+
   addToFavoriteRecipe(recipeId: string) {
     return this.http.post(`${this.apiUrl}/${recipeId}/favorite`, {}).pipe(
       tap(() => this._favoritesResource.reload()),
