@@ -15,8 +15,10 @@ export class RecipeFilterBarComponent {
   filterAdded = output<string>();
   filterRemoved = output<string>();
   filtersCleared = output<void>();
+  nameFilterChanged = output<string>();
 
   filterInput = signal('');
+  filterNameInput = signal('');
 
   filteredSuggestions = computed(() => {
     const search = this.filterInput().toLowerCase();
@@ -25,6 +27,11 @@ export class RecipeFilterBarComponent {
       p.name.toLowerCase().includes(search),
     );
   });
+
+  onNameFilterChange(value: string) {
+    this.filterNameInput.set(value);
+    this.nameFilterChanged.emit(value);
+  }
 
   addFilter() {
     const val = this.filterInput().trim().toLowerCase();

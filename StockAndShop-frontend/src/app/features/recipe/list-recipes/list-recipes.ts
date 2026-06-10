@@ -20,16 +20,24 @@ export class ListRecipesComponent {
 
   selectedRecipe = signal<Recipe | null>(null);
   activeFilters = signal<string[]>([]);
+  nameFilter = signal('');
 
   filteredRecipes = computed(() => {
     const filters = this.activeFilters();
-    if (filters.length === 0) return this.recipes();
-    return this.recipes().filter((r) =>
-      filters.every((f) =>
-        r.ingredients.some((i) => i.productName.toLowerCase().includes(f)),
-      ),
-    );
+    const name = this.nameFilter().toLowerCase().trim();
+    return this.recipes()
+      .filter((r) => !name || r.title.toLowerCase().includes(name))
+      .filter((r) =>
+        filters.length === 0 ||
+        filters.every((f) =>
+          r.ingredients.some((i) => i.productName.toLowerCase().includes(f)),
+        ),
+      );
   });
+
+  onNameFilterChanged(name: string) {
+    this.nameFilter.set(name);
+  }
 
   onFilterAdded(filter: string) {
     this.activeFilters.update((f) => [...f, filter]);
