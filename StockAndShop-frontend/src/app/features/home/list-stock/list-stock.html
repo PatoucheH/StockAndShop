@@ -1,38 +1,44 @@
-<div class="p-4">
-  <div class="flex justify-end mb-4">
-    <button (click)="getRecipes()" class="px-4 py-2 rounded-full bg-gradient-to-tr from-amber-500
-     to-orange-600 text-white text-sm font-medium hover:scale-105 transition-all duration-200 shadow-md">
-      Trouver des recettes avec le stock
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-5">
+  <div class="flex justify-end mb-5">
+    <button (click)="getRecipes()"
+            class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold
+                   bg-amber-500 hover:bg-amber-600 text-white transition-colors shadow-sm cursor-pointer">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+      </svg>
+      Recettes avec ce stock
     </button>
   </div>
-  <div class="grid gap-3 md:grid-cols-2">
+  <div class="grid gap-4 md:grid-cols-2">
     @for (group of groupedStock(); track group.category) {
-      <div class="border rounded-lg overflow-hidden bg-white shadow-sm">
-        <div class="bg-green-600 text-white px-3 py-2">
-          <h2 class="text-sm font-bold capitalize tracking-wide">{{ group.category }}</h2>
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="bg-emerald-600 px-4 py-2.5">
+          <h2 class="text-xs font-bold text-white uppercase tracking-wider">{{ group.category }}</h2>
         </div>
-        <div class="divide-y divide-gray-100">
+        <div class="divide-y divide-gray-50">
           @for (s of group.items; track s.id) {
-            <div class="flex items-center gap-2 px-3 py-2 text-sm">
-              <span class="flex-1 text-gray-800 font-medium">{{ s.nameProduct }}</span>
-              <div class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-md whitespace-nowrap">
+            <div class="flex items-center gap-3 px-4 py-2.5 text-sm">
+              <span class="flex-1 text-gray-800 font-medium truncate">{{ s.nameProduct }}</span>
+              <span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md font-medium whitespace-nowrap">
                 {{ s.quantity | smartUnit:s.unityProduct }}
-              </div>
-              <input type="number" [value]="getAmount(s.id)" (input)="setAmount(s.id, +$any($event.target).value)"
+              </span>
+              <input type="number" [value]="getAmount(s.id)"
+                     (input)="setAmount(s.id, +$any($event.target).value)"
                      [attr.min]="isWeightOrVolume(s.unityProduct) ? '0.001' : '1'"
                      [attr.step]="isWeightOrVolume(s.unityProduct) ? 'any' : '1'"
-                     class="w-14 border rounded px-1 py-1 text-center text-xs focus:outline-none focus:ring-1
-                     focus:ring-green-400"/>
+                     class="w-14 border border-gray-200 rounded-lg px-2 py-1 text-center text-xs
+                            focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent"/>
               @if (isWeightOrVolume(s.unityProduct)) {
                 <select (change)="setUnit(s.id, $any($event.target).value)"
-                        class="text-xs border rounded px-1 py-1 focus:outline-none focus:ring-1 focus:ring-green-400">
+                        class="text-xs border border-gray-200 rounded-lg px-1 py-1
+                               focus:outline-none focus:ring-2 focus:ring-emerald-400">
                   @for (unit of unitConversion.getSubUnits(s.unityProduct); track unit) {
                     <option [value]="unit">{{ unit }}</option>
                   }
                 </select>
               }
-              <button (click)="confirmRemove(s)" class="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1
-                rounded transition whitespace-nowrap">
+              <button (click)="confirmRemove(s)"
+                      class="text-xs text-red-500 hover:text-red-700 font-medium transition-colors cursor-pointer whitespace-nowrap">
                 Retirer
               </button>
             </div>

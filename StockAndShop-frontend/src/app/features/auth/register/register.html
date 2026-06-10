@@ -1,77 +1,98 @@
-<div class="min-h-screen flex items-center justify-center bg-gray-50">
-  <div class="w-full max-w-sm bg-white rounded-2xl shadow-md p-8">
-    <h1 class="text-2xl font-semibold text-center text-gray-800 mb-6">Créer un compte</h1>
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
-      <div class="flex flex-col gap-1">
-        <label class="text-sm text-gray-600" for="email">Email</label>
-        <input id="email" type="email" formControlName="email" required
-          class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-          placeholder="email@example.com"/>
+<div class="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-8">
+  <div class="w-full max-w-sm">
+
+    <div class="flex flex-col items-center mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-emerald-600 flex items-center justify-center mb-4">
+        <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
       </div>
-      <div class="flex flex-col gap-1">
-        <label class="text-sm text-gray-600" for="username">Pseudo</label>
-        <input id="username" type="text" formControlName="username" required
-          class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-          placeholder="Votre pseudo"/>
-      </div>
-      <div class="flex flex-col gap-1">
-        <label class="text-sm text-gray-600" for="password">Mot de passe</label>
-        <div class="relative">
-          <input id="password" [type]="showPassword() ? 'text' : 'password'" formControlName="password" required
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-            placeholder="*******"/>
-          <button type="button" (click)="showPassword.set(!showPassword())"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-            @if (showPassword()) {
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
-              </svg>
-            } @else {
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            }
-          </button>
+      <h1 class="text-xl font-bold text-gray-900">Stock<span class="text-emerald-600">&</span>Shop</h1>
+      <p class="text-sm text-gray-500 mt-1">Créez votre compte</p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-sm font-medium text-gray-700" for="email">Email</label>
+          <input id="email" type="email" formControlName="email" required
+                 placeholder="email@exemple.com"
+                 class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900
+                        placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500
+                        focus:border-transparent transition-all"/>
         </div>
-      </div>
-      <div class="flex flex-col gap-1">
-        <label class="text-sm text-gray-600" for="confirmPassword">Confirmer le mot de passe</label>
-        <div class="relative">
-          <input id="confirmPassword" [type]="showConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassword" required
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-            placeholder="*******"/>
-          <button type="button" (click)="showConfirmPassword.set(!showConfirmPassword())"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-            @if (showConfirmPassword()) {
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
-              </svg>
-            } @else {
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            }
-          </button>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-sm font-medium text-gray-700" for="username">Pseudo</label>
+          <input id="username" type="text" formControlName="username" required
+                 placeholder="Votre pseudo"
+                 class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900
+                        placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500
+                        focus:border-transparent transition-all"/>
         </div>
-        @if (form.errors?.['passwordMismatch'] && form.get('confirmPassword')?.dirty) {
-          <p class="text-xs text-red-500">Les mots de passe ne correspondent pas</p>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-sm font-medium text-gray-700" for="password">Mot de passe</label>
+          <div class="relative">
+            <input id="password" [type]="showPassword() ? 'text' : 'password'" formControlName="password" required
+                   placeholder="••••••••"
+                   class="w-full border border-gray-200 rounded-xl px-4 py-2.5 pr-11 text-sm text-gray-900
+                          placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500
+                          focus:border-transparent transition-all"/>
+            <button type="button" (click)="showPassword.set(!showPassword())"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer">
+              @if (showPassword()) {
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>
+                </svg>
+              } @else {
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+              }
+            </button>
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-sm font-medium text-gray-700" for="confirmPassword">Confirmer le mot de passe</label>
+          <div class="relative">
+            <input id="confirmPassword" [type]="showConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassword" required
+                   placeholder="••••••••"
+                   class="w-full border border-gray-200 rounded-xl px-4 py-2.5 pr-11 text-sm text-gray-900
+                          placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500
+                          focus:border-transparent transition-all"/>
+            <button type="button" (click)="showConfirmPassword.set(!showConfirmPassword())"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer">
+              @if (showConfirmPassword()) {
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>
+                </svg>
+              } @else {
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+              }
+            </button>
+          </div>
+          @if (form.errors?.['passwordMismatch'] && form.get('confirmPassword')?.dirty) {
+            <p class="text-xs text-red-500">Les mots de passe ne correspondent pas</p>
+          }
+        </div>
+        @if (error()) {
+          <p class="text-sm text-red-500 text-center py-1">{{ error() }}</p>
         }
-      </div>
-      @if (error()) {
-        <p class="text-sm text-red-500 text-center">{{ error() }}</p>
-      }
-      @let isLoading = loading();
-      <button type="submit"[disabled]="isLoading"
-        class="w-full bg-green-700 text-white rounded-lg py-2 text-sm font-medium border
-               hover:bg-green-200 hover:text-green-700 hover:border-green-700 disabled:opacity-50 transition-colors">
-        {{ isLoading ? 'Création...' : "S'enregistrer" }}
-      </button>
-    </form>
+        @let isLoading = loading();
+        <button type="submit" [disabled]="isLoading"
+                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-2.5 text-sm font-semibold
+                       transition-colors shadow-sm disabled:opacity-50 cursor-pointer mt-2">
+          {{ isLoading ? 'Création...' : "S'enregistrer" }}
+        </button>
+      </form>
+    </div>
     <p class="text-center text-sm text-gray-500 mt-5">
       Déjà un compte ?
-      <a routerLink="/auth/login" class="text-green-600 hover:underline">Se connecter</a>
+      <a routerLink="/auth/login" class="text-emerald-600 hover:text-emerald-700 font-medium">Se connecter</a>
     </p>
   </div>
 </div>

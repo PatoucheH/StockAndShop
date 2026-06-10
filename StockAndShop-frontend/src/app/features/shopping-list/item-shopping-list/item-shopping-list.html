@@ -1,34 +1,35 @@
-<div class="bg-white border border-green-100 rounded-2xl px-4 py-1.5 flex items-center justify-between
-                 shadow-sm hover:shadow-md transition-all duration-200"
-     [class.bg-gray-400]="isChecked()"
+<div class="bg-white border border-gray-100 rounded-xl px-3 py-2 flex items-center justify-between
+           shadow-sm hover:shadow transition-all duration-150 cursor-pointer select-none"
+     [class.bg-slate-100]="isChecked()"
+     [class.border-slate-200]="isChecked()"
      (click)="checkedItem()">
-  <div class="flex items-center gap-2" >
-    <button class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
-      [class.bg-green-600]="isChecked()"
-      [class.border-green-600]="isChecked()"
-      [class.border-gray-300]="!isChecked()">
+  <div class="flex items-center gap-2.5">
+    <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all shrink-0"
+         [class.bg-emerald-600]="isChecked()"
+         [class.border-emerald-600]="isChecked()"
+         [class.border-gray-300]="!isChecked()">
       @if (isChecked()) {
-        <i class="fa-solid fa-check text-white text-[10px]"></i>
+        <svg class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
       }
-    </button>
-    <div class="flex items-center gap-2 flex-wrap"
+    </div>
+    <div class="flex flex-col"
          [class.line-through]="isChecked()"
-         [class.text-gray-500]="isChecked()">
-              <span class="font-medium text-sm">
-                {{ item().nameProduct }}
-              </span>
-      <span class="text-xs text-gray-500">
+         [class.text-gray-400]="isChecked()">
+      <span class="font-medium text-sm text-gray-800" [class.text-gray-400]="isChecked()">
+        {{ item().nameProduct }}
+      </span>
+      <span class="text-xs text-gray-400">
         {{ item().quantity | smartUnit:item().unityProduct }}
       </span>
     </div>
   </div>
-  <button
-    (click)="$event.stopPropagation(); deleteItem()"
-    class="flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white shadow-md hover:bg-red-600
-      hover:shadow-lg hover:scale-110 active:scale-95 transition-all duration-200">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-      stroke-width="3">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+  <button (click)="$event.stopPropagation(); deleteItem()"
+          class="w-5 h-5 rounded-full flex items-center justify-center
+                 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer">
+    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
     </svg>
   </button>
 </div>

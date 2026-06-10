@@ -1,51 +1,77 @@
-<header class="md:sticky top-0 z-50 flex justify-between items-center
-                bg-gradient-to-tl from-teal-900 to-green-700 h-[75px] px-2 relative">
-  <nav class="hidden nav:block">
-    <ul class="text-white flex gap-6">
-      <li><a routerLink="/" class="hover:text-green-200 transition-colors">Accueil</a></li>
-      <li><a routerLink="/recipes" class="hover:text-green-200 transition-colors">Recettes</a></li>
-      <li>
-        <a routerLink="/shopping-list/favorites" class="hover:text-green-200 transition-colors">
-          Mes listes de courses
-        </a>
-      </li>
-    </ul>
-  </nav>
-  <button class="nav:hidden text-white text-3xl" (click)="isMenuOpen.update(v => !v)">
-    ☰
-  </button>
-  @if (isMenuOpen()) {
-    <nav class="absolute top-[75px] left-0 w-full bg-gradient-to-bl from-teal-900 to-green-700 sm:hidden z-50">
-      <ul class="flex flex-col text-white p-4 gap-4">
-        <li>
-          <a routerLink="/" (click)="isMenuOpen.set(false)" class="hover:text-green-200 transition-colors">
-            Accueil
-          </a>
-        </li>
-        <li>
-          <a routerLink="/recipes" (click)="isMenuOpen.set(false)" class="hover:text-green-200 transition-colors">
-            Recettes
-          </a>
-        </li>
-        <li>
-          <a routerLink="/shopping-list/favorites" (click)="isMenuOpen.set(false)" class="hover:text-green-200 transition-colors">
-            Listes de courses
-          </a>
-        </li>
-      </ul>
+<header class="sticky top-0 z-50 shadow-md"
+        style="background: linear-gradient(135deg, #064e3b 0%, #065f46 40%, #047857 70%, #059669 100%);">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+
+    <a routerLink="/" class="flex items-center gap-2 shrink-0">
+      <span class="font-bold text-white text-lg tracking-tight">
+        Stock<span class="text-emerald-300">&</span>Shop
+      </span>
+    </a>
+
+    <nav class="hidden nav:flex items-center gap-1">
+      <a routerLink="/" [routerLinkActiveOptions]="{exact: true}"
+         routerLinkActive="!text-white bg-white/15 font-semibold"
+         class="px-4 py-2 rounded-lg text-sm font-medium text-emerald-100 hover:text-white hover:bg-white/10 transition-colors">
+        Accueil
+      </a>
+      <a routerLink="/recipes"
+         routerLinkActive="!text-white bg-white/15 font-semibold"
+         class="px-4 py-2 rounded-lg text-sm font-medium text-emerald-100 hover:text-white hover:bg-white/10 transition-colors">
+        Recettes
+      </a>
+      <a routerLink="/shopping-list/favorites"
+         routerLinkActive="!text-white bg-white/15 font-semibold"
+         class="px-4 py-2 rounded-lg text-sm font-medium text-emerald-100 hover:text-white hover:bg-white/10 transition-colors">
+        Listes de courses
+      </a>
     </nav>
+
+    <div class="flex items-center gap-2 shrink-0">
+      <button (click)="disconnect()"
+              class="hidden nav:flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                     text-emerald-100 hover:text-white hover:bg-white/10 transition-colors">
+        <i class="fa-solid fa-right-from-bracket text-sm"></i>
+        Déconnecter
+      </button>
+
+      <button (click)="disconnect()"
+              class="nav:hidden p-2 rounded-lg text-emerald-100 hover:text-white hover:bg-white/10 transition-colors">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+
+      <button class="nav:hidden p-2 rounded-lg text-emerald-100 hover:text-white hover:bg-white/10 transition-colors"
+              (click)="isMenuOpen.update(v => !v)">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          @if (isMenuOpen()) {
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          } @else {
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          }
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  @if (isMenuOpen()) {
+    <div class="nav:hidden border-t border-white/10" style="background: rgba(4, 47, 46, 0.97);">
+      <nav class="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-0.5">
+        <a routerLink="/" (click)="isMenuOpen.set(false)"
+           routerLinkActive="!text-white bg-white/10 font-semibold"
+           [routerLinkActiveOptions]="{exact: true}"
+           class="px-4 py-3 rounded-xl text-sm font-medium text-emerald-100 hover:text-white hover:bg-white/10 transition-colors">
+          Accueil
+        </a>
+        <a routerLink="/recipes" (click)="isMenuOpen.set(false)"
+           routerLinkActive="!text-white bg-white/10 font-semibold"
+           class="px-4 py-3 rounded-xl text-sm font-medium text-emerald-100 hover:text-white hover:bg-white/10 transition-colors">
+          Recettes
+        </a>
+        <a routerLink="/shopping-list/favorites" (click)="isMenuOpen.set(false)"
+           routerLinkActive="!text-white bg-white/10 font-semibold"
+           class="px-4 py-3 rounded-xl text-sm font-medium text-emerald-100 hover:text-white hover:bg-white/10 transition-colors">
+          Listes de courses
+        </a>
+      </nav>
+    </div>
   }
-  <a routerLink="/" class="absolute left-1/2 -translate-x-1/2">
-    <h1 class="font-bold text-white text-xl whitespace-nowrap">
-      STOCK AND SHOP
-    </h1>
-  </a>
-  <button (click)="disconnect()" class="hidden nav:block font-bold bg-green-50 text-green-800
-                px-4 py-2 rounded-3xl text-sm hover:scale-105 transition-all duration-200">
-    Déconnecter
-  </button>
-  <button (click)="disconnect()" class="nav:hidden flex items-center justify-center bg-green-50 text-green-800
-                p-2 rounded-full hover:scale-105 transition-all duration-200">
-    <i class="fa-solid fa-right-from-bracket text-lg"></i>
-  </button>
 </header>

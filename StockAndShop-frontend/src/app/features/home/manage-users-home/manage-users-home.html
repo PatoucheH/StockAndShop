@@ -1,10 +1,12 @@
-<div class="flex flex-col p-4 gap-3">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-5 flex flex-col gap-4">
   @if (isOwner()) {
     <div class="flex justify-end">
       <button (click)="toggleAddForm()"
-              class="px-4 py-1 rounded-full text-sm transition-all duration-200 hover:scale-105 shadow-md
-                     {{ showAddForm() ? 'bg-gray-200 text-gray-700' : 'bg-gradient-to-tr from-green-700 to-teal-900 text-white' }}">
-        {{ showAddForm() ? 'Annuler' : 'Inviter un utilisateur' }}
+              class="px-4 py-2 rounded-xl text-sm font-medium transition-colors cursor-pointer
+                     {{ showAddForm()
+                       ? 'bg-gray-100 text-gray-700 border border-gray-200'
+                       : 'bg-emerald-600 text-white hover:bg-emerald-700' }}">
+        {{ showAddForm() ? 'Annuler' : 'Inviter un membre' }}
       </button>
     </div>
     @if (showAddForm()) {

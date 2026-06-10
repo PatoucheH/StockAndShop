@@ -1,19 +1,86 @@
-<div class="flex flex-col items-center">
-  <h2 class=" text-3xl m-10 italic">TES MAISONS</h2>
-    <div class="flex flex-wrap justify-center gap-8 w-full">
-    @for(home of homes(); track home.id){
-      <div [routerLink]="['/home', home.id]"
-           class="flex flex-col justify-center items-center border border-black rounded-xl p-4 w-64 h-32
-                  hover:bg-green-200 hover:scale-105 transistion all duration-300 cursor-pointer shadow-xl">
-        <p class="text-lg">{{ home.name }}</p>
-        <p class="text-sm">{{ home.description }}</p>
+<div class="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+  <details open class="group">
+    <summary class="flex items-center justify-between mb-4 cursor-pointer [list-style:none] [&::-webkit-details-marker]:hidden select-none">
+      <div class="flex items-center gap-2.5">
+        <svg class="w-4 h-4 text-gray-400 -rotate-90 group-open:rotate-0 transition-transform duration-200 shrink-0"
+             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+        </svg>
+        <h1 class="text-xl font-bold text-gray-900 tracking-tight">Mes maisons</h1>
+        @if (homes().length > 0) {
+          <span class="text-sm text-gray-400 font-normal">({{ homes().length }})</span>
+        }
+      </div>
+      <button (click)="$event.stopPropagation(); openModal()"
+              class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700
+                     text-white px-4 py-2 rounded-xl text-sm font-semibold
+                     transition-colors shadow-sm cursor-pointer">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        <span class="hidden sm:inline">Nouvelle maison</span>
+        <span class="sm:hidden">Ajouter</span>
+      </button>
+    </summary>
+    @if (homes().length > 0) {
+      <ul class="flex flex-col gap-2">
+        @for (home of homes(); track home.id) {
+          <li [routerLink]="['/home', home.id]"
+              class="group/card flex items-center gap-4 bg-white rounded-2xl px-5 py-4
+                     border border-gray-100 shadow-sm
+                     hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer">
+
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0
+                        group-hover/card:bg-emerald-100 transition-colors">
+              <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-gray-900 text-sm truncate">{{ home.name }}</p>
+              @if (home.description) {
+                <p class="text-xs text-gray-400 truncate mt-0.5">{{ home.description }}</p>
+              }
+              <div class="flex items-center gap-1.5 mt-1.5">
+                <svg class="w-3 h-3 text-gray-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                <span class="text-xs text-gray-400 truncate">{{ home.ownerEmail }}</span>
+              </div>
+            </div>
+            <svg class="w-4 h-4 text-gray-300 group-hover/card:text-emerald-500 group-hover/card:translate-x-0.5
+                        transition-all shrink-0"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="flex flex-col items-center justify-center py-20 text-center">
+        <div class="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center mb-4">
+          <svg class="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
+        </div>
+        <h3 class="text-base font-semibold text-gray-800 mb-1">Aucune maison pour l'instant</h3>
+        <p class="text-sm text-gray-500 mb-5 max-w-xs leading-relaxed">
+          Créez votre première maison pour commencer à gérer votre stock et vos listes de courses.
+        </p>
+        <button (click)="openModal()"
+                class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700
+                       text-white px-5 py-2.5 rounded-xl text-sm font-semibold
+                       transition-colors shadow-sm cursor-pointer">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
+          Créer ma première maison
+        </button>
       </div>
     }
-  </div>
-  <button (click)="openModal()" class="bg-gradient-to-tr from-green-800 to-green-600 text-white px-3 py-1 mt-4 rounded-full
-                                        hover:scale-110 transition-all duration-200">
-    Créer une nouvelle maison
-  </button>
+  </details>
 </div>
 
 @if(modalIsOpen()){

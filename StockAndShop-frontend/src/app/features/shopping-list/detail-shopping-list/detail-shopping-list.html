@@ -1,69 +1,67 @@
 @if (loading()) {
   <app-loading />
 } @else if (selectedShoppingList(); as list) {
-  <section class="max-w-4xl mx-auto px-4 py-4">
-    <div class="flex flex-row justify-center items-center gap-4 mb-4">
-      <h2 class="text-2xl text-center font-bold text-green-900">
-        {{ list.name }}
-      </h2>
-      @if (list.id) {
-      <button (click)="toggleFavorite(list.id)"
-        class="min-[350px]:text-xs text-[10px] font-semibold py-2 px-4 rounded-2xl hover:scale-[1.01] transition-all
-              duration-200"
-        [class]="shoppingListService.isFavorited(list.id) ? 'bg-yellow-400 text-white'
-                : 'bg-white text-yellow-500 border border-yellow-400'">
-        {{ shoppingListService.isFavorited(list.id) ? '★ ' : '☆ ' }}
+  <section class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
+    <div class="flex flex-wrap items-center gap-3 mb-5">
+      <button (click)="location.back()"
+              class="p-2 rounded-xl text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors cursor-pointer shrink-0">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
       </button>
-      }
-    </div>
-    <div class="flex flex-row justify-between mb-6">
-      <div class="flex items-center sm:gap-3">
-        <button (click)="location.back()"
-          class="min-[350px]:text-xs text-[10px] bg-gradient-to-r to-teal-900 from-green-700 text-white font-semibold
-               py-2 px-4 rounded-2xl hover:scale-[1.01] transition-all duration-200"
-          title="Retour">
-          Retour
+      <h1 class="text-xl font-bold text-gray-900 tracking-tight flex-1 min-w-0 truncate">{{ list.name }}</h1>
+      <div class="flex items-center gap-2 shrink-0 ml-auto">
+        @if (list.id) {
+          <button (click)="toggleFavorite(list.id)"
+                  class="p-2 rounded-xl transition-colors cursor-pointer"
+                  [class]="shoppingListService.isFavorited(list.id)
+                    ? 'text-amber-400 bg-amber-50 hover:bg-amber-100'
+                    : 'text-gray-300 hover:text-gray-500 hover:bg-gray-100'">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </button>
+        }
+        <button (click)="addToStockItemChecked()"
+                class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold
+                       bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm cursor-pointer">
+          <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+          <span class="hidden sm:inline">Ajouter au stock</span>
+          <span class="sm:hidden">Stock</span>
         </button>
       </div>
-      <div class="flex items-center gap-2">
-        <button class="min-[350px]:text-xs text-[10px] bg-gradient-to-r from-teal-900 to-green-700 text-white font-semibold
-               py-2 px-4 rounded-2xl hover:scale-[1.01] transition-all duration-200"
-          (click)="addToStockItemChecked()">
-          Ajouter au stock
-        </button>
-      </div>
     </div>
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-5">
       @for (group of groupedProducts(); track group.category) {
         <div>
-          <h3 class="text-xs font-semibold uppercase tracking-wider text-green-700 mb-2 px-1">
+          <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2 px-1">
             {{ group.category }}
           </h3>
-          <div class="grid min-[400px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 ">
+          <div class="grid min-[400px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
             @for (item of group.items; track item.id) {
               <app-item-shopping-list [item]="item" />
             }
           </div>
         </div>
       }
+
       @if (id) {
         <app-form-add-product-shopping-list [id]="id" />
       }
     </div>
-    <div class="mt-5">
-      <button
-        (click)="openModal()"
-        class="w-full bg-gradient-to-r from-teal-900 to-green-700 text-white font-semibold
-               py-3 rounded-2xl hover:scale-105 transition-all duration-200">
-        Le produit n'existe pas le créer
+    <div class="mt-6">
+      <button (click)="openModal()"
+              class="w-full py-3 rounded-xl text-sm font-medium text-gray-500 border border-dashed border-gray-300
+                     hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer">
+        + Le produit n'existe pas ? Le créer
       </button>
     </div>
   </section>
 } @else {
   <div class="flex justify-center items-center py-20">
-    <p class="text-gray-500">
-      Pas d'informations pour cette liste
-    </p>
+    <p class="text-sm text-gray-400">Pas d'informations pour cette liste</p>
   </div>
 }
 

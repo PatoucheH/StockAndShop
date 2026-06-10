@@ -1,15 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-
-const UNIT_LABELS: Record<string, string> = {
-  grams: 'g',
-  milliliter: 'ml',
-  piece: 'pièce',
-  jar: 'pot',
-  tub: 'tube',
-  bottle: 'bouteille',
-  packet: 'paquet',
-  box: 'boite',
-};
+import { UNITS } from './units.const';
 
 @Pipe({ name: 'smartUnit', standalone: true })
 export class SmartUnitPipe implements PipeTransform {
@@ -23,6 +13,6 @@ export class SmartUnitPipe implements PipeTransform {
       const l = quantity / 1000;
       return `${Number.isInteger(l) ? l : +l.toFixed(2)} L`;
     }
-    return `${quantity} ${UNIT_LABELS[u] ?? u}`;
+    return `${quantity} ${UNITS[u]?.short ?? u}`;
   }
 }

@@ -1,44 +1,50 @@
-<div class="bg-green-50 border border-green-200 rounded-xl p-4 flex flex-col gap-3">
-  <h3 class="text-sm font-semibold text-center text-green-900">Inviter un utilisateur</h3>
+<div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm flex flex-col gap-4">
+  <h3 class="text-sm font-semibold text-gray-900">Inviter un membre</h3>
   <div class="relative">
-    <input type="text" placeholder="Rechercher par nom ou email..." [value]="searchQuery()"
-      (input)="onSearchInput($any($event.target).value)" (blur)="hideSuggestions()"
-      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2
-      focus:ring-green-500"/>
+    <input type="text" placeholder="Rechercher par nom ou email..."
+           [value]="searchQuery()"
+           (input)="onSearchInput($any($event.target).value)"
+           (blur)="hideSuggestions()"
+           class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900
+                  placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500
+                  focus:border-transparent transition-all"/>
     @if (isSearching()) {
-      <span class="absolute right-3 top-2.5 text-xs text-gray-400">Recherche...</span>
+      <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">Recherche...</span>
     }
     @if (suggestions().length > 0) {
-      <ul class="absolute z-10 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-48 overflow-y-auto">
+      <ul class="absolute z-10 w-full bg-white border border-gray-200 rounded-xl shadow-lg mt-1 max-h-48 overflow-y-auto">
         @for (user of suggestions(); track user.id) {
           <li (mousedown)="selectUser(user)"
-              class="px-3 py-2 text-sm cursor-pointer hover:bg-green-50 flex flex-col">
-            <span class="font-medium">{{ user.name }}</span>
-            <span class="text-xs text-gray-500">{{ user.email }}</span>
+              class="px-4 py-2.5 text-sm cursor-pointer hover:bg-emerald-50 flex flex-col transition-colors">
+            <span class="font-medium text-gray-900">{{ user.name }}</span>
+            <span class="text-xs text-gray-400">{{ user.email }}</span>
           </li>
         }
       </ul>
     }
   </div>
-  <div class="flex items-center gap-2 justify-center">
-    <span class="text-sm text-gray-600">Rôle :</span>
+  <div class="flex items-center gap-2">
+    <span class="text-xs text-gray-500 font-medium">Rôle :</span>
     <button (click)="selectedRole.set('USER')"
-            class="px-3 py-1 rounded-full text-xs transition-all duration-150
-                   {{ selectedRole() === 'USER' ? 'bg-green-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+            class="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer
+                   {{ selectedRole() === 'USER' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
       Utilisateur
     </button>
     <button (click)="selectedRole.set('VIEWER')"
-            class="px-3 py-1 rounded-full text-xs transition-all duration-150
-                   {{ selectedRole() === 'VIEWER' ? 'bg-teal-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+            class="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer
+                   {{ selectedRole() === 'VIEWER' ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
       Lecteur
     </button>
   </div>
+
   @if (errorMessage()) {
-    <p class="text-xs text-red-600 text-center">{{ errorMessage() }}</p>
+    <p class="text-xs text-red-500">{{ errorMessage() }}</p>
   }
+
   <button (click)="submit()" [disabled]="!selectedUser()"
-          class="self-center px-6 py-2 rounded-full text-sm text-white bg-gradient-to-tr from-green-700 to-teal-900
-                 hover:scale-105 transition-all duration-200 shadow-md disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100">
-    Ajouter
+          class="self-end px-5 py-2 rounded-xl text-sm font-semibold text-white
+                 bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-sm cursor-pointer
+                 disabled:opacity-40 disabled:cursor-not-allowed">
+    Inviter
   </button>
 </div>
