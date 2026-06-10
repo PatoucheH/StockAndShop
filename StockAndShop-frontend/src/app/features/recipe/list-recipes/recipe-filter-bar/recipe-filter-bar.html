@@ -2,9 +2,10 @@
   <div class="flex gap-2">
     <input type="text" [ngModel]="filterInput()" (ngModelChange)="filterInput.set($event)"
            (keydown.enter)="addFilter()" list="ingredientsList" placeholder="Filtrer par ingrédient..."
-           class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white
-                  placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500
-                  focus:border-transparent transition-all"/>
+           class="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl text-sm
+                  bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+                  placeholder:text-gray-400 dark:placeholder:text-gray-500
+                  focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"/>
     <datalist id="ingredientsList">
       @for (product of filteredSuggestions(); track product.id) {
         <option [value]="product.name"></option>
@@ -20,26 +21,26 @@
   @if (activeFilters().length > 0) {
     <div class="flex flex-wrap gap-1.5 items-center">
       @for (filter of activeFilters(); track filter) {
-        <span class="flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200
+        <span class="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800
                      rounded-full px-3 py-1 text-xs font-medium">
           {{ filter }}
           <button type="button" (click)="removeFilter(filter)"
-                  class="text-emerald-500 hover:text-emerald-800 leading-none cursor-pointer">✕</button>
+                  class="text-emerald-500 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-200 leading-none cursor-pointer">✕</button>
         </span>
       }
       <button type="button" (click)="clearFilters()"
-              class="text-xs text-gray-400 hover:text-red-500 ml-1 transition-colors cursor-pointer">
+              class="text-xs text-gray-400 dark:text-gray-500 hover:text-red-500 ml-1 transition-colors cursor-pointer">
         Tout effacer
       </button>
     </div>
   }
 
-  <p class="text-xs text-gray-400">
+  <p class="text-xs text-gray-400 dark:text-gray-500">
     {{ resultCount() }} recette{{ resultCount() > 1 ? 's' : '' }}
     @if (activeFilters().length > 0) {
       · filtrée{{ resultCount() > 1 ? 's' : '' }} par
       @for (filter of activeFilters(); track filter; let last = $last) {
-        <span class="font-medium text-emerald-600">"{{ filter }}"</span>{{ last ? '' : ', ' }}
+        <span class="font-medium text-emerald-600 dark:text-emerald-400">"{{ filter }}"</span>{{ last ? '' : ', ' }}
       }
     }
   </p>

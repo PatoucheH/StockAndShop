@@ -3,16 +3,17 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/ro
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 import { AuthService } from '../../../features/auth/auth.service';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-header',
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './header.html',
-
 })
 export class HeaderComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  readonly themeService = inject(ThemeService);
 
   isMenuOpen = signal(false);
 

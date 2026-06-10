@@ -1,4 +1,5 @@
 import { Component, inject, input, linkedSignal } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { ProductItem } from '../../../shared/models/productItem.models';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ProductService } from '../../../shared/services/product.service';
@@ -7,7 +8,7 @@ import { SmartUnitPipe } from '../../../shared/pipes/smart-unit.pipe';
 
 @Component({
   selector: 'app-item-shopping-list',
-  imports: [ReactiveFormsModule, SmartUnitPipe],
+  imports: [ReactiveFormsModule, SmartUnitPipe, NgClass],
   templateUrl: './item-shopping-list.html',
 
 })

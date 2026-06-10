@@ -54,6 +54,11 @@ export class HomeService {
   readonly users = computed(() => this.usersResource.value() ?? []);
   readonly stock = computed(() => this.stockResource.value() ?? []);
 
+  readonly isViewer = computed(() => {
+    const email = this.authService.getUserEmail();
+    return this.users().some(u => u.email === email && u.homeRole === 'VIEWER');
+  });
+
   constructor() {
     toObservable(this.authService.authVersion).pipe(skip(1), takeUntilDestroyed()).subscribe(() => {
       this._selectedHomeId.set(undefined);

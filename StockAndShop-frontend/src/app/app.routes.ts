@@ -14,6 +14,7 @@ export const routes: Routes = [
     children: [
       {
         path: '',
+        title: 'Accueil — Stock&Shop',
         loadComponent: () => import('./features/home/home/home')
           .then((m) => m.HomeComponent),
       },
@@ -25,15 +26,10 @@ export const routes: Routes = [
       },
       {
         path: 'recipes',
+        title: 'Recettes — Stock&Shop',
         loadComponent: () =>
           import('./features/recipe/recipes-page/recipes-page')
             .then((m) => m.RecipesPageComponent),
-      },
-      {
-        path: 'shopping-list/favorites',
-        loadComponent: () =>
-          import('./features/shopping-list/favorite-shopping-lists/favorite-shopping-lists')
-            .then((m) => m.FavoriteShoppingListsComponent),
       },
       {
         path: 'shopping-list/:id',

@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { ShoppingListService } from '../shopping-list.service';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
@@ -41,6 +41,13 @@ export class DetailShoppingListComponent {
   });
 
   modalIsOpen = signal<boolean>(false);
+
+  constructor() {
+    effect(() => {
+      const sl = this.selectedShoppingList();
+      document.title = sl ? `${sl.name} — Stock&Shop` : 'Stock&Shop';
+    });
+  }
 
   ngOnInit() {
     if (!this.id) return;

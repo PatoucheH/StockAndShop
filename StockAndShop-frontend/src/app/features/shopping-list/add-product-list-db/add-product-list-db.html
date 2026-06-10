@@ -1,10 +1,10 @@
 <div class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
      (click)="closeModal.emit()">
-  <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl" (click)="$event.stopPropagation()">
-    <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-      <h2 class="text-base font-semibold text-gray-900">Créer un nouveau produit</h2>
+  <div class="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-700">
+      <h2 class="text-base font-semibold text-gray-900 dark:text-gray-100">Créer un nouveau produit</h2>
       <button (click)="closeModal.emit()"
-              class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer">
+              class="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
         </svg>
@@ -12,30 +12,30 @@
     </div>
     <form [formGroup]="form" (ngSubmit)="submit()" class="px-6 py-5 flex flex-col gap-4">
       <div class="flex flex-col gap-1.5">
-        <label for="name" class="text-sm font-medium text-gray-700">Nom du produit</label>
+        <label for="name" class="text-sm font-medium text-gray-700 dark:text-gray-200">Nom du produit</label>
         <input type="text" id="name" name="name" formControlName="name" required
-               class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900
-                      focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent
-                      transition-all"/>
+               class="border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2.5 text-sm
+                      text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700
+                      focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"/>
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div class="flex flex-col gap-1.5">
-          <label for="unity" class="text-sm font-medium text-gray-700">Unité</label>
+          <label for="unity" class="text-sm font-medium text-gray-700 dark:text-gray-200">Unité</label>
           <select id="unity" name="unity" formControlName="unity" required
-                  class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900
-                         focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent
-                         bg-white transition-all">
+                  class="border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm
+                         text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700
+                         focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all">
             @for (unity of unities(); track $index) {
               <option [ngValue]="unity">{{ unity | unityLabel }}</option>
             }
           </select>
         </div>
         <div class="flex flex-col gap-1.5">
-          <label for="category" class="text-sm font-medium text-gray-700">Catégorie</label>
+          <label for="category" class="text-sm font-medium text-gray-700 dark:text-gray-200">Catégorie</label>
           <select name="category" id="category" formControlName="category"
-                  class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900
-                         focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent
-                         bg-white transition-all">
+                  class="border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm
+                         text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700
+                         focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all">
             @for(cat of categories(); track cat.id){
               <option [ngValue]="cat.name">{{ cat.name }}</option>
             }
@@ -43,18 +43,19 @@
         </div>
       </div>
       <div class="flex flex-col gap-1.5">
-        <label for="quantity" class="text-sm font-medium text-gray-700">Quantité</label>
+        <label for="quantity" class="text-sm font-medium text-gray-700 dark:text-gray-200">Quantité</label>
         <div class="flex gap-2">
           <input type="number" id="quantity" name="quantity" formControlName="quantity" required
                  [attr.min]="isWeightOrVolume() ? '0.001' : '1'"
                  [attr.step]="isWeightOrVolume() ? 'any' : '1'"
-                 class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900
-                        focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent
-                        transition-all"/>
+                 class="flex-1 border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2.5 text-sm
+                        text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700
+                        focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"/>
           @if (isWeightOrVolume()) {
             <select (change)="subUnit.set($any($event.target).value)"
-                    class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900
-                           focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                    class="border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm
+                           text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700
+                           focus:outline-none focus:ring-2 focus:ring-emerald-500">
               @for (unit of unitConversion.getSubUnits(selectedUnity()); track unit) {
                 <option [value]="unit">{{ unit }}</option>
               }
@@ -64,8 +65,8 @@
       </div>
       <div class="flex gap-3 pt-2">
         <button type="button" (click)="closeModal.emit()"
-                class="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-700
-                       border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
+                class="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200
+                       border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer">
           Annuler
         </button>
         <button type="submit"
