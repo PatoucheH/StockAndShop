@@ -1,22 +1,30 @@
 import { Component, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { ShoppingListService } from '../shopping-list.service';
 import { LoadingComponent } from '../../../shared/components/loading/loading';
 import { ErrorComponent } from '../../../shared/components/error/error';
 import { ToastService } from '../../../core/services/toast.service';
+import { Carousel } from 'primeng/carousel';
 
 @Component({
   selector: 'app-favorite-shopping-lists',
-  imports: [RouterLink, LoadingComponent, ErrorComponent],
+  imports: [RouterLink, LoadingComponent, ErrorComponent, Carousel],
   templateUrl: './favorite-shopping-lists.html',
 })
 export class FavoriteShoppingListsComponent {
   shoppingListService = inject(ShoppingListService);
   toast = inject(ToastService);
+  router = inject(Router);
 
   favoriteShoppingLists = this.shoppingListService.favoriteShoppingLists;
   isLoading = this.shoppingListService.isFavoritesLoading;
   hasError = this.shoppingListService.hasFavoritesError;
+
+  responsiveOptions = [
+    { breakpoint: '1024px', numVisible: 3, numScroll: 1 },
+    { breakpoint: '768px', numVisible: 2, numScroll: 1 },
+    { breakpoint: '560px', numVisible: 1, numScroll: 1 },
+  ];
 
   removeFromFavorite(id: number) {
     this.shoppingListService.removeFromFavorite(id).subscribe({
