@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { ShoppingListService } from '../shopping-list.service';
 import { LoadingComponent } from '../../../shared/components/loading/loading';
@@ -20,11 +20,13 @@ export class FavoriteShoppingListsComponent {
   isLoading = this.shoppingListService.isFavoritesLoading;
   hasError = this.shoppingListService.hasFavoritesError;
 
-  responsiveOptions = [
-    { breakpoint: '1024px', numVisible: 3, numScroll: 1 },
-    { breakpoint: '768px', numVisible: 2, numScroll: 1 },
+  numVisible = computed(() => Math.min(3, this.favoriteShoppingLists().length));
+
+  responsiveOptions = computed(() => [
+    { breakpoint: '1024px', numVisible: Math.min(3, this.favoriteShoppingLists().length), numScroll: 1 },
+    { breakpoint: '768px', numVisible: Math.min(2, this.favoriteShoppingLists().length), numScroll: 1 },
     { breakpoint: '560px', numVisible: 1, numScroll: 1 },
-  ];
+  ]);
 
   removeFromFavorite(id: number) {
     this.shoppingListService.removeFromFavorite(id).subscribe({

@@ -1,7 +1,6 @@
-<div class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 pb-8">
   <div class="mb-8">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Listes favorites</h1>
-    <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Vos listes de courses enregistrées</p>
+    <h1 class="text-2xl font-bold tracking-tight">Listes favorites</h1>
   </div>
   @if (isLoading()) {
     <app-loading />
@@ -22,10 +21,10 @@
   } @else {
     <p-carousel
       [value]="favoriteShoppingLists()"
-      [numVisible]="3"
+      [numVisible]="numVisible()"
       [numScroll]="1"
       [circular]="true"
-      [responsiveOptions]="responsiveOptions">
+      [responsiveOptions]="responsiveOptions()">
       <ng-template #item let-sl>
         <div class="px-2">
           <div [routerLink]="['/shopping-list', sl.id]"
