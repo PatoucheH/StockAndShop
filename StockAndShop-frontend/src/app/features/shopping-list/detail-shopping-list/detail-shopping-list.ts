@@ -36,7 +36,10 @@ export class DetailShoppingListComponent {
       map.set(product.category, group);
     }
     return Array.from(map.entries()).map(
-      ([category, items]) => ({ category, items })
+      ([category, items]) => ({
+        category,
+        items: [...items].sort((a, b) => Number(a.isChecked) - Number(b.isChecked)),
+      })
     );
   });
 
