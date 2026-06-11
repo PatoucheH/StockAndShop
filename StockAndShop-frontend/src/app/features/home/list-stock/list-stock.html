@@ -7,6 +7,9 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
       </svg>
       Recettes avec ce stock
+      @if(selectedProducts().length > 0) {
+        ({{ selectedProducts().length }}/5)
+      }
     </button>
   </div>
   <div class="grid gap-4 md:grid-cols-2">
@@ -17,13 +20,15 @@
         </div>
         <div class="divide-y divide-gray-50 dark:divide-gray-700">
           @for (s of group.items; track s.id) {
-            <div class="flex items-center gap-3 px-4 py-2.5 text-sm">
-              <span class="flex-1 text-gray-800 dark:text-gray-200 font-medium truncate">{{ s.nameProduct }}</span>
+            <div (click)="toggleProduct(s)"
+                 class="flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer transition-colors"
+                 [class.bg-emerald-900]="isSelected(s)">
+              <span class="flex-1 text-gray-800 dark:text-gray-200 font-medium">{{ s.nameProduct }}</span>
               <span class="text-xs bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded-md font-medium whitespace-nowrap">
                 {{ s.quantity | smartUnit:s.unityProduct }}
               </span>
               @if (!homeService.isViewer()) {
-                <input type="number" [value]="getAmount(s.id)"
+                <input type="number" [value]="getAmount(s.id)" (click)="$event.stopPropagation()"
                        (input)="setAmount(s.id, +$any($event.target).value)"
                        [attr.min]="isWeightOrVolume(s.unityProduct) ? '0.001' : '1'"
                        [attr.step]="isWeightOrVolume(s.unityProduct) ? 'any' : '1'"
@@ -31,7 +36,7 @@
                               bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
                               focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent"/>
                 @if (isWeightOrVolume(s.unityProduct)) {
-                  <select (change)="setUnit(s.id, $any($event.target).value)"
+                  <select (change)="setUnit(s.id, $any($event.target).value)" (click)="$event.stopPropagation()"
                           class="text-xs border border-gray-200 dark:border-gray-600 rounded-lg px-1 py-1
                                  bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
                                  focus:outline-none focus:ring-2 focus:ring-emerald-400">
@@ -40,7 +45,7 @@
                     }
                   </select>
                 }
-                <button (click)="confirmRemove(s)"
+                <button (click)="$event.stopPropagation(); removeItem(s)"
                         class="text-xs text-red-500 hover:text-red-700 font-medium transition-colors cursor-pointer whitespace-nowrap">
                   Retirer
                 </button>
@@ -58,10 +63,3 @@
   <app-btn-another-recipe/>
 }
 
-@if (pendingRemoveItem()) {
-  <app-confirm-modal
-    [message]="'Retirer ' + pendingRemoveItem()!.nameProduct + ' du stock ?'"
-    confirmLabel="Retirer"
-    (confirmed)="onRemoveConfirmed()"
-    (cancelled)="pendingRemoveItem.set(null)"/>
-}

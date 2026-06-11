@@ -4,6 +4,7 @@ import be.stockandshopbackend.bll.services.recipe.RecipeService;
 import be.stockandshopbackend.dl.entities.Recipe;
 import be.stockandshopbackend.pl.DTOs.Response.PagedRecipeResponse;
 import be.stockandshopbackend.pl.DTOs.Response.RecipeResponse;
+import be.stockandshopbackend.pl.DTOs.requests.GenerateRecipeRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -52,8 +53,18 @@ public class RecipeController {
 
     @PostMapping("/{id}/generate")
     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
-    public ResponseEntity<RecipeResponse> generateRecipe(@PathVariable UUID id) {
+    public ResponseEntity<RecipeResponse> generateRecipe(
+            @PathVariable UUID id,
+            @RequestBody(required = false) GenerateRecipeRequest request) {
+        Recipe recipe;
+        if (request != null
+                && request.products() != null
+                && !request.products().isEmpty()) {
+            recipe = recipeService.generateAndSaveWithProduct(request.products());
+        } else {
+            recipe = recipeService.generateAndSave(id);
+        }
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(RecipeResponse.fromRecipe(recipeService.generateAndSave(id)));
+                .body(RecipeResponse.fromRecipe(recipe));
     }
 }

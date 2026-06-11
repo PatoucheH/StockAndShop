@@ -1,5 +1,6 @@
 package be.stockandshopbackend.bll.services.recipe;
 
+import be.stockandshopbackend.dl.entities.ProductStockHome;
 import be.stockandshopbackend.dl.entities.Recipe;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ public interface RecipeService {
     List<Recipe> getSuggestions(UUID homeId);
 
     /// ADD / GENERATE
+    Recipe generateAndSaveWithProduct(List<ProductStockHome> product);
     Recipe generateAndSave(UUID homeId);
 
 

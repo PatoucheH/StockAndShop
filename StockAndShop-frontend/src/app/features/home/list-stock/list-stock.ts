@@ -26,7 +26,14 @@ export class ListStock {
   toast = inject(ToastService);
 
   modalRecipe = signal(false);
-  pendingRemoveItem = signal<ProductStock | null>(null);
+  selectedProducts = signal<ProductStock[]>([]);
+  canGenerateRecipe = computed(() => {
+    const selectedCount = this.selectedProducts().length;
+    if (selectedCount > 0) {
+      return selectedCount >= 5;
+    }
+    return this.homeService.stock().length >= 5;
+  });
 
   groupedStock = computed(() => {
     const stock = this.homeService.stock();
@@ -48,7 +55,7 @@ export class ListStock {
   }
 
   setAmount(id: number, val: number) {
-    this.decreaseState.update(state => ({
+    this.decreaseState.update((state) => ({
       ...state,
       [id]: { ...state[id], amount: Math.max(0.001, val) },
     }));
@@ -59,7 +66,7 @@ export class ListStock {
   }
 
   setUnit(id: number, unit: string) {
-    this.decreaseState.update(state => ({
+    this.decreaseState.update((state) => ({
       ...state,
       [id]: { ...state[id], unit },
     }));
@@ -69,27 +76,56 @@ export class ListStock {
     return this.unitConversion.isWeightOrVolume(unity);
   }
 
-  confirmRemove(item: ProductStock) {
-    this.pendingRemoveItem.set(item);
-  }
 
-  onRemoveConfirmed() {
-    const item = this.pendingRemoveItem();
-    if (!item) return;
-    const unit = this.getUnit(item.id, item.unityProduct);
-    const quantity = this.unitConversion.toBaseUnit(this.getAmount(item.id), unit);
-    this.homeService.decreseStock({ name: item.nameProduct, quantity }).subscribe({
+  removeItem(s: ProductStock) {
+    if (!s) return;
+    const unit = this.getUnit(s.id, s.unityProduct);
+    const quantity = this.unitConversion.toBaseUnit(this.getAmount(s.id), unit);
+    this.homeService.decreseStock({ name: s.nameProduct, quantity }).subscribe({
       next: () => {
         this.homeService.stockResource.reload();
         this.toast.success('Stock mis à jour');
       },
       error: () => this.toast.error('Impossible de mettre à jour le stock'),
     });
-    this.pendingRemoveItem.set(null);
   }
 
   getRecipes() {
-    this.recipeService.generateRecipe(this.homeService.selectedHome()!.id);
+    if (!this.canGenerateRecipe()) {
+      this.toast.info('Au moins 5 produits sont nécessaires pour générer une recette.');
+      return;
+    }
+    const selected = this.selectedProducts();
+    const stockCount = this.homeService.stock().length;
+    if (selected.length > 0 && selected.length < 5) {
+      this.toast.error('Veuillez sélectionner au moins 5 produits pour générer une recette.');
+      return;
+    }
+    if (selected.length === 0 && stockCount < 5) {
+      this.toast.error('Votre stock doit contenir au moins 5 produits pour générer une recette.');
+      return;
+    }
+    if (selected.length > 0) {
+      this.recipeService.generateNewRecipe(this.homeService.selectedHome()!.id, selected);
+    } else {
+      this.recipeService.generateNewRecipe(this.homeService.selectedHome()!.id);
+    }
     this.modalRecipe.set(true);
+  }
+
+  toggleProduct(product: ProductStock) {
+    this.selectedProducts.update((products) => {
+      const exists = products.some((p) => p.id === product.id);
+
+      if (exists) {
+        return products.filter((p) => p.id !== product.id);
+      }
+
+      return [...products, product];
+    });
+  }
+
+  isSelected(product: ProductStock): boolean {
+    return this.selectedProducts().some((p) => p.id === product.id);
   }
 }

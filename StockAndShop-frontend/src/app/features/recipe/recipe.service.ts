@@ -5,6 +5,7 @@ import { PagedRecipeResponse, Recipe } from '../../shared/models/recipe.models';
 import { skip, tap } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { ProductStock } from '../../shared/models/productStock.models';
 
 @Injectable({ providedIn: 'root' })
 export class RecipeService {
@@ -39,11 +40,13 @@ export class RecipeService {
       { allowSignalWrites: true },
     );
 
-    toObservable(this.authService.authVersion).pipe(skip(1), takeUntilDestroyed()).subscribe(() => {
-      if (this.authService.isLoggedIn()) {
-        this._favoritesResource.reload();
-      }
-    });
+    toObservable(this.authService.authVersion)
+      .pipe(skip(1), takeUntilDestroyed())
+      .subscribe(() => {
+        if (this.authService.isLoggedIn()) {
+          this._favoritesResource.reload();
+        }
+      });
   }
 
   private _favoritesResource = httpResource<Recipe[]>(() => {
@@ -84,9 +87,10 @@ export class RecipeService {
     });
   }
 
-  generateNewRecipe(homeId: string) {
+  generateNewRecipe(homeId: string, products?: ProductStock[]) {
     this.isGeneratingRecipe.set(true);
-    this.http.post<Recipe>(`${this.apiUrl}/${homeId}/generate`, {}).subscribe({
+    const body = products?.length ? { products } : {};
+    this.http.post<Recipe>(`${this.apiUrl}/${homeId}/generate`, body).subscribe({
       next: (recipe) => {
         this._newRecipes.update((prev) => [recipe, ...prev]);
         this.isGeneratingRecipe.set(false);
@@ -98,14 +102,14 @@ export class RecipeService {
   }
 
   addToFavoriteRecipe(recipeId: string) {
-    return this.http.post(`${this.apiUrl}/${recipeId}/favorite`, {}).pipe(
-      tap(() => this._favoritesResource.reload()),
-    );
+    return this.http
+      .post(`${this.apiUrl}/${recipeId}/favorite`, {})
+      .pipe(tap(() => this._favoritesResource.reload()));
   }
 
   removeFromFavoriteRecipe(recipeId: string) {
-    return this.http.delete(`${this.apiUrl}/${recipeId}/favorite`).pipe(
-      tap(() => this._favoritesResource.reload()),
-    );
+    return this.http
+      .delete(`${this.apiUrl}/${recipeId}/favorite`)
+      .pipe(tap(() => this._favoritesResource.reload()));
   }
 }

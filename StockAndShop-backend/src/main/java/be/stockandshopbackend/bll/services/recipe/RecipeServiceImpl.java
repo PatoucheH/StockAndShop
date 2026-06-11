@@ -46,7 +46,8 @@ public class RecipeServiceImpl implements RecipeService {
                 .collect(Collectors.toSet());
         List<Recipe> matching = recipeRepository.findAll().stream()
                 .filter(recipe -> recipe.getRecipeProducts().stream()
-                        .allMatch(rp -> stockProductNames.contains(rp.getProduct().getName())))
+                        .allMatch(rp -> stockProductNames.contains(rp.getProduct().getName()))
+                )
                 .toList();
         if (!matching.isEmpty()) {
             return matching;
@@ -55,17 +56,28 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Transactional
+    public Recipe generateAndSaveWithProduct(List<ProductStockHome> products) {
+        return generateRecipe(products);
+    }
+
+    @Transactional
     public Recipe generateAndSave(UUID homeId) {
-        Home home = homeRepository.findById(homeId).orElseThrow(
-                () -> new NotFoundException("Home not found with id: " + homeId)
-        );
+        Home home = homeRepository.findById(homeId)
+                .orElseThrow(() -> new NotFoundException(
+                        "Home not found with id: " + homeId));
         if (home.getStocks().isEmpty()) {
-            throw new IllegalStateException("Stock of this home: " + homeId + " is empty");
+            throw new IllegalStateException(
+                    "Stock of this home: " + homeId + " is empty");
         }
+        return generateRecipe(home.getStocks());
+    }
+
+    private Recipe generateRecipe(List<ProductStockHome> products) {
         List<String> existingTitles = recipeRepository.findAll().stream()
                 .map(Recipe::getTitle)
                 .toList();
-        String claudeResponse = callClaude(buildPrompt(home.getStocks(), existingTitles));
+        String claudeResponse = callClaude(
+                buildPrompt(products, existingTitles));
         Recipe recipe = parseResponse(claudeResponse);
         return recipeRepository.save(recipe);
     }
