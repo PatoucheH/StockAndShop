@@ -53,6 +53,22 @@
           }
         </ol>
       </section>
+      <div class="flex flex-col items-center gap-3">
+        @if (isLoadingLists()) {
+          <select disabled><option>Chargement...</option></select>
+        } @else {
+          <select (change)="onSelectChange($event)">
+            <option value="">-- Choisir une liste --</option>
+            @for (sl of allShoppingList(); track sl.id) {
+              <option [value]="sl.id">{{ sl.name }}</option>
+            }
+          </select>
+          <button (click)="addToList()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl
+            text-sm font-semibold cursor-pointer">
+            Ajouter à une liste les ingrédients
+          </button>
+        }
+      </div>
     </div>
   </div>
 </div>

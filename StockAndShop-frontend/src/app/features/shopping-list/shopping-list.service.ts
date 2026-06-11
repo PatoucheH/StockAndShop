@@ -20,6 +20,10 @@ export class ShoppingListService {
     return undefined;
   });
 
+  readonly allShoppingListUser = httpResource<ShoppingList[]>(() =>
+    `${this.apiUrl}/all`
+  );
+
   readonly selectedShoppingListResource = httpResource<ShoppingList>(() =>
     this._selectedListId() !== undefined ? `${this.apiUrl}/${this._selectedListId()}` : undefined,
   );
@@ -86,6 +90,12 @@ export class ShoppingListService {
   addProductToShoppingList(product: ProductItemRequest, id: number) {
     return this.http
       .post<ShoppingList>(`${this.apiUrl}/${id}/add-product`, product)
+      .pipe(tap((updatedList) => this.selectedShoppingListResource.update(() => updatedList)));
+  }
+
+  addListProductsToShoppingList(product : ProductItemRequest[], id: number) {
+    return this.http
+      .post<ShoppingList>(`${this.apiUrl}/${id}/add-list-products`, product)
       .pipe(tap((updatedList) => this.selectedShoppingListResource.update(() => updatedList)));
   }
 

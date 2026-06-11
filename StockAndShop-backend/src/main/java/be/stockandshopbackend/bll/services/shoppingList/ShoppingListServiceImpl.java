@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Propagation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long, ShoppingListRepository>
@@ -33,6 +35,17 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
     @Transactional(readOnly = true)
     public ShoppingList findById(Long id) {
         return super.findById(id);
+    }
+
+
+    public List<ShoppingList> findByUser(User userDetails){
+        List<Home> homes = homeRepository.findByUsers_User(userDetails);
+        List<ShoppingList> sl = homes.stream()
+                .map(Home::getShoppingLists)
+                .flatMap(List::stream)
+                .toList();
+        System.out.println(sl);
+        return sl;
     }
 
     @Override
@@ -68,10 +81,21 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
     }
 
     @Transactional
-    public void addProductFromList(Long shoppingListId, String productName, int quantity){
+    public void addProductToList(Long shoppingListId, String productName, int quantity){
         ShoppingList shoppingList = repository.findById(shoppingListId)
                 .orElseThrow(() -> new NotFoundException("ShoppingList with id " + shoppingListId + " not found"));
         shoppingList.addProduct(new ProductListItem(productService.findOneByName(productName), quantity));
+        repository.save(shoppingList);
+    }
+
+    @Transactional
+    public void addListProductsToList(Long shoppingListId, List<ProductListItem> products){
+        ShoppingList shoppingList = repository.findById(shoppingListId).orElseThrow(
+                () -> new NotFoundException("ShoppingList with id " + shoppingListId + " not found")
+        );
+        for(ProductListItem productListItem : products){
+            shoppingList.addProduct(productListItem);
+        }
         repository.save(shoppingList);
     }
 
