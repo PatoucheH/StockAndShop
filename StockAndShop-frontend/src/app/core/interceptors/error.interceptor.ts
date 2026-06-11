@@ -4,8 +4,12 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from '../../features/auth/auth.service';
 import { ToastService } from '../services/toast.service';
+import { switchMap } from 'rxjs/operators';
 
-export const errorInterceptor: HttpInterceptorFn = (req, next) => {
+export const errorInterceptor: HttpInterceptorFn = (
+  req,
+  next
+) => {
   if (req.url.includes('/auth/')) {
     return next(req);
   }
@@ -16,8 +20,20 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
-        auth.logout();
+      if (error.status === 401 && !req.headers.has("x-Retry")) {
+        return auth.tryRestoreSession().pipe(
+          switchMap(ok => {
+            if(!ok){
+              auth.clearSession();
+              router.navigate(['/auth/login']);
+              return throwError(() => error);
+            }
+            return next(req.clone({ setHeaders: {'X-Retry': 'true'} }));
+          })
+        );
+      }
+      if(error.status === 401 && req.headers.has("X-Retry")) {
+        auth.clearSession();
         router.navigate(['/auth/login']);
         return throwError(() => error);
       }
@@ -29,7 +45,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
 function extractErrorMessage(error: HttpErrorResponse): string {
   if (error.error?.message) return error.error.message;
-
   switch (error.status) {
     case 400: return 'Données invalides.';
     case 401: return 'Session expirée, veuillez vous reconnecter.';

@@ -20,11 +20,22 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private long expiration;
 
+    @Value("${jwt.refresh-expiration}")
+    private long refreshExpiration;
+
     public String generateToken(UserDetails userDetails) {
+        return buildToken(userDetails, expiration);
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(userDetails, refreshExpiration);
+    }
+
+    private String buildToken(UserDetails userDetails, long duration) {
         return Jwts.builder()
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .expiration(new Date(System.currentTimeMillis() + duration))
                 .signWith(getSigningKey())
                 .compact();
     }

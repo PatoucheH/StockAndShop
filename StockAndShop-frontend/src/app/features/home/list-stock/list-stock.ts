@@ -5,7 +5,6 @@ import { RecipeService } from '../../recipe/recipe.service';
 import { SmartUnitPipe } from '../../../shared/pipes/smart-unit.pipe';
 import { UnitConversionService } from '../../../shared/services/unit-conversion.service';
 import { StockRecipeModalComponent } from './stock-recipe-modal/stock-recipe-modal';
-import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal';
 import { ToastService } from '../../../core/services/toast.service';
 import { BtnAnotherRecipe } from '../../recipe/btn-another-recipe/btn-another-recipe';
 
@@ -16,7 +15,7 @@ interface DecreaseEntry {
 
 @Component({
   selector: 'app-list-stock',
-  imports: [SmartUnitPipe, StockRecipeModalComponent, ConfirmModalComponent, BtnAnotherRecipe],
+  imports: [SmartUnitPipe, StockRecipeModalComponent, BtnAnotherRecipe],
   templateUrl: './list-stock.html',
 })
 export class ListStock {

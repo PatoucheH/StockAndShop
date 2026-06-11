@@ -35,7 +35,7 @@ public class AuthService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found : " + email));
     }
 
-    public AuthResponse register(RegisterRequest registerRequest) {
+    public AuthResult register(RegisterRequest registerRequest) {
         if(userRepository.findByEmail(registerRequest.email()).isPresent()) {
             throw new ConflictException("Email already in use: " + registerRequest.email());
         }
@@ -48,25 +48,37 @@ public class AuthService implements UserDetailsService {
                 Set.of(userRole)
         );
         userRepository.save(user);
-        String token = jwtService.generateToken(user);
-        return buildAuthResponse(user, token);
+        return buildAuthResult(user);
     }
 
-    public AuthResponse login(LoginRequest loginRequest) {
+    public AuthResult login(LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found : " + loginRequest.email()));
         if(!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
             throw new BadCredentialsException("Incorrect password");
         }
-        String token = jwtService.generateToken(user);
-        return buildAuthResponse(user, token);
+        return buildAuthResult(user);
     }
 
-    private AuthResponse buildAuthResponse(User user, String token) {
+    public String refreshAccessToken(String refreshToken) {
+        String email = jwtService.extractUsername(refreshToken);
+        UserDetails user = loadUserByUsername(email);
+        if(!jwtService.validateToken(refreshToken, user)) {
+            throw new BadCredentialsException("Invalid or expired refresh token");
+        }
+        return jwtService.generateToken(user);
+    }
+
+    private AuthResult buildAuthResult(User user) {
         List<String> roles = user.getRoles().stream()
                 .map(Role::getAuthority)
                 .toList();
-        return new AuthResponse(token, user.getUsername(), user.getDisplayName(), roles);
+        return new AuthResult(
+                jwtService.generateToken(user),
+                jwtService.generateRefreshToken(user),
+                user.getUsername(),
+                user.getDisplayName(),
+                roles
+        );
     }
-
 }

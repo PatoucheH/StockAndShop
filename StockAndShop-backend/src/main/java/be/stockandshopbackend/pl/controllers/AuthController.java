@@ -1,17 +1,22 @@
 package be.stockandshopbackend.pl.controllers;
 
+import be.stockandshopbackend.bll.services.security.AuthResult;
 import be.stockandshopbackend.bll.services.security.AuthService;
 import be.stockandshopbackend.pl.DTOs.Response.AuthResponse;
 import be.stockandshopbackend.pl.DTOs.requests.LoginRequest;
 import be.stockandshopbackend.pl.DTOs.requests.RegisterRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -20,13 +25,64 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @Value("${jwt.cookie-secure}")
+    private boolean cookieSecure;
+
+    @Value("${jwt.cookie-samesite}")
+    private String cookieSamesite;
+
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> registerUser(@RequestBody @Valid RegisterRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
+    public ResponseEntity<AuthResponse> registerUser(@RequestBody @Valid RegisterRequest request,
+                                                     HttpServletResponse response) {
+        AuthResult result = authService.register(request);
+        setRefreshTokenCookie(response, result.refreshToken());
+        return ResponseEntity.status(HttpStatus.CREATED).body(toAuthResponse(result));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> loginUser(@RequestBody @Valid LoginRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(authService.login(request));
+    public ResponseEntity<AuthResponse> loginUser(@RequestBody @Valid LoginRequest request,
+                                                  HttpServletResponse response) {
+        AuthResult result = authService.login(request);
+        setRefreshTokenCookie(response, result.refreshToken());
+        return ResponseEntity.status(HttpStatus.OK).body(toAuthResponse(result));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<Map<String, String>> refreshToken(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken){
+        if(refreshToken == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        String newAccessToken = authService.refreshAccessToken(refreshToken);
+        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletResponse response){
+        clearRefreshTokenCookie(response);
+        return ResponseEntity.noContent().build();
+    }
+
+    private void setRefreshTokenCookie(HttpServletResponse response, String token){
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", token)
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .sameSite(cookieSamesite)
+                .path("/api/auth/refresh")
+                .maxAge(Duration.ofDays(7))
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+    private void clearRefreshTokenCookie(HttpServletResponse response){
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .sameSite("Strict")
+                .path("/api/auth/refresh")
+                .maxAge(0)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
+    private AuthResponse toAuthResponse(AuthResult result){
+        return new AuthResponse(result.accessToken(), result.email(), result.displayName(), result.roles());
     }
 }
