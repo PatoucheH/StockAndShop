@@ -1,15 +1,18 @@
 package be.stockandshopbackend.bll.services.security;
 
+import be.stockandshopbackend.dal.repositories.RefreshTokenRepository;
 import be.stockandshopbackend.dal.repositories.RoleRepository;
 import be.stockandshopbackend.dal.repositories.UserRepository;
+import be.stockandshopbackend.dl.entities.RefreshToken;
 import be.stockandshopbackend.dl.entities.Role;
 import be.stockandshopbackend.dl.entities.User;
 import be.stockandshopbackend.exceptions.ConflictException;
-import be.stockandshopbackend.pl.DTOs.Response.AuthResponse;
 import be.stockandshopbackend.pl.DTOs.requests.LoginRequest;
 import be.stockandshopbackend.pl.DTOs.requests.RegisterRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,7 +20,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -27,7 +32,10 @@ public class AuthService implements UserDetailsService {
     private final RoleRepository roleRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenRepository refreshTokenRepository;
 
+    @Value("${jwt.refresh-expiration}")
+    private long refreshRExpiration;
 
     @Override
     public UserDetails loadUserByUsername(@NonNull String email) throws UsernameNotFoundException {
@@ -35,6 +43,7 @@ public class AuthService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found : " + email));
     }
 
+    @Transactional
     public AuthResult register(RegisterRequest registerRequest) {
         if(userRepository.findByEmail(registerRequest.email()).isPresent()) {
             throw new ConflictException("Email already in use: " + registerRequest.email());
@@ -51,6 +60,7 @@ public class AuthService implements UserDetailsService {
         return buildAuthResult(user);
     }
 
+    @Transactional
     public AuthResult login(LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found : " + loginRequest.email()));
@@ -60,25 +70,58 @@ public class AuthService implements UserDetailsService {
         return buildAuthResult(user);
     }
 
-    public String refreshAccessToken(String refreshToken) {
-        String email = jwtService.extractUsername(refreshToken);
-        UserDetails user = loadUserByUsername(email);
-        if(!jwtService.validateToken(refreshToken, user)) {
-            throw new BadCredentialsException("Invalid or expired refresh token");
+    @Transactional
+    public RefreshResult rotateRefreshToken(String oldToken){
+        Optional<RefreshToken> stored = refreshTokenRepository.findByToken(oldToken);
+
+        if (stored.isEmpty()) {
+            // Token absent de la DB = déjà roté = possible réutilisation par un attaquant
+            try {
+                String email = jwtService.extractUsername(oldToken);
+                userRepository.findByEmail(email)
+                        .ifPresent(refreshTokenRepository::deleteByUser);
+            } catch (Exception ignored) {}
+            throw new BadCredentialsException("Invalid refresh token");
         }
-        return jwtService.generateToken(user);
+
+        RefreshToken token = stored.get();
+        if(token.getExpiresAt().isBefore(Instant.now())){
+            refreshTokenRepository.delete(token);
+            throw new BadCredentialsException("Refresh token expired");
+        }
+        User user = token.getUser();
+        if(!jwtService.validateToken(oldToken, user)){
+            refreshTokenRepository.delete(token);
+            throw new BadCredentialsException("Invalid refresh token");
+        }
+        refreshTokenRepository.delete(token);
+        String newAccessToken = jwtService.generateToken(user);
+        String newRefreshToken = jwtService.generateRefreshToken(user);
+        refreshTokenRepository.save(
+                new RefreshToken(newRefreshToken, user, Instant.now().plusMillis(refreshRExpiration)));
+        return new RefreshResult(newAccessToken, newRefreshToken);
+    }
+
+    @Transactional
+    public void revokeRefreshToken(String token){
+        refreshTokenRepository.deleteByToken(token);
+    }
+
+    @Transactional
+    public void revokeAllRefreshTokens(User user){
+        refreshTokenRepository.deleteByUser(user);
     }
 
     private AuthResult buildAuthResult(User user) {
         List<String> roles = user.getRoles().stream()
                 .map(Role::getAuthority)
                 .toList();
-        return new AuthResult(
-                jwtService.generateToken(user),
-                jwtService.generateRefreshToken(user),
-                user.getUsername(),
-                user.getDisplayName(),
-                roles
-        );
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        refreshTokenRepository.deleteByUserAndExpiresAtBefore(user, Instant.now());
+        refreshTokenRepository.save(new RefreshToken(
+                refreshToken, user, Instant.now().plusMillis(refreshRExpiration)
+        ));
+        return new AuthResult(accessToken, refreshToken, user.getUsername(), user.getDisplayName(), roles);
     }
 }

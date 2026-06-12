@@ -5,6 +5,7 @@ import be.stockandshopbackend.bll.services.security.AuthService;
 import be.stockandshopbackend.pl.DTOs.Response.AuthResponse;
 import be.stockandshopbackend.pl.DTOs.requests.LoginRequest;
 import be.stockandshopbackend.pl.DTOs.requests.RegisterRequest;
+import be.stockandshopbackend.bll.services.security.RefreshResult;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,14 +50,19 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<Map<String, String>> refreshToken(
-            @CookieValue(name = "refreshToken", required = false) String refreshToken){
+            @CookieValue(name = "refreshToken", required = false) String refreshToken,
+            HttpServletResponse response) {
         if(refreshToken == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        String newAccessToken = authService.refreshAccessToken(refreshToken);
-        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+        RefreshResult result = authService.rotateRefreshToken(refreshToken);
+        setRefreshTokenCookie(response, result.refreshToken());
+        return ResponseEntity.ok(Map.of("accessToken", result.accessToken()));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletResponse response){
+    public ResponseEntity<Void> logout(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken,
+            HttpServletResponse response){
+        if (refreshToken != null) authService.revokeRefreshToken(refreshToken);
         clearRefreshTokenCookie(response);
         return ResponseEntity.noContent().build();
     }
@@ -66,7 +72,7 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(cookieSecure)
                 .sameSite(cookieSamesite)
-                .path("/api/auth/refresh")
+                .path("/api/auth")
                 .maxAge(Duration.ofDays(7))
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -75,8 +81,8 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
                 .secure(cookieSecure)
-                .sameSite("Strict")
-                .path("/api/auth/refresh")
+                .sameSite(cookieSamesite)
+                .path("/api/auth")
                 .maxAge(0)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
