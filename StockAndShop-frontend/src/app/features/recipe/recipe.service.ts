@@ -76,9 +76,12 @@ export class RecipeService {
     this._page.update((p) => p + 1);
   }
 
-  generateRecipe(homeId: string) {
+  generateRecipe(homeId: string, products?: ProductStock[]) {
     this.isGeneratingRecipe.set(true);
-    this.http.get<Recipe[]>(`${this.apiUrl}/${homeId}/suggestions`).subscribe({
+    const request$ = products?.length
+      ? this.http.post<Recipe[]>(`${this.apiUrl}/${homeId}/suggestions`, { productNames: products.map(p => p.nameProduct) })
+      : this.http.get<Recipe[]>(`${this.apiUrl}/${homeId}/suggestions`);
+    request$.subscribe({
       next: (recipes) => {
         this._newRecipes.set(recipes);
         this.isGeneratingRecipe.set(false);
@@ -89,10 +92,13 @@ export class RecipeService {
     });
   }
 
-  generateNewRecipe(homeId: string, products?: ProductStock[]) {
+  clearNewRecipes() {
+    this._newRecipes.set([]);
+  }
+
+  generateNewRecipe(homeId: string) {
     this.isGeneratingRecipe.set(true);
-    const body = products?.length ? { products } : {};
-    this.http.post<Recipe>(`${this.apiUrl}/${homeId}/generate`, body).subscribe({
+    this.http.post<Recipe>(`${this.apiUrl}/${homeId}/generate`, {}).subscribe({
       next: (recipe) => {
         this._newRecipes.update((prev) => [recipe, ...prev]);
         this.isGeneratingRecipe.set(false);

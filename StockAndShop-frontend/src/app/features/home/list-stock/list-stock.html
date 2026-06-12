@@ -64,6 +64,8 @@
 <!-- Recipe suggestion modal -->
 @if (modalRecipe()) {
   <app-stock-recipe-modal (closed)="modalRecipe.set(false)"/>
-  <app-btn-another-recipe/>
+  @if (!recipeService.isGeneratingRecipe()) {
+    <app-btn-another-recipe/>
+  }
 }
 

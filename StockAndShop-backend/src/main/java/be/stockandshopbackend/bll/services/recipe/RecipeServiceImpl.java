@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -41,15 +42,20 @@ public class RecipeServiceImpl implements RecipeService {
         Home home = homeRepository.findById(homeId).orElseThrow(
                 () -> new NotFoundException("Home not found with id: " + homeId)
         );
-        Set<String> stockProductNames = home.getStocks().stream()
+        List<String> stockProductNames = home.getStocks().stream()
                 .map(s -> s.getProduct().getName())
-                .collect(Collectors.toSet());
+                .toList();
+        return getSuggestionsWithProducts(homeId, stockProductNames);
+    }
+
+    @Transactional
+    public List<Recipe> getSuggestionsWithProducts(UUID homeId, List<String> productNames) {
+        Set<String> filter = new HashSet<>(productNames);
         List<Recipe> matching = recipeRepository.findAll().stream()
                 .filter(recipe -> recipe.getRecipeProducts().stream()
-                        .allMatch(rp -> stockProductNames.contains(rp.getProduct().getName()))
+                        .allMatch(rp -> filter.contains(rp.getProduct().getName()))
                 )
                 .toList();
-        // Falls back to generating a new recipe if none of the existing ones can be made with current stock
         if (!matching.isEmpty()) {
             return matching;
         }
@@ -83,9 +89,14 @@ public class RecipeServiceImpl implements RecipeService {
         return recipeRepository.save(recipe);
     }
 
+    private static final String PANTRY_STAPLES =
+            "eau, eau minérale, sel, sel fin, poivre, poivre noir, poivre blanc, " +
+            "huile d'olive, huile de tournesol, huile végétale, vinaigre, " +
+            "beurre, sucre, farine, levure chimique, bicarbonate de soude";
+
     private String buildPrompt(List<ProductStockHome> stocks, List<String> existingTitles) {
         StringBuilder sb = new StringBuilder();
-        sb.append("You are a head chef. Here are the products currently in stock:\n\n");
+        sb.append("You are a head chef. Here are the products currently in the pantry:\n\n");
         stocks.forEach(stock -> sb.append("- ")
                 .append(stock.getProduct().getName())
                 .append(": ").append(stock.getQuantity())
@@ -98,7 +109,18 @@ public class RecipeServiceImpl implements RecipeService {
         }
         sb.append("""
 
-                  Suggest a NEW recipe using these ingredients.
+                  The following are universal household staples that everyone always has at home.
+                  You may use them freely in the recipe steps, but NEVER list them in the INGREDIENTS section:
+                  """)
+          .append(PANTRY_STAPLES).append("\n");
+        sb.append("""
+
+                  Suggest a NEW recipe using ONLY the pantry products listed above.
+                  Rules:
+                  - Only use ingredients from the provided stock list (staples are allowed in steps but not in INGREDIENTS).
+                  - If the available products do not allow a coherent, appetizing dish, propose the simplest and most honest recipe possible — never invent ingredients that are not in the list.
+                  - A recipe must be culinarily coherent and realistic. Prefer a simple but correct dish over a complicated incoherent one.
+
                   Please reply ONLY in this format, in FRENCH, without any additional text:
 
                   TITLE: name of the recipe
@@ -111,6 +133,7 @@ public class RecipeServiceImpl implements RecipeService {
 
                   Important: product names must match EXACTLY the names provided in the stock list.
                   Do NOT use brackets [] around any text.
+                  Do NOT list staple ingredients (water, salt, pepper, oil, butter, flour, sugar, vinegar) in INGREDIENTS.
                   """);
         return sb.toString();
     }

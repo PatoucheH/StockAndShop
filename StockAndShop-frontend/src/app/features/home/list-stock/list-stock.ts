@@ -104,11 +104,9 @@ export class ListStock {
       this.toast.error('Votre stock doit contenir au moins 5 produits pour générer une recette.');
       return;
     }
-    if (selected.length > 0) {
-      this.recipeService.generateNewRecipe(this.homeService.selectedHome()!.id, selected);
-    } else {
-      this.recipeService.generateNewRecipe(this.homeService.selectedHome()!.id);
-    }
+    this.recipeService.clearNewRecipes();
+    const homeId = this.homeService.selectedHome()!.id;
+    this.recipeService.generateRecipe(homeId, selected.length > 0 ? selected : undefined);
     this.modalRecipe.set(true);
   }
 

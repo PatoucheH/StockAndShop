@@ -5,6 +5,7 @@ import be.stockandshopbackend.dl.entities.Recipe;
 import be.stockandshopbackend.pl.DTOs.Response.PagedRecipeResponse;
 import be.stockandshopbackend.pl.DTOs.Response.RecipeResponse;
 import be.stockandshopbackend.pl.DTOs.requests.GenerateRecipeRequest;
+import be.stockandshopbackend.pl.DTOs.requests.SuggestionsWithProductsRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -46,6 +47,18 @@ public class RecipeController {
     public ResponseEntity<List<RecipeResponse>> getSuggestions(@PathVariable UUID id) {
         return ResponseEntity.ok(
                 recipeService.getSuggestions(id).stream()
+                        .map(RecipeResponse::fromRecipe)
+                        .toList()
+        );
+    }
+
+    @PostMapping("/{id}/suggestions")
+    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
+    public ResponseEntity<List<RecipeResponse>> getSuggestionsWithProducts(
+            @PathVariable UUID id,
+            @RequestBody SuggestionsWithProductsRequest request) {
+        return ResponseEntity.ok(
+                recipeService.getSuggestionsWithProducts(id, request.productNames()).stream()
                         .map(RecipeResponse::fromRecipe)
                         .toList()
         );

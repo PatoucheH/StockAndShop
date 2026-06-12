@@ -13,6 +13,7 @@ public interface RecipeService {
     /// GET
     Page<Recipe> getAllRecipes(Pageable pageable);
     List<Recipe> getSuggestions(UUID homeId);
+    List<Recipe> getSuggestionsWithProducts(UUID homeId, List<String> productNames);
 
     /// ADD / GENERATE
     Recipe generateAndSaveWithProduct(List<ProductStockHome> product);
