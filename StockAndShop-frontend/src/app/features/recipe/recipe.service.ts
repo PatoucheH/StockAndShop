@@ -76,7 +76,7 @@ export class RecipeService {
     this._page.update((p) => p + 1);
   }
 
-  generateRecipe(homeId: string, products?: ProductStock[]) {
+  generateRecipe(homeId: string, products?: ProductStock[], onError?: (msg: string) => void) {
     this.isGeneratingRecipe.set(true);
     const request$ = products?.length
       ? this.http.post<Recipe[]>(`${this.apiUrl}/${homeId}/suggestions`, { productNames: products.map(p => p.nameProduct) })
@@ -86,8 +86,9 @@ export class RecipeService {
         this._newRecipes.set(recipes);
         this.isGeneratingRecipe.set(false);
       },
-      error: () => {
+      error: (err) => {
         this.isGeneratingRecipe.set(false);
+        onError?.(err?.error ?? 'Impossible de générer une recette.');
       },
     });
   }
@@ -96,15 +97,16 @@ export class RecipeService {
     this._newRecipes.set([]);
   }
 
-  generateNewRecipe(homeId: string) {
+  generateNewRecipe(homeId: string, onError?: (msg: string) => void) {
     this.isGeneratingRecipe.set(true);
     this.http.post<Recipe>(`${this.apiUrl}/${homeId}/generate`, {}).subscribe({
       next: (recipe) => {
         this._newRecipes.update((prev) => [recipe, ...prev]);
         this.isGeneratingRecipe.set(false);
       },
-      error: () => {
+      error: (err) => {
         this.isGeneratingRecipe.set(false);
+        onError?.(err?.error ?? 'Impossible de générer une recette.');
       },
     });
   }

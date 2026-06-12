@@ -5,6 +5,7 @@ import be.stockandshopbackend.dal.repositories.ProductRepository;
 import be.stockandshopbackend.dal.repositories.RecipeRepository;
 import be.stockandshopbackend.dl.entities.*;
 import be.stockandshopbackend.exceptions.NotFoundException;
+import be.stockandshopbackend.exceptions.RecipeNotPossibleException;
 import com.anthropic.client.AnthropicClient;
 import com.anthropic.models.messages.Message;
 import com.anthropic.models.messages.MessageCreateParams;
@@ -83,8 +84,13 @@ public class RecipeServiceImpl implements RecipeService {
         List<String> existingTitles = recipeRepository.findAll().stream()
                 .map(Recipe::getTitle)
                 .toList();
-        String claudeResponse = callClaude(
-                buildPrompt(products, existingTitles));
+        String claudeResponse = callClaude(buildPrompt(products, existingTitles));
+        if (claudeResponse.trim().startsWith("IMPOSSIBLE")) {
+            String reason = claudeResponse.trim().replaceFirst("^IMPOSSIBLE[:\\s]*", "").trim();
+            throw new RecipeNotPossibleException(reason.isEmpty()
+                    ? "Les ingrédients disponibles ne permettent pas de créer une recette cohérente."
+                    : reason);
+        }
         Recipe recipe = parseResponse(claudeResponse);
         return recipeRepository.save(recipe);
     }
@@ -118,8 +124,8 @@ public class RecipeServiceImpl implements RecipeService {
                   Suggest a NEW recipe using ONLY the pantry products listed above.
                   Rules:
                   - Only use ingredients from the provided stock list (staples are allowed in steps but not in INGREDIENTS).
-                  - If the available products do not allow a coherent, appetizing dish, propose the simplest and most honest recipe possible — never invent ingredients that are not in the list.
-                  - A recipe must be culinarily coherent and realistic. Prefer a simple but correct dish over a complicated incoherent one.
+                  - A recipe must be culinarily coherent, realistic and appetizing.
+                  - If the available products absolutely cannot produce a coherent and appetizing recipe (e.g. random unrelated products, only drinks, incoherent combinations), do NOT force a recipe. Instead, reply with exactly: IMPOSSIBLE: <brief reason in French>. Nothing else.
 
                   Please reply ONLY in this format, in FRENCH, without any additional text:
 

@@ -3,6 +3,7 @@ package be.stockandshopbackend.advisor;
 import be.stockandshopbackend.exceptions.AlreadyExistsException;
 import be.stockandshopbackend.exceptions.ConflictException;
 import be.stockandshopbackend.exceptions.NotFoundException;
+import be.stockandshopbackend.exceptions.RecipeNotPossibleException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -41,6 +42,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({UsernameNotFoundException.class, BadCredentialsException.class})
     public ResponseEntity<String> handleAuthenticationException(RuntimeException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(RecipeNotPossibleException.class)
+    public ResponseEntity<String> handleRecipeNotPossible(RecipeNotPossibleException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

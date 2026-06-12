@@ -106,7 +106,10 @@ export class ListStock {
     }
     this.recipeService.clearNewRecipes();
     const homeId = this.homeService.selectedHome()!.id;
-    this.recipeService.generateRecipe(homeId, selected.length > 0 ? selected : undefined);
+    this.recipeService.generateRecipe(homeId, selected.length > 0 ? selected : undefined, (msg) => {
+      this.toast.error(msg);
+      this.modalRecipe.set(false);
+    });
     this.modalRecipe.set(true);
   }
 
