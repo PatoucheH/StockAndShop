@@ -42,6 +42,7 @@ public class ProductServiceImpl extends BaseCRUDService<Product, Long, ProductRe
         if(repository.existsByName(name)) throw new AlreadyExistsException("This product exists already");
         Category category = categoryService.findByNameOrCreate(categoryName);
         Product product = new Product();
+        // Stored lowercase so lookups are case-insensitive without needing LOWER() in every query
         product.setName(name.toLowerCase());
         product.setUnity(Unity.fromValue(unity));
         product.setCategory(category);

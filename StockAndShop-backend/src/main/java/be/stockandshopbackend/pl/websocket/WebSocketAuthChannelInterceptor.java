@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
+// Browsers can't send custom HTTP headers during the WebSocket handshake upgrade,
+// so the JWT is passed in the STOMP CONNECT frame headers instead of Authorization HTTP header.
 @Component
 @RequiredArgsConstructor
 public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {

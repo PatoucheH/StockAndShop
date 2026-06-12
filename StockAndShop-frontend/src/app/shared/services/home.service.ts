@@ -17,6 +17,7 @@ export class HomeService {
   private apiUrl = `${environment.apiUrl}/home`;
   private authService = inject(AuthService);
 
+  // linkedSignal resets to undefined whenever authVersion changes, clearing home selection on logout/login
   private _selectedHomeId = linkedSignal<string | undefined>(() => {
     this.authService.authVersion();
     return undefined;

@@ -25,6 +25,7 @@ export class DetailsHomeComponent implements OnInit {
   shoppingLists = this.homeService.shoppingLists;
   stock = this.homeService.stock;
 
+  // Resets to the 'list' tab whenever the selected home changes
   view = linkedSignal<'list' | 'stock' | 'user'>(() => {
     this.home();
     return 'list';

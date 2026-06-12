@@ -20,6 +20,7 @@ export class FavoriteShoppingListsComponent {
   isLoading = this.shoppingListService.isFavoritesLoading;
   hasError = this.shoppingListService.hasFavoritesError;
 
+  // Clamped so the carousel doesn't render empty slots when fewer than 3 lists exist
   numVisible = computed(() => Math.min(3, this.favoriteShoppingLists().length));
 
   responsiveOptions = computed(() => [

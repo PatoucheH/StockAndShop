@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductListItemRepository extends JpaRepository<ProductListItem, Long> {
 
+    // Native query because ProductListItem has no back-reference to ShoppingList, preventing Spring from deriving this join
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM product_list_item WHERE id = :itemId AND shopping_list_id = :listId",

@@ -12,6 +12,7 @@ export class AuthService {
 
   private readonly _accessToken = signal<string | null>(null);
 
+  // Monotonically increasing counter used as a reactive dependency — increment to force all auth-dependent signals to re-evaluate
   readonly authVersion = signal(0);
 
   login(body: LoginRequest) {

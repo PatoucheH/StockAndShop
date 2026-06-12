@@ -20,6 +20,8 @@ export const errorInterceptor: HttpInterceptorFn = (
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      // On first 401, try to refresh the token and retry the request once
+      // X-Retry header prevents an infinite loop if the retried request also returns 401
       if (error.status === 401 && !req.headers.has("x-Retry")) {
         return auth.tryRestoreSession().pipe(
           switchMap(ok => {

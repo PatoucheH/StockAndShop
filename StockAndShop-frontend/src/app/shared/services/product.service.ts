@@ -21,6 +21,7 @@ export class ProductService {
     return this.http.post(`${this.apiUrl}`, product);
   }
 
+  // Hits /product-list-item/{id}/check — the '-list-item' suffix is appended to the product apiUrl base
   checkedItemOnList(id: number){
     return this.http.patch(`${this.apiUrl}-list-item/${id}/check`, {});
   }

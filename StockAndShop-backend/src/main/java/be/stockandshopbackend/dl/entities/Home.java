@@ -41,6 +41,7 @@ public class Home extends UuidBaseEntity {
         shoppingLists.add(shoppingList);
     }
 
+    // Accumulates quantity if the product already exists in stock, otherwise adds a new entry
     public void addProductStock(ProductStockHome productStockHome) {
         stocks.stream()
         .filter(s -> s.getProduct().getId().equals(productStockHome.getProduct().getId()))

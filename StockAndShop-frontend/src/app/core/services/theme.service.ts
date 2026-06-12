@@ -21,6 +21,7 @@ export class ThemeService {
   private resolveInitialTheme(): boolean {
     const stored = localStorage.getItem('theme');
     if (stored) return stored === 'dark';
+    // Falls back to the OS dark-mode preference when no stored theme exists
     return this.doc.defaultView?.matchMedia('(prefers-color-scheme: dark)').matches ?? false;
   }
 }

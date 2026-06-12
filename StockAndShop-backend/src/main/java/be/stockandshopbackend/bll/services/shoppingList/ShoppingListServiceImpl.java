@@ -64,6 +64,7 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
     //region WEBSOCKET
 
     private String currentUsername(){
+        // SecurityContextHolder used here because @AuthenticationPrincipal is only available at controller level
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
@@ -84,6 +85,7 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
         if (!repository.existsById(id)) {
             throw new NotFoundException("No shopping list found with id : " + id);
         }
+        // Removal from the parent collection triggers deletion via orphanRemoval declared on Home.shoppingLists
         homeRepository.findByShoppingListsId(id).ifPresent(home -> {
             home.getShoppingLists().removeIf(sl -> sl.getId().equals(id));
             homeRepository.save(home);
@@ -138,6 +140,7 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
     public void addProductToList(Long shoppingListId, String productName, int quantity){
         ShoppingList shoppingList = repository.findById(shoppingListId)
                 .orElseThrow(() -> new NotFoundException("ShoppingList with id " + shoppingListId + " not found"));
+        // Keep a reference before adding so we can broadcast the saved item without relying on getLast()
         ProductListItem newItem = new ProductListItem(productService.findOneByName(productName), quantity);
         shoppingList.addProduct(newItem);
         repository.save(shoppingList);

@@ -16,10 +16,12 @@ export class WebSocketService implements OnDestroy {
   constructor() {
     effect(() => {
       const token = this.authService.getToken();
-      this.authService.authVersion(); // rend l'effect réactif aux changements de session
+      // authVersion is read to make this effect reactive to all auth changes, not just token value changes
+      this.authService.authVersion();
 
       if (token) {
         this.client.connectHeaders = { Authorization: `Bearer ${token}` };
+        // Reconnect with updated headers when the token changes
         if (this.client.active) {
           this.client.deactivate().then(() => this.client.activate());
         } else {
@@ -33,8 +35,7 @@ export class WebSocketService implements OnDestroy {
 
   subscribe(topic: string): Observable<IMessage> {
     return new Observable(observer => {
-      // @stomp/stompjs met les subscriptions en queue si pas encore connecté
-      // et les ré-établit automatiquement après reconnexion
+      // @stomp/stompjs queues subscriptions if not yet connected and re-establishes them automatically after reconnection
       const sub = this.client.subscribe(topic, msg => observer.next(msg));
       return () => sub.unsubscribe();
     });

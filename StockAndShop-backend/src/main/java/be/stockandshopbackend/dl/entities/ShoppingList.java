@@ -32,6 +32,7 @@ public class ShoppingList extends LongBaseEntity {
         this.description = description;
     }
 
+    // Accumulates quantity if the product already exists in the list, otherwise adds a new entry
     public void addProduct(ProductListItem item) {
         products.stream()
                 .filter(p -> p.getProduct().getId().equals(item.getProduct().getId()))

@@ -39,6 +39,7 @@ public class SecurityConfig {
     @Value("${cors.allowed-origins}")
     private String allowedOrigins;
 
+    // @Lazy breaks the circular dependency: JwtAuthenticationFilter -> AuthService -> SecurityConfig
     public SecurityConfig(@Lazy JwtAuthenticationFilter jwtAuthenticationFilter,
                           UserDetailsService userDetailsService,
                           PasswordEncoder passwordEncoder) {
@@ -84,6 +85,7 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                // /ws/** is open here because WebSocket auth is handled at the STOMP layer by WebSocketAuthChannelInterceptor
                 .requestMatchers(
                     "/api/auth/**",
                     "/ws/**",

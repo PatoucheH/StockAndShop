@@ -14,6 +14,7 @@ public class ProductListItem extends LongBaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
+    // DB-level cascade: item is deleted when the referenced product is deleted, bypassing JPA lifecycle hooks
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Product product;
 

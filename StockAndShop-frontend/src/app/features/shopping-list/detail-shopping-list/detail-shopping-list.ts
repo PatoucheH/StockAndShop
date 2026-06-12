@@ -38,6 +38,7 @@ export class DetailShoppingListComponent {
     return Array.from(map.entries()).map(
       ([category, items]) => ({
         category,
+        // Number(false) = 0, Number(true) = 1 — unchecked items sort before checked ones
         items: [...items].sort((a, b) => Number(a.isChecked) - Number(b.isChecked)),
       })
     );

@@ -18,6 +18,7 @@ export class ItemShoppingList {
   shoppingListService = inject(ShoppingListService);
 
   item = input.required<ProductItem>();
+  // Mirrors the input for optimistic UI — local state is updated immediately on toggle, then synced back if the input changes
   isChecked = linkedSignal(() => this.item().isChecked);
 
   checkedItem() {

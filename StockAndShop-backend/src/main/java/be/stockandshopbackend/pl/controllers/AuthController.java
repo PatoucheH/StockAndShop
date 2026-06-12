@@ -72,6 +72,7 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(cookieSecure)
                 .sameSite(cookieSamesite)
+                // Scoped to /api/auth so the browser only sends the refresh token on auth endpoints, not on every API call
                 .path("/api/auth")
                 .maxAge(Duration.ofDays(7))
                 .build();

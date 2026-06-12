@@ -49,6 +49,7 @@ public class RecipeServiceImpl implements RecipeService {
                         .allMatch(rp -> stockProductNames.contains(rp.getProduct().getName()))
                 )
                 .toList();
+        // Falls back to generating a new recipe if none of the existing ones can be made with current stock
         if (!matching.isEmpty()) {
             return matching;
         }
@@ -90,6 +91,7 @@ public class RecipeServiceImpl implements RecipeService {
                 .append(": ").append(stock.getQuantity())
                 .append(" ").append(stock.getProduct().getUnity().name().toLowerCase())
                 .append("\n"));
+        // Passing existing titles to Claude to avoid generating duplicates
         if (!existingTitles.isEmpty()) {
             sb.append("\nThe following recipes already exist — do NOT suggest any of them:\n");
             existingTitles.forEach(title -> sb.append("- ").append(title).append("\n"));
@@ -152,6 +154,7 @@ public class RecipeServiceImpl implements RecipeService {
                         });
                     }
                 } else if (currentSection.equals("STEPS")) {
+                    // Claude occasionally wraps step text in brackets despite instructions — strip them
                     steps.add(line.replaceAll("^\\[|\\]$", "").trim());
                 }
             }

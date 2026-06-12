@@ -75,7 +75,7 @@ public class AuthService implements UserDetailsService {
         Optional<RefreshToken> stored = refreshTokenRepository.findByToken(oldToken);
 
         if (stored.isEmpty()) {
-            // Token absent de la DB = déjà roté = possible réutilisation par un attaquant
+            // Token not in DB means it was already rotated — possible reuse attempt by an attacker, revoke all tokens for this user
             try {
                 String email = jwtService.extractUsername(oldToken);
                 userRepository.findByEmail(email)

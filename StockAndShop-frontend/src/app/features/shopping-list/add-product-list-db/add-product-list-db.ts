@@ -58,6 +58,7 @@ export class AddProductListDb {
     this.productService.createProduct(productToCreate).subscribe({
       next: () => {
         const quantity = this.unitConversion.toBaseUnit(Number(formValue.quantity), this.subUnit());
+        // Lowercased to match the server-normalized product name (backend stores all names in lowercase)
         const productToAdd: ProductItemRequest = {
           name: formValue.name.toLowerCase(),
           quantity,

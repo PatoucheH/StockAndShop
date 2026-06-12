@@ -26,6 +26,8 @@ export class RecipeService {
   });
 
   constructor() {
+    // allowSignalWrites: true is required because this effect writes to _allRecipes
+    // page 0 means a fresh load (reset after auth change), any other page appends for infinite scroll
     effect(
       () => {
         if (this._resource.isLoading()) return;

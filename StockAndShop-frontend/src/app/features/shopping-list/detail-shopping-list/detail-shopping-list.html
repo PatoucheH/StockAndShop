@@ -1,6 +1,7 @@
 @if (loading()) {
   <app-loading />
 } @else if (selectedShoppingList(); as list) {
+  <!-- Page header: back button, list title, favorite and add-to-stock actions -->
   <section class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
     <div class="flex flex-wrap items-center gap-3 mb-5">
       <button (click)="location.back()"
@@ -33,6 +34,7 @@
         </button>
       </div>
     </div>
+    <!-- Product list grouped by category -->
     <div class="flex flex-col gap-5">
       @for (group of groupedProducts(); track group.category) {
         <div>
@@ -51,6 +53,7 @@
         <app-form-add-product-shopping-list [id]="id" />
       }
     </div>
+    <!-- Add product controls: inline form and create-new trigger -->
     <div class="mt-6">
       <button (click)="openModal()"
               class="w-full py-3 rounded-xl text-sm font-medium text-gray-500 dark:text-gray-400

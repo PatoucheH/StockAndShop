@@ -104,6 +104,7 @@ public class HomeController {
             @PathVariable UUID id,
             @RequestBody @Valid AddUserToHomeRequest req
     ){
+        // OWNER cannot be assigned via invitation; only the home creator gets OWNER (see POST /home)
         HomeRole role = (req.role() == null || req.role() == HomeRole.OWNER) ? HomeRole.USER : req.role();
         UserHome userHome = new UserHome(userService.findByEmail(req.email()), role);
         homeService.addUserHome(id, userHome);

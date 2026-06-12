@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/// DTO for ProductStockHome AND ProductListItem return
+// Shared DTO for both ProductStockHome (stock) and ProductListItem (shopping list)
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -41,6 +41,7 @@ public class ProductItemResponse {
         );
     }
 
+    // Stock items are never in a checked state
     public static ProductItemResponse fromProductStockHome(ProductStockHome productStockHome){
         return new ProductItemResponse(
                 productStockHome.getId(),

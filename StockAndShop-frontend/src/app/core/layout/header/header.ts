@@ -22,6 +22,7 @@ export class HeaderComponent {
   );
 
   constructor() {
+    // routeChange() is read purely as a dependency — any navigation triggers this effect and closes the mobile menu
     effect(() => {
       this.routeChange();
       this.isMenuOpen.set(false);

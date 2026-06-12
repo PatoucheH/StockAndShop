@@ -18,6 +18,7 @@ export class ShoppingListService {
   private authService = inject(AuthService);
   private wsService = inject(WebSocketService);
 
+  // linkedSignal resets to undefined whenever authVersion changes, clearing list selection on logout/login
   private _selectedListId = linkedSignal<number | undefined>(() => {
     this.authService.authVersion();
     return undefined;
@@ -65,6 +66,7 @@ export class ShoppingListService {
   }
 
   private handleWsEvent(event: ShoppingListWsEvent) {
+    // Own events are ignored — local state was already updated optimistically when the action was dispatched
     if (event.triggeredByUsername === this.authService.getUserEmail()) return;
     switch (event.type) {
       case 'ITEM_TOGGLED': {
@@ -96,6 +98,7 @@ export class ShoppingListService {
   }
 
   selectShoppingList(id: number) {
+    // Selecting the same list forces a reload in case its content changed since last visit
     if (this._selectedListId() === id) {
       this.selectedShoppingListResource.reload();
     } else {

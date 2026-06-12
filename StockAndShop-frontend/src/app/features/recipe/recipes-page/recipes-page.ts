@@ -21,6 +21,7 @@ export class RecipesPageComponent {
   currentHasError = computed(() =>
     this.showFavorites() ? this.recipeService.hasFavoritesError() : this.recipeService.hasError(),
   );
+  // Favorites are fully loaded at once — pagination only applies to the all-recipes view
   currentHasMore = computed(() =>
     this.showFavorites() ? false : this.recipeService.hasMore(),
   );

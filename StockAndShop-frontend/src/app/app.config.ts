@@ -15,6 +15,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([errorInterceptor, jwtInterceptor])),
+    // Attempts to restore the session from the httpOnly refresh token cookie before the app renders
     provideAppInitializer(() => {
       const auth = inject(AuthService);
       return auth.tryRestoreSession();

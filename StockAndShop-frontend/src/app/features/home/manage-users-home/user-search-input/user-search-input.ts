@@ -62,6 +62,7 @@ export class UserSearchInputComponent {
   }
 
   hideSuggestions() {
+    // Delayed so a click on a suggestion registers before the dropdown hides
     setTimeout(() => this.showSuggestions.set(false), 150);
   }
 

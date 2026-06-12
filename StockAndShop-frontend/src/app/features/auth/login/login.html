@@ -1,5 +1,6 @@
 <div class="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-gray-900 px-4">
   <div class="w-full max-w-sm">
+    <!-- Logo and branding -->
     <div class="flex flex-col items-center mb-8">
       <div class="w-12 h-12 rounded-2xl bg-emerald-600 flex items-center justify-center mb-4">
         <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -10,6 +11,7 @@
       <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100">Stock<span class="text-emerald-600">&</span>Shop</h1>
       <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Connectez-vous à votre compte</p>
     </div>
+    <!-- Login form: email, password -->
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-7">
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
         <div class="flex flex-col gap-1.5">
@@ -56,6 +58,7 @@
         </button>
       </form>
     </div>
+    <!-- Register redirect link -->
     <p class="text-center text-sm text-gray-500 dark:text-gray-400 mt-5">
       Pas encore de compte ?
       <a routerLink="/auth/register" class="text-emerald-600 hover:text-emerald-700 font-medium">S'enregistrer</a>

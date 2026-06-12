@@ -41,6 +41,7 @@ public class User extends UuidBaseEntity implements UserDetails {
         return this.username;
     }
 
+    // Spring Security uses email as the unique principal — the 'username' field is the display name only
     @Override
     public String getUsername() {
         return this.email;

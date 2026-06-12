@@ -37,6 +37,7 @@ public class ProductListItemServiceImpl extends BaseCRUDService<ProductListItem,
         productListItem.toggleIsChecked();
         repository.save(productListItem);
 
+        // ProductListItem has no back-reference to ShoppingList, so we look it up via the repository
         shoppingListRepository.findByProductsId(productListItemId).ifPresent(shoppingList ->
             messagingTemplate.convertAndSend(
                 "/topic/shopping-list/" + shoppingList.getId(),
