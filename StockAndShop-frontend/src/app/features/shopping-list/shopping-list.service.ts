@@ -1,19 +1,22 @@
 import { computed, inject, Injectable, linkedSignal } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { ProductItemRequest } from '../../shared/models/productItem.models';
-import { skip, tap } from 'rxjs';
+import { ProductItem, ProductItemRequest } from '../../shared/models/productItem.models';
+import { EMPTY, skip, switchMap, tap } from 'rxjs';
 import { ShoppingList, ShoppingListRequest } from './shopping-list.models';
 import { AuthService } from '../auth/auth.service';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { WebSocketService } from '../../core/services/websocket.service';
+import { ItemRemovedPayload, ItemToggledPayload, ShoppingListWsEvent } from '../../shared/models/websocket.models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ShoppingListService {
-  private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/shopping-list`;
+  private http = inject(HttpClient);
   private authService = inject(AuthService);
+  private wsService = inject(WebSocketService);
 
   private _selectedListId = linkedSignal<number | undefined>(() => {
     this.authService.authVersion();
@@ -53,6 +56,43 @@ export class ShoppingListService {
         this._favoritesResource.reload();
       }
     });
+    toObservable(this._selectedListId).pipe(
+      takeUntilDestroyed(),
+      switchMap(id =>
+        id !== undefined ? this.wsService.subscribe(`/topic/shopping-list/${id}`) : EMPTY
+      )
+    ).subscribe(msg => this.handleWsEvent(JSON.parse(msg.body) as ShoppingListWsEvent));
+  }
+
+  private handleWsEvent(event: ShoppingListWsEvent) {
+    if (event.triggeredByUsername === this.authService.getUserEmail()) return;
+    switch (event.type) {
+      case 'ITEM_TOGGLED': {
+        const p = event.payload as ItemToggledPayload;
+        this.updateItemCheckedState(p.itemId, p.isChecked);
+        break;
+      }
+      case 'ITEM_ADDED':
+        this.selectedShoppingListResource.update(list =>
+          list ? { ...list, products: [...list.products, event.payload as ProductItem] } : list
+        );
+        break;
+      case 'ITEMS_BATCH_ADDED':
+        this.selectedShoppingListResource.update(list =>
+          list ? { ...list, products: [...list.products, ...(event.payload as ProductItem[])] } : list
+        );
+        break;
+      case 'ITEM_REMOVED': {
+        const p = event.payload as ItemRemovedPayload;
+        this.selectedShoppingListResource.update(list =>
+          list ? { ...list, products: list.products.filter(item => item.id !== p.itemId) } : list
+        );
+        break;
+      }
+      case 'ITEM_TRANSFERRED':
+        this.selectedShoppingListResource.reload();
+        break;
+    }
   }
 
   selectShoppingList(id: number) {

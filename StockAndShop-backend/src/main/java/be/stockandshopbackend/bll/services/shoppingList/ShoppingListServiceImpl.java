@@ -7,14 +7,19 @@ import be.stockandshopbackend.dal.repositories.ProductListItemRepository;
 import be.stockandshopbackend.dal.repositories.ShoppingListRepository;
 import be.stockandshopbackend.dl.entities.*;
 import be.stockandshopbackend.exceptions.NotFoundException;
+import be.stockandshopbackend.pl.DTOs.Response.ProductItemResponse;
+import be.stockandshopbackend.pl.DTOs.websocket.ShoppingListEventDTO;
+import be.stockandshopbackend.pl.DTOs.websocket.ShoppingListEventType;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Propagation;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
+import static be.stockandshopbackend.pl.DTOs.websocket.ShoppingListEventType.*;
 
 @Service
 public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long, ShoppingListRepository>
@@ -23,12 +28,20 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
     private final ProductService productService;
     private final ProductListItemRepository productListItemRepository;
     private final HomeRepository homeRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public ShoppingListServiceImpl(ShoppingListRepository repository, ProductService productService, ProductListItemRepository productListItemRepository, HomeRepository homeRepository){
+    public ShoppingListServiceImpl(
+            ShoppingListRepository repository,
+            ProductService productService,
+            ProductListItemRepository productListItemRepository,
+            HomeRepository homeRepository,
+            SimpMessagingTemplate messagingTemplate
+    ){
         super(repository);
         this.productService = productService;
         this.productListItemRepository = productListItemRepository;
         this.homeRepository = homeRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @Override
@@ -48,6 +61,23 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
         return sl;
     }
 
+    //region WEBSOCKET
+
+    private String currentUsername(){
+        return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
+    private void broadcast(Long shoppingListId, ShoppingListEventType type, Object payload){
+        messagingTemplate.convertAndSend(
+                "/topic/shopping-list/" + shoppingListId,
+                new ShoppingListEventDTO(type, shoppingListId, currentUsername(), payload)
+        );
+    }
+
+    //endregion
+
+    //region DELETE
+
     @Override
     @Transactional
     public void deleteById(Long id) {
@@ -66,7 +96,31 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
             throw new NotFoundException("ShoppingList with id " + shoppingListId + " not found");
         }
         productListItemRepository.deleteByIdAndShoppingListId(itemId, shoppingListId);
+        broadcast(shoppingListId, ITEM_REMOVED, Map.of("itemId", itemId));
     }
+
+    @Transactional
+    public ShoppingList deleteProductCheckedAndAddStock(Long shoppingListId, UUID homeId) {
+        ShoppingList shoppingList = repository.findById(shoppingListId).orElseThrow(
+                () -> new NotFoundException("ShoppingList with id " + shoppingListId + " not found")
+        );
+        Home home = homeRepository.findById(homeId).orElseThrow(
+                () -> new NotFoundException("Home not found with the id : " + homeId)
+        );
+        List<ProductListItem> checkedItems = shoppingList.getProducts().stream()
+                .filter(ProductListItem::isChecked)
+                .toList();
+        for (ProductListItem item : checkedItems) {
+            home.addProductStock(new ProductStockHome(item.getProduct(), item.getQuantity()));
+            shoppingList.getProducts().remove(item);
+        }
+        homeRepository.save(home);
+        repository.save(shoppingList);
+        broadcast(shoppingListId, ITEM_TRANSFERRED, null);
+        return shoppingList;
+    }
+
+    //endregion
 
     //region ADD
 
@@ -84,8 +138,10 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
     public void addProductToList(Long shoppingListId, String productName, int quantity){
         ShoppingList shoppingList = repository.findById(shoppingListId)
                 .orElseThrow(() -> new NotFoundException("ShoppingList with id " + shoppingListId + " not found"));
-        shoppingList.addProduct(new ProductListItem(productService.findOneByName(productName), quantity));
+        ProductListItem newItem = new ProductListItem(productService.findOneByName(productName), quantity);
+        shoppingList.addProduct(newItem);
         repository.save(shoppingList);
+        broadcast(shoppingListId, ITEM_ADDED, ProductItemResponse.fromProductListItem(newItem));
     }
 
     @Transactional
@@ -97,27 +153,11 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
             shoppingList.addProduct(productListItem);
         }
         repository.save(shoppingList);
+        List<ProductItemResponse> added = products.stream()
+                .map(ProductItemResponse::fromProductListItem)
+                .toList();
+        broadcast(shoppingListId, ITEMS_BATCH_ADDED, added);
     }
 
     //endregion
-
-    public ShoppingList deleteProductCheckedAndAddStock(Long shoppingListId, UUID homeId) {
-        ShoppingList shoppingList = repository.findById(shoppingListId).orElseThrow(
-                () -> new NotFoundException("ShoppingList with id " + shoppingListId + " not found")
-        );
-        Home home = homeRepository.findById(homeId).orElseThrow(
-                () -> new NotFoundException("Home not found with the id : " + homeId)
-        );
-        List<ProductListItem> checkedItems = shoppingList.getProducts().stream()
-                .filter(ProductListItem::isChecked)
-                .toList();
-        for (ProductListItem item : checkedItems) {
-            home.addProductStock(new ProductStockHome(item.getProduct(), item.getQuantity()));
-            shoppingList.getProducts().remove(item);
-        }
-        homeRepository.save(home);
-        repository.save(shoppingList);
-        return shoppingList;
-    }
-
 }
