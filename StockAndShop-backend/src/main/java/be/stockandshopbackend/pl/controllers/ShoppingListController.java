@@ -49,7 +49,6 @@ public class ShoppingListController {
     }
 
     @GetMapping("/all")
-    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<List<ShoppingListResponse>> getShoppingListsByUser(@AuthenticationPrincipal UserDetails userDetails){
         List<ShoppingList> shoppingList = shoppingListService.findByUser((User) userDetails);
         return ResponseEntity.ok(shoppingList.stream()

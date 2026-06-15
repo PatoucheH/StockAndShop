@@ -11,7 +11,8 @@ public enum Unity {
     JAR("jar"),
     BOTTLE("bottle"),
     PACKET("packet"),
-    BOX("box");
+    BOX("box"),
+    CAN("can");
 
     private final String value;
 

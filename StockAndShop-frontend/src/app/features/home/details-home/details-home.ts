@@ -8,6 +8,7 @@ import { AddShoppingListComponent } from '../../shopping-list/add-shopping-list/
 import { ListStock } from '../list-stock/list-stock';
 import { ManageUsersHomeComponent } from '../manage-users-home/manage-users-home';
 import { LoadingComponent } from '../../../shared/components/loading/loading';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-details-home',
@@ -40,6 +41,13 @@ export class DetailsHomeComponent implements OnInit {
     effect(() => {
       const home = this.home();
       document.title = home ? `${home.name} — Stock&Shop` : 'Stock&Shop';
+    });
+
+    effect(() => {
+      const err = this.homeService.usersResource.error();
+      if (err instanceof HttpErrorResponse && err.status === 403) {
+        this.router.navigate(['/']);
+      }
     });
   }
 
