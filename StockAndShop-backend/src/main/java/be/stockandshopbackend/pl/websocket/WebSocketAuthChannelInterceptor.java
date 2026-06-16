@@ -1,7 +1,10 @@
 package be.stockandshopbackend.pl.websocket;
 
 import be.stockandshopbackend.bll.services.security.JwtService;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -11,10 +14,12 @@ import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 // Browsers can't send custom HTTP headers during the WebSocket handshake upgrade,
 // so the JWT is passed in the STOMP CONNECT frame headers instead of Authorization HTTP header.
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
@@ -23,18 +28,24 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
     private final UserDetailsService userDetailsService;
 
     @Override
-    public Message<?> preSend(Message<?> message, MessageChannel channel){
+    public Message<?> preSend(@NonNull Message<?> message, @NonNull MessageChannel channel){
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
         if(accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())){
             String authHeader = accessor.getFirstNativeHeader("Authorization");
             if(authHeader != null && authHeader.startsWith("Bearer ")){
                 String token = authHeader.substring(7);
-                String username = jwtService.extractUsername(token);
-                UserDetails user = userDetailsService.loadUserByUsername(username);
-                if(jwtService.validateToken(token, user)){
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                    accessor.setUser(auth);
+                // An expired/invalid token must not throw here: an uncaught exception crashes the
+                // broker's clientInboundChannel and forces Spring to close the whole WS session.
+                try {
+                    String username = jwtService.extractUsername(token);
+                    UserDetails user = userDetailsService.loadUserByUsername(username);
+                    if(jwtService.validateToken(token, user)){
+                        UsernamePasswordAuthenticationToken auth =
+                                new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                        accessor.setUser(auth);
+                    }
+                } catch (JwtException | UsernameNotFoundException e) {
+                    log.debug("WebSocket CONNECT with invalid/expired token: {}", e.getMessage());
                 }
             }
         }

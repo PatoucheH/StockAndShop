@@ -133,9 +133,9 @@ public class RecipeServiceImpl implements RecipeService {
                   INGREDIENTS:
                   exact_product_name:quantity_as_integer
                   STEPS:
-                  First step description.
-                  Second step description.
-                  Third step description.
+                  Faire revenir les oignons dans l'huile à feu moyen pendant 5 minutes.
+                  Ajouter les tomates et laisser mijoter 10 minutes.
+                  Servir chaud.
 
                   Important: product names must match EXACTLY the names provided in the stock list.
                   Do NOT use brackets [] around any text.

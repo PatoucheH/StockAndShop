@@ -6,5 +6,6 @@ export const UNITS: Record<string, { short: string; long: string }> = {
   tub:        { short: 'tube',       long: 'Tube'        },
   bottle:     { short: 'bouteille',  long: 'Bouteille'   },
   packet:     { short: 'paquet',     long: 'Paquet'      },
-  box:        { short: 'boite',      long: 'Boite'       },
+  box:        { short: 'carton',     long: 'Carton'      },
+  can:        { short: 'boite',      long: 'Boite'       },
 };

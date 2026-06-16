@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RecipeNotPossibleException.class)
     public ResponseEntity<String> handleRecipeNotPossible(RecipeNotPossibleException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

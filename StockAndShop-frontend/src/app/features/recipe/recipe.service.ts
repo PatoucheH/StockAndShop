@@ -102,6 +102,7 @@ export class RecipeService {
     this.http.post<Recipe>(`${this.apiUrl}/${homeId}/generate`, {}).subscribe({
       next: (recipe) => {
         this._newRecipes.update((prev) => [recipe, ...prev]);
+        this._allRecipes.update((prev) => [recipe, ...prev]);
         this.isGeneratingRecipe.set(false);
       },
       error: (err) => {

@@ -18,9 +18,10 @@ export class ShoppingListService {
   private authService = inject(AuthService);
   private wsService = inject(WebSocketService);
 
-  // linkedSignal resets to undefined whenever authVersion changes, clearing list selection on logout/login
+  // linkedSignal resets to undefined whenever identityVersion changes, clearing list selection on logout/login —
+  // tied to identityVersion (not authVersion) so a silent token refresh doesn't tear down the WS subscription below
   private _selectedListId = linkedSignal<number | undefined>(() => {
-    this.authService.authVersion();
+    this.authService.identityVersion();
     return undefined;
   });
 
@@ -51,8 +52,10 @@ export class ShoppingListService {
   }
 
   constructor() {
-    toObservable(this.authService.authVersion).pipe(skip(1), takeUntilDestroyed()).subscribe(() => {
+    toObservable(this.authService.identityVersion).pipe(skip(1), takeUntilDestroyed()).subscribe(() => {
       this._selectedListId.set(undefined);
+    });
+    toObservable(this.authService.authVersion).pipe(skip(1), takeUntilDestroyed()).subscribe(() => {
       if (this.authService.isLoggedIn()) {
         this._favoritesResource.reload();
       }
