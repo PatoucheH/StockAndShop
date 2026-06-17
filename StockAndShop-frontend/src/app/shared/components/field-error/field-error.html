@@ -1,0 +1,6 @@
+@let ctrl = control();
+@if (ctrl && ctrl.invalid && ctrl.touched) {
+  @for (msg of getMessages(ctrl); track msg) {
+    <p class="text-xs text-red-500 mt-0.5">{{ msg }}</p>
+  }
+}

@@ -10,10 +10,11 @@ import { ShoppingListService } from '../shopping-list.service';
 import { UnitConversionService } from '../../../shared/services/unit-conversion.service';
 import { UnityLabelPipe } from '../../../shared/pipes/unity-label.pipe';
 import { ToastService } from '../../../core/services/toast.service';
+import { FieldErrorComponent } from '../../../shared/components/field-error/field-error';
 
 @Component({
   selector: 'app-add-product-to-list',
-  imports: [ReactiveFormsModule, UnityLabelPipe],
+  imports: [ReactiveFormsModule, UnityLabelPipe, FieldErrorComponent],
   templateUrl: './add-product-list-db.html',
 })
 export class AddProductListDb {
@@ -46,7 +47,10 @@ export class AddProductListDb {
   subUnit = linkedSignal(() => this.unitConversion.getDefaultSubUnit(this.selectedUnity()));
 
   submit() {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     const formValue = this.form.getRawValue();
 
     const productToCreate: ProductRequest = {

@@ -3,10 +3,11 @@ import { AuthService } from '../auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LoginRequest } from '../../../core/models/auth.models';
+import { FieldErrorComponent } from '../../../shared/components/field-error/field-error';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, FieldErrorComponent],
   templateUrl: './login.html',
 
 })
@@ -26,7 +27,10 @@ export class LoginComponent {
   showPassword = signal(false);
 
   onSubmit() {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     this.loading.set(true);
     this.error.set(null);
     const request: LoginRequest = this.form.getRawValue() as LoginRequest;

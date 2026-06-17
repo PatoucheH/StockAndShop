@@ -22,6 +22,7 @@
                         text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700
                         placeholder:text-gray-400 dark:placeholder:text-gray-500
                         focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"/>
+          <app-field-error [control]="form.get('email')" />
         </div>
         <div class="flex flex-col gap-1.5">
           <label class="text-sm font-medium text-gray-700 dark:text-gray-200" for="password">Mot de passe</label>
@@ -46,6 +47,7 @@
               }
             </button>
           </div>
+          <app-field-error [control]="form.get('password')" />
         </div>
         @if (error()) {
           <p class="text-sm text-red-500 text-center py-1">{{ error() }}</p>

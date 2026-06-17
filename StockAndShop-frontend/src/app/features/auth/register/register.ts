@@ -3,6 +3,7 @@ import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Va
 import { AuthService } from '../auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { RegisterRequest } from '../../../core/models/auth.models';
+import { FieldErrorComponent } from '../../../shared/components/field-error/field-error';
 
 function passwordMatchValidator(): ValidatorFn {
   return (group: AbstractControl): ValidationErrors | null => {
@@ -14,7 +15,7 @@ function passwordMatchValidator(): ValidatorFn {
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, FieldErrorComponent],
   templateUrl: './register.html',
 
 })
@@ -39,7 +40,10 @@ export class RegisterComponent {
   showConfirmPassword = signal(false);
 
   onSubmit() {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     this.loading.set(true);
     this.error.set(null);
     const { confirmPassword: _confirm, ...requestData } = this.form.getRawValue();
