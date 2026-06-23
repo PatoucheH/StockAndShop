@@ -67,9 +67,12 @@ export class DetailShoppingListComponent {
   }
 
   addToStockItemChecked(){
-    const home = this.homeService.selectedHome();
-    if (!home) return;
-    this.shoppingListService.addToStockItemCheckedofShoppingList(home.id).subscribe({
+    const homeId = this.homeService.selectedHome()?.id ?? this.selectedShoppingList()?.homeId;
+    if (!homeId) {
+      this.toast.error('Impossible d\'identifier la maison');
+      return;
+    }
+    this.shoppingListService.addToStockItemCheckedofShoppingList(homeId).subscribe({
       next: () => {
         this.homeService.stockResource.reload();
         this.toast.success('Produits ajoutés au stock');

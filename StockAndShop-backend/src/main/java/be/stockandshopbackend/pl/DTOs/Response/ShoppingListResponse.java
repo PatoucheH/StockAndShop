@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -17,6 +18,7 @@ public class ShoppingListResponse {
     private String name;
     private String description;
     private List<ProductItemResponse> products;
+    private UUID homeId;
 
 
     public static ShoppingListResponse fromShoppingList(ShoppingList shoppingList) {
@@ -27,7 +29,8 @@ public class ShoppingListResponse {
                 shoppingList.getProducts().stream()
                         .map(ProductItemResponse::fromProductListItem)
                         .sorted(Comparator.comparing(ProductItemResponse::getCategory))
-                        .toList()
+                        .toList(),
+                shoppingList.getHomeId()
         );
     }
 }

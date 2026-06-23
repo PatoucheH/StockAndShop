@@ -10,12 +10,16 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @NoArgsConstructor @AllArgsConstructor
 @Getter @Setter
 @ToString
 public class ShoppingList extends LongBaseEntity {
+
+    @Column(name = "home_id", insertable = false, updatable = false)
+    private UUID homeId;
 
     @Column(nullable = false)
     private String name;

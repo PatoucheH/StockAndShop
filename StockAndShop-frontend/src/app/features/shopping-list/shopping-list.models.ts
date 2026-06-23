@@ -4,7 +4,8 @@ export interface ShoppingList {
   id: number,
   name: string,
   description: string,
-  products: ProductItem[]
+  products: ProductItem[],
+  homeId: string,
 }
 
 export interface ShoppingListRequest {
