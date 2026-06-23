@@ -2,6 +2,7 @@ package be.stockandshopbackend.bll.services.product;
 
 import be.stockandshopbackend.bll.services.base.BaseCRUDService;
 import be.stockandshopbackend.bll.services.category.CategoryService;
+import be.stockandshopbackend.bll.services.openfoodfacts.OpenFoodFactsService;
 import be.stockandshopbackend.dal.repositories.ProductRepository;
 import be.stockandshopbackend.dl.entities.Category;
 import be.stockandshopbackend.dl.entities.Product;
@@ -12,16 +13,20 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductServiceImpl extends BaseCRUDService<Product, Long, ProductRepository>
                                 implements ProductService {
 
     private final CategoryService categoryService;
+    private final OpenFoodFactsService openFoodFactsService;
 
-    public ProductServiceImpl(ProductRepository repository, CategoryService categoryService) {
+    public ProductServiceImpl(ProductRepository repository, CategoryService categoryService,
+                              OpenFoodFactsService openFoodFactsService) {
         super(repository);
         this.categoryService = categoryService;
+        this.openFoodFactsService = openFoodFactsService;
     }
 
     public List<Product> findAllByName(String name){
@@ -36,6 +41,12 @@ public class ProductServiceImpl extends BaseCRUDService<Product, Long, ProductRe
     public Unity[] findAllUnities(){
         return Unity.values();
     }
+
+    public Optional<Product> findByBarcode(String barcode){
+        return repository.findByBarcode(barcode)
+                .or(() -> openFoodFactsService.fetchAndSave(barcode));
+    }
+
 
     @Transactional
     public Product createProduct(String name, String unity, String categoryName){

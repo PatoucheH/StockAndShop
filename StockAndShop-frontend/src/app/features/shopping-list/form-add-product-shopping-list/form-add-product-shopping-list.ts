@@ -1,16 +1,17 @@
 import { Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
-import { startWith, debounceTime, distinctUntilChanged, switchMap, of, tap } from 'rxjs';
+import { startWith, debounceTime, distinctUntilChanged, switchMap, of, tap, map } from 'rxjs';
 import { ProductItemRequest } from '../../../shared/models/productItem.models';
 import { ProductService } from '../../../shared/services/product.service';
 import { ShoppingListService } from '../shopping-list.service';
 import { UnitConversionService } from '../../../shared/services/unit-conversion.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { BarcodeScanner } from '../../../shared/components/barcode-scanner/barcode-scanner';
 
 @Component({
   selector: 'app-form-add-product-shopping-list',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, BarcodeScanner],
   templateUrl: './form-add-product-shopping-list.html',
 })
 export class FormAddProductShoppingList {
@@ -22,6 +23,26 @@ export class FormAddProductShoppingList {
   id = input.required<string>();
   isFocused = signal(false);
   isExplicitlySelected = signal(false);
+
+  // test implements scan code bar
+  isScanning = signal(false);
+  isLoadingBarcode = signal(false);
+  onBarcodeDetected(barcode: string){
+    this.isScanning.set(false);
+    this.isLoadingBarcode.set(true);
+
+    this.productService.getByBarcode(barcode).subscribe({
+      next: (product) => {
+        this.isLoadingBarcode.set(false);
+        this.form.patchValue({ nameProduct: product.name });
+        this.toast.success(`${product.name} trouvé - ajustez la quantité et validez`);
+      },
+      error: () => {
+        this.isLoadingBarcode.set(false);
+        this.toast.error('Produit introuvable - essayer de le chercher manuellement');
+      },
+    });
+  }
 
   form = new FormGroup({
     nameProduct: new FormControl('', Validators.required),
@@ -43,7 +64,16 @@ export class FormAddProductShoppingList {
       switchMap(term => (term && term.length >= 2)
         ? this.productService.searchByName(term)
         : of([])
-      )
+      ),
+      map(products => {
+        const seen = new Set<string>();
+        return products.filter(p => {
+          const key = p.name.toLowerCase();
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+      })
     ),
     { initialValue: [] }
   );

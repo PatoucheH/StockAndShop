@@ -48,6 +48,14 @@ public class ProductController {
         return ResponseEntity.ok(productService.findAllUnities());
     }
 
+    @GetMapping("/barcode/{barcode}")
+    public ResponseEntity<ProductResponse> getProductByBarcode(@PathVariable String barcode){
+        return productService.findByBarcode(barcode)
+                .map(ProductResponse::fromProduct)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     //endregion
 
     //region POST

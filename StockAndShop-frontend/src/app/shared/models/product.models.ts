@@ -3,6 +3,12 @@ export interface Product{
   name: string,
   unity: string,
   category: string,
+  barcode?: string,
+  brand?: string,
+  imageUrl?: string,
+  packageQuantity?: string,
+  nutriscoreGrade?: string,
+  ecoscoreGrade?: string,
 }
 
 export interface ProductRequest {

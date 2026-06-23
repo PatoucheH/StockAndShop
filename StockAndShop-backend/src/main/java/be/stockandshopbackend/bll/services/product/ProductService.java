@@ -4,6 +4,7 @@ import be.stockandshopbackend.dl.entities.Product;
 import be.stockandshopbackend.dl.enums.Unity;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductService {
 
@@ -13,6 +14,7 @@ public interface ProductService {
     List<Product> findAllByName(String name);
     Product findOneByName(String name);
     Unity[] findAllUnities();
+    Optional<Product> findByBarcode(String barcode);
 
     /// ADD
     Product createProduct(String name, String unity, String categoryName);
