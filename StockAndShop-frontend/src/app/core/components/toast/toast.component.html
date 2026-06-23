@@ -1,4 +1,4 @@
-<div class="fixed top-4 right-4 z-[9999] flex flex-col gap-2 w-80 max-w-sm pointer-events-none">
+<div class="fixed top-4 right-4 left-4 sm:left-auto z-[9999] flex flex-col gap-2 sm:w-80 max-w-sm pointer-events-none">
   @for (toast of toasts(); track toast.id) {
     <div class="flex items-center justify-between gap-3 px-4 py-3 rounded-xl shadow-lg pointer-events-auto text-sm font-medium"
          [ngClass]="{

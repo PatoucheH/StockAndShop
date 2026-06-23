@@ -4,7 +4,7 @@
        ? 'bg-slate-200 dark:bg-slate-600 border-slate-200 dark:border-slate-600'
        : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700'"
      (click)="checkedItem()">
-  <div class="flex items-center gap-2.5">
+  <div class="flex items-center gap-2.5 min-w-0 flex-1">
     <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all shrink-0"
          [class.bg-emerald-600]="isChecked()"
          [class.border-emerald-600]="isChecked()"
@@ -15,10 +15,10 @@
         </svg>
       }
     </div>
-    <div class="flex flex-col"
+    <div class="flex flex-col min-w-0"
          [class.line-through]="isChecked()"
          [class.text-gray-400]="isChecked()">
-      <span class="font-medium text-sm text-gray-800 dark:text-gray-200" [class.text-gray-400]="isChecked()">
+      <span class="font-medium text-sm text-gray-800 dark:text-gray-200 truncate" [class.text-gray-400]="isChecked()">
         {{ item().nameProduct }}
       </span>
       <span class="text-xs text-gray-400 dark:text-gray-500">

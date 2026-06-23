@@ -1,5 +1,7 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { toSignal, toObservable } from '@angular/core/rxjs-interop';
+import { debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
 import { ProductService } from '../../../../shared/services/product.service';
 
 @Component({
@@ -20,13 +22,17 @@ export class RecipeFilterBarComponent {
   filterInput = signal('');
   filterNameInput = signal('');
 
-  filteredSuggestions = computed(() => {
-    const search = this.filterInput().toLowerCase();
-    if (!search) return [];
-    return this.productService.allProducts().filter((p) =>
-      p.name.toLowerCase().includes(search),
-    );
-  });
+  filteredSuggestions = toSignal(
+    toObservable(this.filterInput).pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(term => (term && term.length >= 2)
+        ? this.productService.searchByName(term)
+        : of([])
+      )
+    ),
+    { initialValue: [] }
+  );
 
   onNameFilterChange(value: string) {
     this.filterNameInput.set(value);

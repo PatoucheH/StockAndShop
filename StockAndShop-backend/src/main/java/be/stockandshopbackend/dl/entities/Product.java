@@ -23,4 +23,18 @@ public class Product extends LongBaseEntity {
     @JoinColumn(nullable = false)
     private Category category;
 
+    @Column(unique = true)
+    private String barcode;
+
+    private String brand;
+
+    @Column(columnDefinition = "TEXT")
+    private String imageUrl;
+
+    private String packageQuantity;
+
+    private String nutriscoreGrade;
+
+    private String ecoscoreGrade;
+
 }

@@ -13,6 +13,12 @@ public class ProductResponse{
     private String name;
     private String unity;
     private String category;
+    private String barcode;
+    private String brand;
+    private String imageUrl;
+    private String packageQuantity;
+    private String nutriscoreGrade;
+    private String ecoscoreGrade;
 
 
     public static ProductResponse fromProduct(Product p) {
@@ -20,7 +26,13 @@ public class ProductResponse{
                 p.getId(),
                 p.getName(),
                 p.getUnity().getValue(),
-                p.getCategory().getName()
+                p.getCategory().getName(),
+                p.getBarcode(),
+                p.getBrand(),
+                p.getImageUrl(),
+                p.getPackageQuantity(),
+                p.getNutriscoreGrade(),
+                p.getEcoscoreGrade()
         );
     }
 }

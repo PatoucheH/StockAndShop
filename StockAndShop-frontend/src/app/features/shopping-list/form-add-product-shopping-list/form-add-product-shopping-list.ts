@@ -1,9 +1,9 @@
-import { Component, computed, inject, input, linkedSignal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { toSignal, toObservable } from '@angular/core/rxjs-interop';
+import { startWith, debounceTime, distinctUntilChanged, switchMap, of, tap } from 'rxjs';
 import { ProductItemRequest } from '../../../shared/models/productItem.models';
 import { ProductService } from '../../../shared/services/product.service';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { startWith } from 'rxjs';
 import { ShoppingListService } from '../shopping-list.service';
 import { UnitConversionService } from '../../../shared/services/unit-conversion.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -19,28 +19,43 @@ export class FormAddProductShoppingList {
   unitConversion = inject(UnitConversionService);
   toast = inject(ToastService);
 
-  products = this.productService.allProducts;
   id = input.required<string>();
+  isFocused = signal(false);
+  isExplicitlySelected = signal(false);
 
   form = new FormGroup({
     nameProduct: new FormControl('', Validators.required),
     quantity: new FormControl<number | null>(null, [Validators.required, Validators.min(0.001)]),
   });
 
-  nameProduct = toSignal(this.form.controls.nameProduct.valueChanges.pipe(startWith('')), {
-    initialValue: '',
-  });
+  nameProduct = toSignal(
+    this.form.controls.nameProduct.valueChanges.pipe(
+      startWith(''),
+      tap(() => this.isExplicitlySelected.set(false))
+    ),
+    { initialValue: '' }
+  );
+
+  filteredProducts = toSignal(
+    toObservable(this.nameProduct).pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(term => (term && term.length >= 2)
+        ? this.productService.searchByName(term)
+        : of([])
+      )
+    ),
+    { initialValue: [] }
+  );
 
   selectedProduct = computed(() => {
     const name = this.nameProduct()?.toLowerCase();
-    return this.products().find((p) => p.name.toLowerCase() === name);
+    return this.filteredProducts().find((p) => p.name.toLowerCase() === name);
   });
 
-  filteredProducts = computed(() => {
-    const search = this.nameProduct()?.toLowerCase() || '';
-    if (!search) return [];
-    return this.products().filter((product) => product.name.toLowerCase().includes(search));
-  });
+  showDropdown = computed(() =>
+    this.isFocused() && this.filteredProducts().length > 0 && !this.isExplicitlySelected()
+  );
 
   isWeightOrVolume = computed(() =>
     this.unitConversion.isWeightOrVolume(this.selectedProduct()?.unity ?? '')
@@ -49,6 +64,15 @@ export class FormAddProductShoppingList {
   subUnit = linkedSignal(() =>
     this.unitConversion.getDefaultSubUnit(this.selectedProduct()?.unity ?? '')
   );
+
+  selectProduct(name: string) {
+    this.form.controls.nameProduct.setValue(name);
+    this.isExplicitlySelected.set(true);
+    this.isFocused.set(false);
+  }
+
+  onFocus() { this.isFocused.set(true); }
+  onBlur() { this.isFocused.set(false); }
 
   addProduct() {
     if (this.form.invalid || !this.selectedProduct()) return;
