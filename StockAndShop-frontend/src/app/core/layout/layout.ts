@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { HeaderComponent } from './header/header';
 import { RouterOutlet } from '@angular/router';
+import { HeaderComponent } from './header/header';
+import { BottomNavComponent } from './bottom-nav/bottom-nav';
 
 @Component({
   selector: 'app-layout',
-  imports: [HeaderComponent, RouterOutlet],
+  imports: [HeaderComponent, RouterOutlet, BottomNavComponent],
   templateUrl: './layout.html',
-
 })
 export class LayoutComponent {}

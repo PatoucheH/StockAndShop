@@ -1,17 +1,15 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../features/auth/auth.service';
-import { ThemeService } from '../../services/theme.service';
 
 @Component({
-  selector: 'app-header',
+  selector: 'app-bottom-nav',
   imports: [RouterLink, RouterLinkActive],
-  templateUrl: './header.html',
+  templateUrl: './bottom-nav.html',
 })
-export class HeaderComponent {
+export class BottomNavComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
-  readonly themeService = inject(ThemeService);
 
   disconnect() {
     this.authService.logout();
