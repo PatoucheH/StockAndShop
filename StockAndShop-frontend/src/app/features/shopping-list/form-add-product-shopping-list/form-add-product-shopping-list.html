@@ -1,12 +1,14 @@
 <form [formGroup]="form" (ngSubmit)="addProduct()"
-      class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 flex items-center gap-2 shadow-sm overflow-visible">
+      class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-1 flex
+            items-center gap-2 shadow-sm overflow-visible">
   <div class="relative flex-1 min-w-0">
     <input type="text" formControlName="nameProduct"
            placeholder="Ajouter un produit..."
            autocomplete="off"
            (focus)="onFocus()"
            (blur)="onBlur()"
-           class="w-full bg-transparent outline-none text-sm text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"/>
+           class="w-full bg-transparent outline-none text-sm text-gray-800 dark:text-gray-200 placeholder:text-gray-400
+                  dark:placeholder:text-gray-500"/>
     @if (showDropdown()) {
       <div class="absolute top-full left-0 right-0 z-50 mt-1
                   bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700
