@@ -10,7 +10,7 @@ import { SmartUnitPipe } from '../../../shared/pipes/smart-unit.pipe';
   selector: 'app-item-shopping-list',
   imports: [ReactiveFormsModule, SmartUnitPipe, NgClass],
   templateUrl: './item-shopping-list.html',
-
+  host: { class: 'min-w-0' },
 })
 export class ItemShoppingList {
 
