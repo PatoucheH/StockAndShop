@@ -30,6 +30,18 @@ public class OpenFoodFactsServiceImpl implements OpenFoodFactsService {
     // Mots d'emballage en fin de nom
     private static final Pattern CONTAINER_SUFFIX =
             Pattern.compile("\\s+(can|canette|bouteille|boite|bidon|pack|sachet)$", Pattern.CASE_INSENSITIVE);
+    // Marques de supermarchés et distributeurs belges/français
+    private static final Pattern STORE_BRAND =
+            Pattern.compile("\\b(carrefour|delhaize|lidl|aldi|colruyt|boni|cora|intermarch[eé]|spar|okay|albert\\s+heijn|leclerc|monoprix|franprix|casino|g[eé]ant|syst[eè]me\\s+u|match|proxy|365|bio\\s+village)\\b", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    // Qualificatifs purement marketing
+    private static final Pattern MARKETING_WORD =
+            Pattern.compile("\\b(premium|s[eé]lection|tradition|artisan|terroir|sp[eé]cial|excellence|prestige|gourmet|saveur|classic|original)\\b", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    // Adjectifs de taille/format
+    private static final Pattern SIZE_WORD =
+            Pattern.compile("\\b(grand[e]?|petit[e]?|gros|grosse|mini|maxi|extra|super|mega|xl|xxl|family|familial[e]?)\\b", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    // Pourcentages (3.5%, 0% mg, 20% mg...)
+    private static final Pattern PERCENTAGE =
+            Pattern.compile("\\s*\\d+[,.]?\\d*\\s*%\\s*(mg|mat\\.?\\s*gr\\.?)?", Pattern.CASE_INSENSITIVE);
 
     private final RestClient restClient;
     private final ProductRepository productRepository;
@@ -116,9 +128,13 @@ public class OpenFoodFactsServiceImpl implements OpenFoodFactsService {
 
     private String sanitize(String raw) {
         String name = raw.strip().toLowerCase();
+        name = STORE_BRAND.matcher(name).replaceAll("");
         name = CATEGORY_PREFIX.matcher(name).replaceFirst("");
         name = QUANTITY.matcher(name).replaceAll("");
+        name = PERCENTAGE.matcher(name).replaceAll("");
         name = CONTAINER_SUFFIX.matcher(name).replaceFirst("");
+        name = MARKETING_WORD.matcher(name).replaceAll("");
+        name = SIZE_WORD.matcher(name).replaceAll("");
         return name.replaceAll("\\s+", " ").strip();
     }
 
