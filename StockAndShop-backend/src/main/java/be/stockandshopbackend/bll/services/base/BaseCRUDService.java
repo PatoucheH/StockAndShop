@@ -5,6 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
+/**
+ * Generic base service that wires a JpaRepository to standard CRUD operations,
+ * converting Spring's {@link java.util.Optional} to {@link be.stockandshopbackend.exceptions.NotFoundException}
+ * so controllers never deal with absent-value handling.
+ */
 public abstract class BaseCRUDService<T, ID, R extends JpaRepository<T, ID>> {
 
     protected final R repository;

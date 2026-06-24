@@ -45,6 +45,7 @@ export const errorInterceptor: HttpInterceptorFn = (
   );
 };
 
+/** Falls back to a generic French message when the server doesn't send a structured error body. */
 function extractErrorMessage(error: HttpErrorResponse): string {
   if (error.error?.message) return error.error.message;
   switch (error.status) {

@@ -4,12 +4,19 @@ import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 
+/**
+ * Singleton STOMP client for the whole application.
+ *
+ * Activates when the user logs in, deactivates on logout, and transparently
+ * re-subscribes to all active topics after a reconnect.
+ */
 @Injectable({ providedIn: 'root' })
 export class WebSocketService implements OnDestroy {
   private authService = inject(AuthService);
 
-  // @stomp/stompjs does NOT remember subscriptions across a reconnect — each reconnect gets a
-  // brand new STOMP session, so every active topic must be re-subscribed by hand in onConnect.
+  // Two separate maps because @stomp/stompjs does NOT restore subscriptions after a reconnect.
+  // activeTopics holds the registered callbacks and survives reconnects;
+  // liveSubscriptions holds the actual STOMP handles and is rebuilt on every new session.
   private activeTopics = new Map<string, Set<(msg: IMessage) => void>>();
   private liveSubscriptions = new Map<string, StompSubscription>();
 
@@ -24,13 +31,12 @@ export class WebSocketService implements OnDestroy {
   constructor() {
     effect(() => {
       const token = this.authService.getToken();
-      // authVersion is read to make this effect reactive to all auth changes, not just token value changes
+      // Read authVersion to react to all auth state changes, not just token value changes.
       this.authService.authVersion();
 
       if (token) {
-        // Used on the next CONNECT frame only (initial connect or a future auto-reconnect) —
-        // the JWT is never re-checked on an already-open session, so refreshing the token
-        // must not force a disconnect/reconnect of an otherwise healthy WebSocket.
+        // connectHeaders are only sent on the next STOMP CONNECT frame.
+        // A token refresh must not force a reconnect of an already healthy session.
         this.client.connectHeaders = { Authorization: `Bearer ${token}` };
         if (!this.client.active) {
           this.client.activate();
@@ -53,6 +59,10 @@ export class WebSocketService implements OnDestroy {
     }));
   }
 
+  /**
+   * Returns a cold Observable that subscribes to {@code topic} on the STOMP broker.
+   * The STOMP subscription is created lazily and torn down when all observers unsubscribe.
+   */
   subscribe(topic: string): Observable<IMessage> {
     return new Observable(observer => {
       const callback = (msg: IMessage) => observer.next(msg);

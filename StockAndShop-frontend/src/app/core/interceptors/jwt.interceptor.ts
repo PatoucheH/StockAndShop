@@ -6,6 +6,7 @@ export const jwtInterceptor: HttpInterceptorFn = (
   req,
   next
 ) => {
+  // Skip auth endpoints — they use the httpOnly cookie and must not carry the access token
   if (req.url.includes('/auth/')) return next(req);
   const token = inject(AuthService).getToken();
   if (!token) return next(req);

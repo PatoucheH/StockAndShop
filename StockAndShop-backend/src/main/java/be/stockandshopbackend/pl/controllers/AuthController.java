@@ -48,6 +48,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(toAuthResponse(result));
     }
 
+    // Returns only the new access token in the body; the new refresh token is set as an httpOnly cookie
     @PostMapping("/refresh")
     public ResponseEntity<Map<String, String>> refreshToken(
             @CookieValue(name = "refreshToken", required = false) String refreshToken,

@@ -63,11 +63,16 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
 
     //region WEBSOCKET
 
+    // SecurityContextHolder used here because @AuthenticationPrincipal is only available at controller level.
     private String currentUsername(){
-        // SecurityContextHolder used here because @AuthenticationPrincipal is only available at controller level
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
+    /**
+     * Pushes an event to every client subscribed to {@code /topic/shopping-list/{id}}.
+     *
+     * @param payload event-specific data; may be {@code null} (e.g. for {@code ITEM_TRANSFERRED})
+     */
     private void broadcast(Long shoppingListId, ShoppingListEventType type, Object payload){
         messagingTemplate.convertAndSend(
                 "/topic/shopping-list/" + shoppingListId,

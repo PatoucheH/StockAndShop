@@ -7,6 +7,11 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Root mapped superclass for all entities. Provides automatic {@code createdAt}/{@code updatedAt}
+ * timestamps via JPA lifecycle hooks and identity-based {@code equals}/{@code hashCode} so
+ * Hibernate collection comparisons work correctly across proxy boundaries.
+ */
 @MappedSuperclass
 @Getter @Setter
 public abstract class BaseEntity<T> {

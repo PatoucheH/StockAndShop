@@ -15,6 +15,9 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([errorInterceptor, jwtInterceptor])),
+    // Angular applies interceptors in declaration order outbound and in reverse inbound.
+    // errorInterceptor therefore handles 401s first on the way back, refreshes the token, and retries —
+    // the retry travels the full chain again so jwtInterceptor attaches the new access token.
     // Attempts to restore the session from the httpOnly refresh token cookie before the app renders
     provideAppInitializer(() => {
       const auth = inject(AuthService);

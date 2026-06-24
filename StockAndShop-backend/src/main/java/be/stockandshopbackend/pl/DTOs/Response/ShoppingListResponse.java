@@ -26,6 +26,7 @@ public class ShoppingListResponse {
                 shoppingList.getId(),
                 shoppingList.getName(),
                 shoppingList.getDescription(),
+                // Sorted by category so the frontend can render grouped rows without additional sorting
                 shoppingList.getProducts().stream()
                         .map(ProductItemResponse::fromProductListItem)
                         .sorted(Comparator.comparing(ProductItemResponse::getCategory))

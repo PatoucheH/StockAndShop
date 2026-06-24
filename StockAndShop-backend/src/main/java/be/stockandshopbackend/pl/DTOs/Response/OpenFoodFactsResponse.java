@@ -1,9 +1,13 @@
-package be.stockandshopbackend.bll.services.openfoodfacts;
+package be.stockandshopbackend.pl.DTOs.Response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+/**
+ * Partial mapping of the Open Food Facts API v0 response.
+ * {@code status == 1} means the product was found; any other value means not found.
+ */
 public record OpenFoodFactsResponse(
         @JsonProperty("status") int status,
         @JsonProperty("product") OFFProduct product

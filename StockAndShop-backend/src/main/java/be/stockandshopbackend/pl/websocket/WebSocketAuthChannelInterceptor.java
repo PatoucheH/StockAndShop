@@ -17,8 +17,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-// Browsers can't send custom HTTP headers during the WebSocket handshake upgrade,
-// so the JWT is passed in the STOMP CONNECT frame headers instead of Authorization HTTP header.
+/**
+ * Authenticates WebSocket sessions by reading a JWT from the STOMP CONNECT frame.
+ *
+ * <p>Browsers cannot set custom HTTP headers during the WebSocket upgrade handshake,
+ * so the token cannot be validated at the HTTP level as it is for REST requests.
+ * The client therefore includes it in the first STOMP frame's headers instead.</p>
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

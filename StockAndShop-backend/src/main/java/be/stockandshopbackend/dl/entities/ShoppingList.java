@@ -18,6 +18,8 @@ import java.util.UUID;
 @ToString
 public class ShoppingList extends LongBaseEntity {
 
+    // Read-only mirror of the FK column written by Home's @JoinColumn; insertable/updatable=false
+    // prevents JPA from treating it as a second managed column for the same FK.
     @Column(name = "home_id", insertable = false, updatable = false)
     private UUID homeId;
 

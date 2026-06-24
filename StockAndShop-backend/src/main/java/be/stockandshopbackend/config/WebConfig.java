@@ -6,6 +6,10 @@ import org.springframework.web.method.HandlerTypePredicate;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Globally prefixes every {@code @RestController} in this package with {@code /api},
+ * avoiding the need to repeat the prefix on each controller's {@code @RequestMapping}.
+ */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 

@@ -18,6 +18,7 @@ public class ProductItemResponse {
     private String unityProduct;
     private int quantity;
     private String category;
+    // Explicit @JsonProperty because Lombok generates isIsChecked() for boolean fields starting with "is", breaking Jackson's default key derivation
     @JsonProperty("isChecked")
     private boolean isChecked;
 
@@ -30,6 +31,7 @@ public class ProductItemResponse {
         this.isChecked = b;
     }
 
+    // Note: argument order differs from the all-fields constructor — uses the (id,name,unity,category,qty,checked) variant
     public static ProductItemResponse fromProductListItem(ProductListItem productListItem){
         return new ProductItemResponse(
                 productListItem.getId(),

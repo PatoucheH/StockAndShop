@@ -118,6 +118,7 @@ public class AuthService implements UserDetailsService {
                 .toList();
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
+        // Eagerly prune expired tokens for this user to keep the refresh_tokens table from growing unboundedly
         refreshTokenRepository.deleteByUserAndExpiresAtBefore(user, Instant.now());
         refreshTokenRepository.save(new RefreshToken(
                 refreshToken, user, Instant.now().plusMillis(refreshRExpiration)

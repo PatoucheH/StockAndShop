@@ -61,6 +61,7 @@ export class HomeService {
   });
 
   constructor() {
+    // skip(1) avoids triggering on the initial signal value emitted at subscription time
     toObservable(this.authService.authVersion).pipe(skip(1), takeUntilDestroyed()).subscribe(() => {
       this._selectedHomeId.set(undefined);
       if (this.authService.isLoggedIn()) {

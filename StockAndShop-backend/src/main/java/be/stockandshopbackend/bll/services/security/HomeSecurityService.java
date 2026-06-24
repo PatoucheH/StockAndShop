@@ -9,9 +9,16 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 import java.util.UUID;
 
-//     @PreAuthorize("@homeSecurity.isOwner(#id, authentication.principal)") CHECK IF OWNER OF HOME or ADMIN
-//     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)") CHECK IF USER IS IN HOME or ADMIN
-
+/**
+ * Spring Security bean used as a SpEL expression target in {@code @PreAuthorize} annotations.
+ * Register as "homeSecurity" so controllers can write:
+ * <pre>
+ *   @PreAuthorize("@homeSecurity.isOwner(#id, authentication.principal)")
+ *   @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
+ * </pre>
+ * Overloaded by ID type (UUID for home, Long for shopping list / product-list item).
+ * Admins bypass all home-level checks.
+ */
 @Service("homeSecurity")
 @RequiredArgsConstructor
 public class HomeSecurityService {
@@ -57,6 +64,7 @@ public class HomeSecurityService {
                 .orElse(false);
     }
 
+    /** Navigates Home → ShoppingList → ProductListItem to check membership — used by ProductListItemController. */
     public boolean isInHomeByProductItem(Long productListItemId, User user){
         if(isAdmin(user)) return true;
         return homeRepository.findByShoppingLists_ProductsId(productListItemId)

@@ -42,6 +42,10 @@ public class ProductServiceImpl extends BaseCRUDService<Product, Long, ProductRe
         return Unity.values();
     }
 
+    /**
+     * Checks the local DB first; on a miss, calls OpenFoodFacts and persists the result
+     * so subsequent scans of the same barcode are served locally.
+     */
     public Optional<Product> findByBarcode(String barcode){
         return repository.findByBarcode(barcode)
                 .or(() -> openFoodFactsService.fetchAndSave(barcode));

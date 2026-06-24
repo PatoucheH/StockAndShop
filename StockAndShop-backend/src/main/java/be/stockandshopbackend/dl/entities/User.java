@@ -28,6 +28,7 @@ public class User extends UuidBaseEntity implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    // EAGER is required because Spring Security loads roles during authentication outside any active session
     @Getter @Setter
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

@@ -22,6 +22,7 @@ public class Recipe extends UuidBaseEntity {
     @JoinColumn(name = "recipe_id", nullable = false)
     private List<RecipeProduct> recipeProducts = new ArrayList<>();
 
+    // @OrderColumn persists the list index to step_order so steps are always retrieved in the right sequence
     @ElementCollection
     @CollectionTable(name = "recipe_steps", joinColumns = @JoinColumn(name = "recipe_id"))
     @Column(name = "step", columnDefinition = "TEXT")

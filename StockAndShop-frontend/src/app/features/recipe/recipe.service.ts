@@ -71,11 +71,16 @@ export class RecipeService {
     return this.favoriteRecipes().some((r) => r.id === id);
   }
 
+  /** Increments the page signal, which triggers the httpResource to fetch the next batch for infinite scroll. */
   loadNextPage() {
     if (!this.hasMore() || this.isLoading()) return;
     this._page.update((p) => p + 1);
   }
 
+  /**
+   * Fetches recipe suggestions. When products are provided, POSTs their names so the backend
+   * filters by that specific subset; otherwise GETs suggestions based on the home's full stock.
+   */
   generateRecipe(homeId: string, products?: ProductStock[], onError?: (msg: string) => void) {
     this.isGeneratingRecipe.set(true);
     const request$ = products?.length
@@ -97,6 +102,7 @@ export class RecipeService {
     this._newRecipes.set([]);
   }
 
+  /** Calls the AI-generate endpoint and prepends the new recipe to both the global list and the "new" buffer. */
   generateNewRecipe(homeId: string, onError?: (msg: string) => void) {
     this.isGeneratingRecipe.set(true);
     this.http.post<Recipe>(`${this.apiUrl}/${homeId}/generate`, {}).subscribe({

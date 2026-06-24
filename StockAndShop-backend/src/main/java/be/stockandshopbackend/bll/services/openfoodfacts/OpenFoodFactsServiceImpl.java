@@ -5,10 +5,10 @@ import be.stockandshopbackend.dal.repositories.ProductRepository;
 import be.stockandshopbackend.dl.entities.Category;
 import be.stockandshopbackend.dl.entities.Product;
 import be.stockandshopbackend.dl.enums.Unity;
+import be.stockandshopbackend.pl.DTOs.Response.OpenFoodFactsResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientException;
 
 import java.util.List;
 import java.util.Optional;
@@ -122,6 +122,7 @@ public class OpenFoodFactsServiceImpl implements OpenFoodFactsService {
         return name.replaceAll("\\s+", " ").strip();
     }
 
+    // OFF returns categories as a comma-separated hierarchy (most specific last); we take the first (broadest) entry
     private String resolveCategory(String categories) {
         if (categories == null || categories.isBlank()) return "other";
         return categories.split(",")[0].strip();

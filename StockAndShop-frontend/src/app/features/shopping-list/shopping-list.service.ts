@@ -18,8 +18,8 @@ export class ShoppingListService {
   private authService = inject(AuthService);
   private wsService = inject(WebSocketService);
 
-  // linkedSignal resets to undefined whenever identityVersion changes, clearing list selection on logout/login —
-  // tied to identityVersion (not authVersion) so a silent token refresh doesn't tear down the WS subscription below
+  // Resets on identity change (logout/login) to clear the list selection.
+  // Tied to identityVersion, not authVersion, so a silent token refresh doesn't tear down the WS subscription.
   private _selectedListId = linkedSignal<number | undefined>(() => {
     this.authService.identityVersion();
     return undefined;
@@ -60,6 +60,7 @@ export class ShoppingListService {
         this._favoritesResource.reload();
       }
     });
+    // switchMap cancels the previous topic subscription whenever the selected list changes.
     toObservable(this._selectedListId).pipe(
       takeUntilDestroyed(),
       switchMap(id =>
@@ -68,8 +69,12 @@ export class ShoppingListService {
     ).subscribe(msg => this.handleWsEvent(JSON.parse(msg.body) as ShoppingListWsEvent));
   }
 
+  /**
+   * Applies a server-pushed event to local state.
+   * Events from the current user are ignored — the optimistic update applied at action
+   * dispatch time already reflects the change, so applying it again would be a no-op at best.
+   */
   private handleWsEvent(event: ShoppingListWsEvent) {
-    // Own events are ignored — local state was already updated optimistically when the action was dispatched
     if (event.triggeredByUsername === this.authService.getUserEmail()) return;
     switch (event.type) {
       case 'ITEM_TOGGLED': {

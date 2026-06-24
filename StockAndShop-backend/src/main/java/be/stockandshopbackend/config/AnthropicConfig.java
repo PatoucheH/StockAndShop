@@ -6,6 +6,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Manually instantiates the Anthropic SDK client using the OkHttp transport.
+ * This sidesteps Spring AI's autoconfiguration (which uses a different client abstraction)
+ * so the app can call the Anthropic SDK directly for full control over model params.
+ */
 @Configuration
 public class AnthropicConfig {
 

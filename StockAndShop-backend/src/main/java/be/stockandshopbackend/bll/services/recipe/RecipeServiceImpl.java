@@ -49,6 +49,11 @@ public class RecipeServiceImpl implements RecipeService {
         return getSuggestionsWithProducts(homeId, stockProductNames);
     }
 
+    /**
+     * Returns existing recipes whose every ingredient is covered by the provided product list.
+     * Falls back to AI generation when no existing recipe matches — the generated recipe is persisted
+     * and counts toward future suggestions.
+     */
     @Transactional
     public List<Recipe> getSuggestionsWithProducts(UUID homeId, List<String> productNames) {
         Set<String> filter = new HashSet<>(productNames);
@@ -95,6 +100,8 @@ public class RecipeServiceImpl implements RecipeService {
         return recipeRepository.save(recipe);
     }
 
+    // Claude is told it may use these in recipe steps but must NEVER list them as stock INGREDIENTS,
+    // so the parsed ingredient section only contains items that are actually tracked in the home stock.
     private static final String PANTRY_STAPLES =
             "eau, eau minérale, sel, sel fin, poivre, poivre noir, poivre blanc, " +
             "huile d'olive, huile de tournesol, huile végétale, vinaigre, " +

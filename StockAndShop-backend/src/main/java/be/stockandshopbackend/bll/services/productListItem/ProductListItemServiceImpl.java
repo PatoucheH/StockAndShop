@@ -30,6 +30,9 @@ public class ProductListItemServiceImpl extends BaseCRUDService<ProductListItem,
         this.shoppingListRepository = shoppingListRepository;
     }
 
+    /**
+     * Toggles the checked state of an item and broadcasts the change to all list subscribers.
+     */
     @Transactional
     public void checkedItem(Long productListItemId) {
         ProductListItem productListItem = repository.findById(productListItemId)

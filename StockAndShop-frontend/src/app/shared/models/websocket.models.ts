@@ -16,6 +16,7 @@ export interface ItemRemovedPayload {
   itemId: number;
 }
 
+/** Mirror of the Java {@code ShoppingListEventDTO}. Narrow on {@code type} to determine payload shape. */
 export interface ShoppingListWsEvent {
   type: ShoppingListEventType;
   shoppingListId: number;

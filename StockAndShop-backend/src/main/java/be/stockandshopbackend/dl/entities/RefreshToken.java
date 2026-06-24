@@ -16,6 +16,7 @@ public class RefreshToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // length = 512 because JWT tokens can exceed the default VARCHAR(255) limit
     @Column(unique = true, nullable = false, length = 512)
     private String token;
 

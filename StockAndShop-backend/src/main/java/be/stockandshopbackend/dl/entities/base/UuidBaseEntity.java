@@ -9,6 +9,11 @@ import lombok.Setter;
 
 import java.util.UUID;
 
+/**
+ * Base entity variant that uses a database-generated UUID as primary key.
+ * Used for publicly exposed aggregates (Home, User, Recipe) where auto-increment
+ * integers would leak row-count information.
+ */
 @MappedSuperclass
 @Getter @Setter
 public abstract class UuidBaseEntity extends BaseEntity<UUID> {

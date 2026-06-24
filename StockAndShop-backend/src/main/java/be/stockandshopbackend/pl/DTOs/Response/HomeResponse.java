@@ -21,6 +21,7 @@ public class HomeResponse {
 
 
     public static HomeResponse fromHome(Home h) {
+        // getUsername() returns the email field (Spring Security principal) — not the display name
         String ownerEmail = h.getUsers().stream()
                 .filter(uh -> uh.getHomeRole() == HomeRole.OWNER)
                 .map(uh -> uh.getUser().getUsername())
