@@ -1,18 +1,30 @@
-<li (click)="selected.emit(recipe())"
+<li (click)="navigate()"
     class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm px-4 py-4
            cursor-pointer hover:shadow-md hover:border-emerald-200 dark:hover:border-emerald-800 transition-all duration-200 group">
   <div class="flex items-center justify-between gap-2">
     <h2 class="font-semibold text-gray-800 dark:text-gray-200 capitalize group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors text-sm">
       {{ recipe().title }}
     </h2>
-    <svg class="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all shrink-0"
-         fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-    </svg>
+    <div class="flex items-center gap-2 shrink-0">
+      <!-- Score badge -->
+      @if (recipe().score != null) {
+        <div class="flex items-center gap-0.5">
+          <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          <span class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ recipe().score | number:'1.1-1' }}</span>
+        </div>
+      }
+      <svg class="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all"
+           fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+    </div>
   </div>
   <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
     {{ recipe().steps.length }} étape{{ recipe().steps.length > 1 ? 's' : '' }}
     · {{ recipe().ingredients.length }} ingrédient{{ recipe().ingredients.length > 1 ? 's' : '' }}
+    · {{ recipe().timing }} min
   </p>
   <div class="flex flex-wrap gap-1.5 mt-2.5">
     @for (ingredient of recipe().ingredients.slice(0, 4); track ingredient.productId) {

@@ -42,6 +42,11 @@ public class RecipeController {
         ));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<RecipeResponse> getById(@PathVariable UUID id) {
+        return ResponseEntity.ok(RecipeResponse.fromRecipe(recipeService.getById(id)));
+    }
+
     @GetMapping("/{id}/suggestions")
     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<List<RecipeResponse>> getSuggestions(@PathVariable UUID id) {

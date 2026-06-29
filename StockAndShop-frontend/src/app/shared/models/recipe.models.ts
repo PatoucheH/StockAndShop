@@ -10,6 +10,9 @@ export interface Recipe {
   title: string;
   ingredients: RecipeIngredient[];
   steps: string[];
+  timing: number;
+  score: number | null;
+  tags: string[];
   createdAt: string;
 }
 
@@ -19,4 +22,19 @@ export interface PagedRecipeResponse {
   page: number;
   size: number;
   hasMore: boolean;
+}
+
+export interface RecipeComment {
+  id: number;
+  comment: string;
+  score: number;
+  recipeId: string;
+  username: string;
+  createdAt: string;
+}
+
+export interface RecipeCommentRequest {
+  comment: string;
+  score: number;
+  recipeId: string;
 }

@@ -12,6 +12,7 @@ public interface RecipeService {
 
     /// GET
     Page<Recipe> getAllRecipes(Pageable pageable);
+    Recipe getById(UUID id);
     List<Recipe> getSuggestions(UUID homeId);
     List<Recipe> getSuggestionsWithProducts(UUID homeId, List<String> productNames);
 

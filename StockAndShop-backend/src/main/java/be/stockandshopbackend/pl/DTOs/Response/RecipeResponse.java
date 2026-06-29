@@ -13,6 +13,7 @@ public record RecipeResponse(
         List<String> steps,
         int timing,
         Double score,
+        List<String> tags,
         LocalDateTime createdAt
 ) {
     public static RecipeResponse fromRecipe(Recipe recipe) {
@@ -25,6 +26,7 @@ public record RecipeResponse(
                 recipe.getSteps(),
                 recipe.getTiming(),
                 recipe.getScore(),
+                recipe.getTags(),
                 recipe.getCreatedAt()
         );
     }

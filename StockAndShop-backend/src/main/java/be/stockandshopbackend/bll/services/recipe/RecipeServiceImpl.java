@@ -38,6 +38,11 @@ public class RecipeServiceImpl implements RecipeService {
         return recipeRepository.findAll(pageable);
     }
 
+    public Recipe getById(UUID id) {
+        return recipeRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Recipe not found: " + id));
+    }
+
     @Transactional
     public List<Recipe> getSuggestions(UUID homeId) {
         Home home = homeRepository.findById(homeId).orElseThrow(

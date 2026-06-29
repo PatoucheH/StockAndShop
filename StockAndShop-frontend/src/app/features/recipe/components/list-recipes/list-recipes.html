@@ -28,11 +28,11 @@
       @for (recipe of filteredRecipes(); track recipe.id) {
         <app-recipe-list-item
           [recipe]="recipe"
-          [activeFilters]="activeFilters()"
-          (selected)="openRecipe($event)"/>
+          [activeFilters]="activeFilters()"/>
       }
     </ul>
   }
+
   @if (hasMore()) {
     <div class="flex justify-center mt-6 pb-4">
       <button type="button" (click)="loadMore.emit()" [disabled]="isLoading()"
@@ -42,8 +42,4 @@
       </button>
     </div>
   }
-}
-
-@if (selectedRecipe()) {
-  <app-recipe-card [recipe]="selectedRecipe()!" (close)="closeRecipe()"/>
 }

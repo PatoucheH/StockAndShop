@@ -1,0 +1,44 @@
+<div class="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+     (click)="close.emit()">
+  <div class="relative w-full max-w-lg max-h-[80vh] flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden"
+       (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="bg-emerald-900 text-white px-5 py-4 flex items-center justify-between gap-3 shrink-0">
+      <div>
+        <h2 class="text-base font-bold">Avis sur la recette</h2>
+        <p class="text-xs text-emerald-300 mt-0.5">
+          {{ comments().length }} commentaire{{ comments().length > 1 ? 's' : '' }}
+        </p>
+      </div>
+      <button (click)="close.emit()"
+              class="p-1.5 rounded-lg text-white/50 hover:text-white transition-colors cursor-pointer">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="overflow-y-auto flex-1 px-5 py-5 space-y-3">
+      @if (isLoading()) {
+        <app-loading message="Chargement des avis..." />
+      } @else if (hasError()) {
+        <p class="text-sm text-red-500 text-center py-8">Impossible de charger les avis.</p>
+      } @else if (comments().length === 0) {
+        <p class="text-sm text-gray-400 dark:text-gray-500 text-center py-8">
+          Aucun avis pour le moment. Soyez le premier !
+        </p>
+      } @else {
+        @for (comment of comments(); track comment.id) {
+          <app-recipe-comment-item [comment]="comment" />
+        }
+      }
+
+      <app-add-comment-form
+        [recipeId]="recipe().id"
+        [disabled]="hasUserCommented()" />
+    </div>
+
+  </div>
+</div>
