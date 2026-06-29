@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { AuthResponse, LoginRequest, RegisterRequest } from '../../core/models/auth.models';
-import { environment } from '../../../environments/environment';
+import { AuthResponse, LoginRequest, RegisterRequest } from '../../../core/models/auth.models';
+import { environment } from '../../../../environments/environment';
 import { catchError, finalize, map, Observable, of, shareReplay, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })

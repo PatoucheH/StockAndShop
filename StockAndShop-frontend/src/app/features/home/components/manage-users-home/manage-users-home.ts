@@ -1,6 +1,6 @@
 ﻿import { Component, computed, inject, signal } from '@angular/core';
 import { HomeService } from '../../../../shared/services/home.service';
-import { AuthService } from '../../../auth/auth.service';
+import { AuthService } from '../../../auth/services/auth.service';
 import { UserSearchResult } from '../../../../shared/models/user.models';
 import { UserSearchInputComponent } from './user-search-input/user-search-input';
 import { HomeMemberListComponent } from './home-member-list/home-member-list';

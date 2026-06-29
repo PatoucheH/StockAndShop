@@ -3,7 +3,7 @@ import { HomeService } from '../../../../shared/services/home.service';
 import { AddHomeComponent } from '../../components/add-home/add-home';
 import { RouterLink } from '@angular/router';
 import { FavoriteShoppingListsComponent } from '../../../shopping-list/components/favorite-shopping-lists/favorite-shopping-lists';
-import { AuthService } from '../../../auth/auth.service';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-home',

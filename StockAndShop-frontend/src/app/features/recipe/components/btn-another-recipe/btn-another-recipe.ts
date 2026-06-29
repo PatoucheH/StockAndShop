@@ -1,5 +1,5 @@
 ﻿import { Component, inject } from '@angular/core';
-import { RecipeService } from '../../recipe.service';
+import { RecipeService } from '../../services/recipe.service';
 import { HomeService } from '../../../../shared/services/home.service';
 import { ToastService } from '../../../../core/services/toast.service';
 

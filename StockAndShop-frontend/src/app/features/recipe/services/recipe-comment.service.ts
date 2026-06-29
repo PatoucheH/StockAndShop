@@ -1,8 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-import { RecipeComment, RecipeCommentRequest } from '../../shared/models/recipe.models';
-import { AuthService } from '../auth/auth.service';
+import { environment } from '../../../../environments/environment';
+import { RecipeComment, RecipeCommentRequest } from '../../../shared/models/recipe.models';
+import { AuthService } from '../../auth/services/auth.service';
 import { tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })

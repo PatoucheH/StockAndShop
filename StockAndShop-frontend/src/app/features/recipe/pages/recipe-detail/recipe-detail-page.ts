@@ -3,18 +3,19 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { SmartUnitPipe } from '../../../../shared/pipes/smart-unit.pipe';
 import { Recipe } from '../../../../shared/models/recipe.models';
-import { RecipeService } from '../../recipe.service';
-import { RecipeCommentService } from '../../recipe-comment.service';
-import { ShoppingListService } from '../../../shopping-list/shopping-list.service';
-import { ToastService } from '../../../../core/services/toast.service';
+import { ProductItemRequest } from '../../../../shared/models/productItem.models';
+import { RecipeService } from '../../services/recipe.service';
+import { RecipeCommentService } from '../../services/recipe-comment.service';
 import { LoadingComponent } from '../../../../shared/components/loading/loading';
 import { ErrorComponent } from '../../../../shared/components/error/error';
+import { AddToListComponent } from '../../../../shared/components/add-to-list/add-to-list';
 import { RecipeCommentItemComponent } from '../../../../shared/components/recipe-comments-modal/recipe-comment-item/recipe-comment-item';
 import { AddCommentFormComponent } from '../../../../shared/components/recipe-comments-modal/add-comment-form/add-comment-form';
+import { CookRecipeModalComponent } from './components/cook-recipe-modal/cook-recipe-modal';
 
 @Component({
   selector: 'app-recipe-detail-page',
-  imports: [DecimalPipe, SmartUnitPipe, LoadingComponent, ErrorComponent, RecipeCommentItemComponent, AddCommentFormComponent],
+  imports: [DecimalPipe, SmartUnitPipe, LoadingComponent, ErrorComponent, AddToListComponent, RecipeCommentItemComponent, AddCommentFormComponent, CookRecipeModalComponent],
   templateUrl: './recipe-detail-page.html',
 })
 export class RecipeDetailPageComponent implements OnInit {
@@ -22,8 +23,6 @@ export class RecipeDetailPageComponent implements OnInit {
   private router = inject(Router);
   recipeService = inject(RecipeService);
   private commentService = inject(RecipeCommentService);
-  shoppingListService = inject(ShoppingListService);
-  private toast = inject(ToastService);
 
   readonly recipeId = this.route.snapshot.paramMap.get('id')!;
 
@@ -42,9 +41,11 @@ export class RecipeDetailPageComponent implements OnInit {
   hasError = computed(() => !this.isLoading() && !this.recipe());
 
   tab = signal<'recipe' | 'reviews'>('recipe');
-  selectedListId = signal<number | null>(null);
-  allShoppingList = computed(() => this.shoppingListService.allShoppingListUser.value() ?? []);
-  isLoadingLists = this.shoppingListService.allShoppingListUser.isLoading;
+  showCookModal = signal(false);
+
+  ingredientsAsRequest = computed<ProductItemRequest[]>(() =>
+    (this.recipe()?.ingredients ?? []).map(i => ({ name: i.productName, quantity: i.quantity }))
+  );
 
   comments = this.commentService.comments;
   commentsLoading = this.commentService.isLoading;
@@ -71,24 +72,5 @@ export class RecipeDetailPageComponent implements OnInit {
       ? this.recipeService.removeFromFavoriteRecipe(id)
       : this.recipeService.addToFavoriteRecipe(id);
     action.subscribe();
-  }
-
-  onSelectChange(event: Event) {
-    const id = Number((event.target as HTMLSelectElement).value);
-    this.selectedListId.set(id || null);
-  }
-
-  addToList() {
-    const recipe = this.recipe();
-    if (!recipe) return;
-    const products = recipe.ingredients.map((p) => ({
-      name: p.productName,
-      unity: p.unity,
-      quantity: p.quantity,
-    }));
-    this.shoppingListService.addListProductsToShoppingList(products, this.selectedListId()!).subscribe({
-      next: () => this.toast.success('Produits ajoutés à la liste'),
-      error: () => this.toast.error("Problème lors de l'ajout des produits à la liste"),
-    });
   }
 }

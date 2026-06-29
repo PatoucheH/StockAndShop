@@ -1,12 +1,12 @@
 import { computed, inject, Injectable, linkedSignal } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Home, HomeRequest } from '../../features/home/home.models';
+import { Home, HomeRequest } from '../../features/home/models/home.models';
 import { Observable, skip, tap } from 'rxjs';
-import { ShoppingList } from '../../features/shopping-list/shopping-list.models';
+import { ShoppingList } from '../../features/shopping-list/models/shopping-list.models';
 import { User, UserSearchResult } from '../models/user.models';
 import { ProductStock, ProductStockDecrese } from '../models/productStock.models';
-import { AuthService } from '../../features/auth/auth.service';
+import { AuthService } from '../../features/auth/services/auth.service';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 
 @Injectable({

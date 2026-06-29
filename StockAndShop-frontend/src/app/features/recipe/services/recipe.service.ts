@@ -1,11 +1,11 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-import { PagedRecipeResponse, Recipe } from '../../shared/models/recipe.models';
+import { environment } from '../../../../environments/environment';
+import { PagedRecipeResponse, Recipe } from '../../../shared/models/recipe.models';
 import { skip, tap } from 'rxjs';
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from '../../auth/services/auth.service';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { ProductStock } from '../../shared/models/productStock.models';
+import { ProductStock } from '../../../shared/models/productStock.models';
 
 @Injectable({ providedIn: 'root' })
 export class RecipeService {

@@ -17,7 +17,8 @@
   <!-- Stock grid: items grouped by category with edit controls -->
   <div class="columns-1 md:columns-2 gap-4">
     @for (group of groupedStock(); track group.category) {
-      <div class="break-inside-avoid mb-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
+      <div class="break-inside-avoid mb-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100
+                  dark:border-gray-700 shadow-sm overflow-hidden">
         <div class="bg-emerald-600 px-4 py-2.5">
           <h2 class="text-xs font-bold text-white uppercase tracking-wider">{{ group.category }}</h2>
         </div>
@@ -25,9 +26,10 @@
           @for (s of group.items; track s.id) {
             <div (click)="toggleProduct(s)"
                  class="flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer transition-colors"
-                 [class.bg-emerald-900]="isSelected(s)">
+                 [ngClass]="isSelected(s) ? ['bg-emerald-200', 'dark:bg-emerald-900'] : []">
               <span class="flex-1 text-gray-800 dark:text-gray-200 font-medium">{{ s.nameProduct }}</span>
-              <span class="text-xs bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded-md font-medium whitespace-nowrap">
+              <span class="text-xs bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-1
+                          rounded-md font-medium whitespace-nowrap">
                 {{ s.quantity | smartUnit:s.unityProduct }}
               </span>
               @if (!homeService.isViewer()) {

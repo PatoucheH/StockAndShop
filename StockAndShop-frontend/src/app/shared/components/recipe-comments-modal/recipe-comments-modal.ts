@@ -1,6 +1,6 @@
 import { Component, inject, input, OnInit, output } from '@angular/core';
 import { Recipe } from '../../models/recipe.models';
-import { RecipeCommentService } from '../../../features/recipe/recipe-comment.service';
+import { RecipeCommentService } from '../../../features/recipe/services/recipe-comment.service';
 import { RecipeCommentItemComponent } from './recipe-comment-item/recipe-comment-item';
 import { AddCommentFormComponent } from './add-comment-form/add-comment-form';
 import { LoadingComponent } from '../loading/loading';

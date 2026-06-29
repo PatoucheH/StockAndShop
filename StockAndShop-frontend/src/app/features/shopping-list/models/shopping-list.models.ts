@@ -1,4 +1,4 @@
-import { ProductItem } from '../../shared/models/productItem.models';
+import { ProductItem } from '../../../shared/models/productItem.models';
 
 export interface ShoppingList {
   id: number,

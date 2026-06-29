@@ -1,6 +1,6 @@
 ﻿import { Component, inject, computed } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
-import { ShoppingListService } from '../../shopping-list.service';
+import { ShoppingListService } from '../../services/shopping-list.service';
 import { LoadingComponent } from '../../../../shared/components/loading/loading';
 import { ErrorComponent } from '../../../../shared/components/error/error';
 import { ToastService } from '../../../../core/services/toast.service';

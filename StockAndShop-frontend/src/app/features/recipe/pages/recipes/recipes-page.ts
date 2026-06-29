@@ -1,5 +1,5 @@
 ﻿import { Component, computed, inject, signal } from '@angular/core';
-import { RecipeService } from '../../recipe.service';
+import { RecipeService } from '../../services/recipe.service';
 import { ListRecipesComponent } from '../../components/list-recipes/list-recipes';
 
 @Component({

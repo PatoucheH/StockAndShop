@@ -1,9 +1,9 @@
 ﻿import { Component, computed, effect, inject, linkedSignal, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HomeService } from '../../../../shared/services/home.service';
-import { AuthService } from '../../../auth/auth.service';
+import { AuthService } from '../../../auth/services/auth.service';
 import { ConfirmModalComponent } from '../../../../shared/components/confirm-modal/confirm-modal';
-import { ListShoppingListComponent } from '../../../shopping-list/components/list-shoppingList/list-shopping-list';
+import { ListShoppingListComponent } from '../../../shopping-list/components/list-shopping-list/list-shopping-list';
 import { AddShoppingListComponent } from '../../../shopping-list/components/add-shopping-list/add-shopping-list';
 import { ListStock } from '../../components/list-stock/list-stock';
 import { ManageUsersHomeComponent } from '../../components/manage-users-home/manage-users-home';

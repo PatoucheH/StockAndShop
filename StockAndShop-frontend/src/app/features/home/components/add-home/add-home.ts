@@ -1,6 +1,6 @@
 ﻿import { Component, inject, output } from '@angular/core';
 import { HomeService } from '../../../../shared/services/home.service';
-import { HomeRequest } from '../../home.models';
+import { HomeRequest } from '../../models/home.models';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FieldErrorComponent } from '../../../../shared/components/field-error/field-error';
 

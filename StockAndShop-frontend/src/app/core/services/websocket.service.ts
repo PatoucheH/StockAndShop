@@ -1,5 +1,5 @@
 import { effect, inject, Injectable, OnDestroy } from '@angular/core';
-import { AuthService } from '../../features/auth/auth.service';
+import { AuthService } from '../../features/auth/services/auth.service';
 import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';

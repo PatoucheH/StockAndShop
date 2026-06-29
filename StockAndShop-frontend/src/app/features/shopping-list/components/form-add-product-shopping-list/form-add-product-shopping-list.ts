@@ -4,7 +4,7 @@ import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { startWith, debounceTime, distinctUntilChanged, switchMap, of, tap, map } from 'rxjs';
 import { ProductItemRequest } from '../../../../shared/models/productItem.models';
 import { ProductService } from '../../../../shared/services/product.service';
-import { ShoppingListService } from '../../shopping-list.service';
+import { ShoppingListService } from '../../services/shopping-list.service';
 import { UnitConversionService } from '../../../../shared/services/unit-conversion.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { BarcodeScanner } from '../../../../shared/components/barcode-scanner/barcode-scanner';

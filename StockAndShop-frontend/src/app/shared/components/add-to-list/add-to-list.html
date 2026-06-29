@@ -1,0 +1,21 @@
+@if (isLoadingLists()) {
+  <p class="text-sm text-gray-400">Chargement des listes...</p>
+} @else if (allShoppingList().length === 0) {
+  <p class="text-sm text-gray-400 dark:text-gray-500">Aucune liste disponible.</p>
+} @else {
+  <select (change)="onSelectChange($event)"
+          class="w-full text-sm rounded-xl border border-gray-200 dark:border-gray-600
+                 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200
+                 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+    <option value="">-- Choisir une liste --</option>
+    @for (sl of allShoppingList(); track sl.id) {
+      <option [value]="sl.id">{{ sl.name }}</option>
+    }
+  </select>
+  <button (click)="addToList()" [disabled]="!selectedListId()"
+          class="w-full mt-2 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer
+                 bg-emerald-600 hover:bg-emerald-700 text-white
+                 disabled:opacity-50 disabled:cursor-not-allowed">
+    {{ label() }}
+  </button>
+}

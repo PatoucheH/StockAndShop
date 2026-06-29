@@ -6,7 +6,7 @@ import { ProductService } from '../../../../shared/services/product.service';
 import { CategoryService } from '../../../../shared/services/category.service';
 import { ProductRequest } from '../../../../shared/models/product.models';
 import { ProductItemRequest } from '../../../../shared/models/productItem.models';
-import { ShoppingListService } from '../../shopping-list.service';
+import { ShoppingListService } from '../../services/shopping-list.service';
 import { UnitConversionService } from '../../../../shared/services/unit-conversion.service';
 import { UnityLabelPipe } from '../../../../shared/pipes/unity-label.pipe';
 import { ToastService } from '../../../../core/services/toast.service';

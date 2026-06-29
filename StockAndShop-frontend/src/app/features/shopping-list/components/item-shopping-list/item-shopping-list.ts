@@ -3,7 +3,7 @@ import { NgClass } from '@angular/common';
 import { ProductItem } from '../../../../shared/models/productItem.models';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ProductService } from '../../../../shared/services/product.service';
-import { ShoppingListService } from '../../shopping-list.service';
+import { ShoppingListService } from '../../services/shopping-list.service';
 import { SmartUnitPipe } from '../../../../shared/pipes/smart-unit.pipe';
 
 @Component({

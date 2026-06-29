@@ -1,5 +1,5 @@
 ﻿import { Component, computed, effect, inject, signal } from '@angular/core';
-import { ShoppingListService } from '../../shopping-list.service';
+import { ShoppingListService } from '../../services/shopping-list.service';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { AddProductListDb } from '../../components/add-product-list-db/add-product-list-db';

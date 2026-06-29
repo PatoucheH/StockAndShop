@@ -1,5 +1,5 @@
-﻿import { Component, inject, signal } from '@angular/core';
-import { ShoppingListService } from '../../shopping-list.service';
+import { Component, inject, signal } from '@angular/core';
+import { ShoppingListService } from '../../services/shopping-list.service';
 import { RouterLink } from '@angular/router';
 import { HomeService } from '../../../../shared/services/home.service';
 import { ConfirmModalComponent } from '../../../../shared/components/confirm-modal/confirm-modal';

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -111,6 +112,10 @@ public class RecipeServiceImpl implements RecipeService {
             "eau, eau minérale, sel, sel fin, poivre, poivre noir, poivre blanc, " +
             "huile d'olive, huile de tournesol, huile végétale, vinaigre, " +
             "beurre, sucre, farine, levure chimique, bicarbonate de soude";
+
+    private static final Set<String> PANTRY_STAPLES_SET = Arrays.stream(PANTRY_STAPLES.split(","))
+            .map(String::trim)
+            .collect(Collectors.toUnmodifiableSet());
 
     private String buildPrompt(List<ProductStockHome> stocks, List<String> existingTitles) {
         StringBuilder sb = new StringBuilder();
@@ -207,12 +212,15 @@ public class RecipeServiceImpl implements RecipeService {
                     case "INGREDIENTS" -> {
                         String[] parts = line.split(":");
                         if (parts.length == 2) {
-                            productRepository.findByName(parts[0].trim()).ifPresent(product -> {
-                                try {
-                                    products.add(new RecipeProduct(product, Integer.parseInt(parts[1].trim())));
-                                } catch (NumberFormatException ignored) {
-                                }
-                            });
+                            String productName = parts[0].trim();
+                            if (!PANTRY_STAPLES_SET.contains(productName)) {
+                                productRepository.findByName(productName).ifPresent(product -> {
+                                    try {
+                                        products.add(new RecipeProduct(product, Integer.parseInt(parts[1].trim())));
+                                    } catch (NumberFormatException ignored) {
+                                    }
+                                });
+                            }
                         }
                     }
                     case "STEPS" ->

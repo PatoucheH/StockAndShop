@@ -1,5 +1,5 @@
 import { Component, inject, input, output, signal } from '@angular/core';
-import { RecipeCommentService } from '../../../../features/recipe/recipe-comment.service';
+import { RecipeCommentService } from '../../../../features/recipe/services/recipe-comment.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { FormsModule } from '@angular/forms';
 

@@ -1,10 +1,10 @@
 import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { Recipe } from '../../models/recipe.models';
-import { RecipeService } from '../../../features/recipe/recipe.service';
-import { ShoppingListService } from '../../../features/shopping-list/shopping-list.service';
+import { RecipeService } from '../../../features/recipe/services/recipe.service';
+import { ShoppingListService } from '../../../features/shopping-list/services/shopping-list.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { RecipeCommentService } from '../../../features/recipe/recipe-comment.service';
+import { RecipeCommentService } from '../../../features/recipe/services/recipe-comment.service';
 import { RecipeCommentsModalComponent } from '../recipe-comments-modal/recipe-comments-modal';
 
 @Component({

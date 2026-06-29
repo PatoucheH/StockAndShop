@@ -1,7 +1,8 @@
 ﻿import { Component, computed, inject, signal } from '@angular/core';
 import { HomeService } from '../../../../shared/services/home.service';
 import { ProductStock } from '../../../../shared/models/productStock.models';
-import { RecipeService } from '../../../recipe/recipe.service';
+import { RecipeService } from '../../../recipe/services/recipe.service';
+import { NgClass } from '@angular/common';
 import { SmartUnitPipe } from '../../../../shared/pipes/smart-unit.pipe';
 import { UnitConversionService } from '../../../../shared/services/unit-conversion.service';
 import { StockRecipeModalComponent } from './stock-recipe-modal/stock-recipe-modal';
@@ -15,7 +16,7 @@ interface DecreaseEntry {
 
 @Component({
   selector: 'app-list-stock',
-  imports: [SmartUnitPipe, StockRecipeModalComponent, BtnAnotherRecipe],
+  imports: [NgClass, SmartUnitPipe, StockRecipeModalComponent, BtnAnotherRecipe],
   templateUrl: './list-stock.html',
 })
 export class ListStock {

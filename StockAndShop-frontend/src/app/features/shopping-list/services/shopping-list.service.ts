@@ -1,13 +1,13 @@
 import { computed, inject, Injectable, linkedSignal } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-import { ProductItem, ProductItemRequest } from '../../shared/models/productItem.models';
+import { environment } from '../../../../environments/environment';
+import { ProductItem, ProductItemRequest } from '../../../shared/models/productItem.models';
 import { EMPTY, skip, switchMap, tap } from 'rxjs';
-import { ShoppingList, ShoppingListRequest } from './shopping-list.models';
-import { AuthService } from '../auth/auth.service';
+import { ShoppingList, ShoppingListRequest } from '../models/shopping-list.models';
+import { AuthService } from '../../auth/services/auth.service';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { WebSocketService } from '../../core/services/websocket.service';
-import { ItemRemovedPayload, ItemToggledPayload, ShoppingListWsEvent } from '../../shared/models/websocket.models';
+import { WebSocketService } from '../../../core/services/websocket.service';
+import { ItemRemovedPayload, ItemToggledPayload, ShoppingListWsEvent } from '../../../shared/models/websocket.models';
 
 @Injectable({
   providedIn: 'root',

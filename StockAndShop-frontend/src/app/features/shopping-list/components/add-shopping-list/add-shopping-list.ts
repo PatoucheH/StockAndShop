@@ -1,7 +1,7 @@
 ﻿import { Component, inject, output } from '@angular/core';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ShoppingListService } from '../../shopping-list.service';
-import { ShoppingListRequest } from '../../shopping-list.models';
+import { ShoppingListService } from '../../services/shopping-list.service';
+import { ShoppingListRequest } from '../../models/shopping-list.models';
 import { HomeService } from '../../../../shared/services/home.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { FieldErrorComponent } from '../../../../shared/components/field-error/field-error';

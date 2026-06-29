@@ -1,5 +1,5 @@
 ﻿import { Component, effect, inject, output, signal } from '@angular/core';
-import { RecipeService } from '../../../../recipe/recipe.service';
+import { RecipeService } from '../../../../recipe/services/recipe.service';
 import { RecipeCardComponent } from '../../../../../shared/components/recipe-card/recipe-card';
 
 @Component({

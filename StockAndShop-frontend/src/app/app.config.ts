@@ -7,7 +7,7 @@ import Aura from '@primeuix/themes/aura';
 import { routes } from './app.routes';
 import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
-import { AuthService } from './features/auth/auth.service';
+import { AuthService } from './features/auth/services/auth.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
