@@ -121,18 +121,18 @@ public class RecipeServiceImpl implements RecipeService {
             existingTitles.forEach(title -> sb.append("- ").append(title).append("\n"));
         }
         sb.append("""
-
                   The following are universal household staples that everyone always has at home.
                   You may use them freely in the recipe steps, but NEVER list them in the INGREDIENTS section:
                   """)
           .append(PANTRY_STAPLES).append("\n");
         sb.append("""
-
                   Suggest a NEW recipe using ONLY the pantry products listed above.
                   Rules:
                   - Only use ingredients from the provided stock list (staples are allowed in steps but not in INGREDIENTS).
                   - A recipe must be culinarily coherent, realistic and appetizing.
-                  - If the available products absolutely cannot produce a coherent and appetizing recipe (e.g. random unrelated products, only drinks, incoherent combinations), do NOT force a recipe. Instead, reply with exactly: IMPOSSIBLE: <brief reason in French>. Nothing else.
+                  - If the available products absolutely cannot produce a coherent and appetizing recipe (e.g. random
+                    unrelated products, only drinks, incoherent combinations), do NOT force a recipe. Instead, reply
+                    with exactly: IMPOSSIBLE: <brief reason in French>. Nothing else.
 
                   Please reply ONLY in this format, in FRENCH, without any additional text:
 
@@ -142,12 +142,14 @@ public class RecipeServiceImpl implements RecipeService {
                   STEPS:
                   Faire revenir les oignons dans l'huile à feu moyen pendant 5 minutes.
                   Ajouter les tomates et laisser mijoter 10 minutes.
-                  Servir chaud.
+                  servir chaud.
+                  TIMING: <integer number of minutes>
+                  TAGS: tag1, tag2, tag3
 
                   Important: product names must match EXACTLY the names provided in the stock list.
                   Do NOT use brackets [] around any text.
                   Do NOT list staple ingredients (water, salt, pepper, oil, butter, flour, sugar, vinegar) in INGREDIENTS.
-                  """);
+                 \s""");
         return sb.toString();
     }
 
@@ -170,6 +172,8 @@ public class RecipeServiceImpl implements RecipeService {
         String title = "";
         List<RecipeProduct> products = new ArrayList<>();
         List<String> steps = new ArrayList<>();
+        int timing = 0;
+        List<String> tags = new ArrayList<>();
         String currentSection = "";
         for (String line : sections) {
             line = line.trim();
@@ -179,22 +183,45 @@ public class RecipeServiceImpl implements RecipeService {
                 currentSection = "INGREDIENTS";
             } else if (line.equals("STEPS:")) {
                 currentSection = "STEPS";
-            } else if (!line.isEmpty()) {
-                if (currentSection.equals("INGREDIENTS")) {
-                    String[] parts = line.split(":");
-                    if (parts.length == 2) {
-                        productRepository.findByName(parts[0].trim()).ifPresent(product -> {
-                            try {
-                                products.add(new RecipeProduct(product, Integer.parseInt(parts[1].trim())));
-                            } catch (NumberFormatException ignored) {}
-                        });
+            } else if (line.startsWith("TIMING:")) {
+                currentSection = "TIMING";
+                try {
+                    timing = Integer.parseInt(line.replace("TIMING:", "").trim());
+                } catch (NumberFormatException ignored) {}
+            } else if (line.startsWith("TAGS:")) {
+                currentSection = "TAGS";
+                String rawTags = line.replace("TAGS:", "").trim();
+                if (!rawTags.isEmpty()) {
+                    for (String tag : rawTags.split(",")) {
+                        String t = tag.trim();
+                        if (!t.isEmpty()) tags.add(t);
                     }
-                } else if (currentSection.equals("STEPS")) {
-                    // Claude occasionally wraps step text in brackets despite instructions — strip them
-                    steps.add(line.replaceAll("^\\[|\\]$", "").trim());
+                }
+            } else if (!line.isEmpty()) {
+                switch (currentSection) {
+                    case "INGREDIENTS" -> {
+                        String[] parts = line.split(":");
+                        if (parts.length == 2) {
+                            productRepository.findByName(parts[0].trim()).ifPresent(product -> {
+                                try {
+                                    products.add(new RecipeProduct(product, Integer.parseInt(parts[1].trim())));
+                                } catch (NumberFormatException ignored) {
+                                }
+                            });
+                        }
+                    }
+                    case "STEPS" ->
+                        // Claude occasionally wraps step text in brackets despite instructions — strip them
+                            steps.add(line.replaceAll("^\\[|]$", "").trim());
+                    case "TAGS" -> {
+                        for (String tag : line.split(",")) {
+                            String t = tag.trim();
+                            if (!t.isEmpty()) tags.add(t);
+                        }
+                    }
                 }
             }
         }
-        return new Recipe(title, products, steps);
+        return new Recipe(title, products, steps, timing, tags);
     }
 }

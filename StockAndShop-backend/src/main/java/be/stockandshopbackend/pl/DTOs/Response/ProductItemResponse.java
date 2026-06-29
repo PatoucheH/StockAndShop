@@ -3,36 +3,19 @@ package be.stockandshopbackend.pl.DTOs.Response;
 import be.stockandshopbackend.dl.entities.ProductListItem;
 import be.stockandshopbackend.dl.entities.ProductStockHome;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 // Shared DTO for both ProductStockHome (stock) and ProductListItem (shopping list)
-
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
-public class ProductItemResponse {
-    private Long id;
-    private String nameProduct;
-    private String unityProduct;
-    private int quantity;
-    private String category;
-    // Explicit @JsonProperty because Lombok generates isIsChecked() for boolean fields starting with "is", breaking Jackson's default key derivation
-    @JsonProperty("isChecked")
-    private boolean isChecked;
-
-    public ProductItemResponse(Long id, String name, String unity, String category, int quantity, boolean b) {
-        this.id = id;
-        this.nameProduct = name;
-        this.unityProduct = unity;
-        this.category = category;
-        this.quantity = quantity;
-        this.isChecked = b;
-    }
-
-    // Note: argument order differs from the all-fields constructor — uses the (id,name,unity,category,qty,checked) variant
-    public static ProductItemResponse fromProductListItem(ProductListItem productListItem){
+public record ProductItemResponse(
+        Long id,
+        String nameProduct,
+        String unityProduct,
+        int quantity,
+        String category,
+        // @JsonProperty kept explicitly — records expose isChecked() which Jackson maps correctly,
+        // but the annotation guarantees the JSON key stays "isChecked" regardless of Jackson config.
+        @JsonProperty("isChecked") boolean isChecked
+) {
+    public static ProductItemResponse fromProductListItem(ProductListItem productListItem) {
         return new ProductItemResponse(
                 productListItem.getId(),
                 productListItem.getProduct().getName(),
@@ -44,13 +27,13 @@ public class ProductItemResponse {
     }
 
     // Stock items are never in a checked state
-    public static ProductItemResponse fromProductStockHome(ProductStockHome productStockHome){
+    public static ProductItemResponse fromProductStockHome(ProductStockHome productStockHome) {
         return new ProductItemResponse(
                 productStockHome.getId(),
                 productStockHome.getProduct().getName(),
                 productStockHome.getProduct().getUnity().getValue(),
-                productStockHome.getProduct().getCategory().getName(),
                 productStockHome.getQuantity(),
+                productStockHome.getProduct().getCategory().getName(),
                 false
         );
     }

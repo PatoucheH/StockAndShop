@@ -115,6 +115,7 @@ public class HomeController {
 
     // Creator is automatically assigned OWNER; no subsequent role change can reassign OWNER (see addUser)
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<HomeResponse> createHome(@RequestBody @Valid HomeRequest h,
                                                    @AuthenticationPrincipal UserDetails user){
         Home home = new Home(h.name(), h.description());

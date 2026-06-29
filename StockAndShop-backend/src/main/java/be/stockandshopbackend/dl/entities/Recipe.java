@@ -29,4 +29,27 @@ public class Recipe extends UuidBaseEntity {
     @OrderColumn(name = "step_order")
     private List<String> steps = new ArrayList<>();
 
+    @Column(nullable = false)
+    private int timing;
+
+    @Column(nullable = true)
+    private Double score;
+
+    @ElementCollection
+    @CollectionTable(name = "recipe_tags", joinColumns = @JoinColumn(name = "recipe_id"))
+    @Column(name = "tag")
+    private List<String> tags = new ArrayList<>();
+
+    public Recipe(String title,
+                  List<RecipeProduct> recipeProducts,
+                  List<String> steps,
+                  int timing,
+                  List<String> tags) {
+        this.title = title;
+        this.recipeProducts = recipeProducts;
+        this.steps = steps;
+        this.timing = timing;
+        this.tags = tags;
+    }
+
 }

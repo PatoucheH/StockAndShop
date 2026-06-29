@@ -11,6 +11,8 @@ public record RecipeResponse(
         String title,
         List<RecipeProductResponse> ingredients,
         List<String> steps,
+        int timing,
+        Double score,
         LocalDateTime createdAt
 ) {
     public static RecipeResponse fromRecipe(Recipe recipe) {
@@ -21,6 +23,8 @@ public record RecipeResponse(
                         .map(RecipeProductResponse::fromRecipeProduct)
                         .toList(),
                 recipe.getSteps(),
+                recipe.getTiming(),
+                recipe.getScore(),
                 recipe.getCreatedAt()
         );
     }
