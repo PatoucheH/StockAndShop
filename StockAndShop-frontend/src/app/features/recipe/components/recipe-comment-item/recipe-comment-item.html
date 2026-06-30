@@ -7,7 +7,9 @@
   </div>
   <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{{ comment().comment }}</p>
   <p class="text-xs text-gray-400 dark:text-gray-500">{{ comment().createdAt | date:'dd/MM/yyyy' }}</p>
-  <button (click)="deleteComment(comment().id)" class="text-red-500">
-    Supprimer
-  </button>
+  @if (isOwner()) {
+    <button (click)="deleteComment(comment().id)" class="text-red-500">
+      Supprimer
+    </button>
+  }
 </div>
