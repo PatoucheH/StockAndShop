@@ -1,21 +1,22 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DecimalPipe } from '@angular/common';
 import { SmartUnitPipe } from '../../../../shared/pipes/smart-unit.pipe';
+import { StarRatingComponent } from '../../../../shared/components/star-rating/star-rating';
 import { Recipe } from '../../../../shared/models/recipe.models';
 import { ProductItemRequest } from '../../../../shared/models/productItem.models';
 import { RecipeService } from '../../services/recipe.service';
 import { RecipeCommentService } from '../../services/recipe-comment.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import { LoadingComponent } from '../../../../shared/components/loading/loading';
 import { ErrorComponent } from '../../../../shared/components/error/error';
-import { AddToListComponent } from '../../../../shared/components/add-to-list/add-to-list';
-import { RecipeCommentItemComponent } from '../../../../shared/components/recipe-comments-modal/recipe-comment-item/recipe-comment-item';
-import { AddCommentFormComponent } from '../../../../shared/components/recipe-comments-modal/add-comment-form/add-comment-form';
-import { CookRecipeModalComponent } from './components/cook-recipe-modal/cook-recipe-modal';
+import { AddToListComponent } from '../../components/add-to-list/add-to-list';
+import { RecipeCommentItemComponent } from '../../components/recipe-comment-item/recipe-comment-item';
+import { AddCommentFormComponent } from '../../components/add-comment-form/add-comment-form';
+import { CookRecipeModalComponent } from '../../components/cook-recipe-modal/cook-recipe-modal';
 
 @Component({
   selector: 'app-recipe-detail-page',
-  imports: [DecimalPipe, SmartUnitPipe, LoadingComponent, ErrorComponent, AddToListComponent, RecipeCommentItemComponent, AddCommentFormComponent, CookRecipeModalComponent],
+  imports: [SmartUnitPipe, StarRatingComponent, LoadingComponent, ErrorComponent, AddToListComponent, RecipeCommentItemComponent, AddCommentFormComponent, CookRecipeModalComponent],
   templateUrl: './recipe-detail-page.html',
 })
 export class RecipeDetailPageComponent implements OnInit {
@@ -23,6 +24,7 @@ export class RecipeDetailPageComponent implements OnInit {
   private router = inject(Router);
   recipeService = inject(RecipeService);
   private commentService = inject(RecipeCommentService);
+  private toast = inject(ToastService);
 
   readonly recipeId = this.route.snapshot.paramMap.get('id')!;
 
@@ -51,14 +53,11 @@ export class RecipeDetailPageComponent implements OnInit {
   commentsLoading = this.commentService.isLoading;
   hasUserCommented = this.commentService.hasUserCommented;
 
-  scoreStars = computed(() => {
-    const s = this.recipe()?.score;
-    if (s == null) return null;
-    return Array.from({ length: 5 }, (_, i) => i < Math.round(s));
-  });
-
   ngOnInit() {
     this.commentService.loadForRecipe(this.recipeId);
+    if (this.route.snapshot.queryParamMap.get('tab') === 'reviews') {
+      this.tab.set('reviews');
+    }
   }
 
   goBack() {
@@ -71,6 +70,8 @@ export class RecipeDetailPageComponent implements OnInit {
     const action = this.recipeService.isFavorited(id)
       ? this.recipeService.removeFromFavoriteRecipe(id)
       : this.recipeService.addToFavoriteRecipe(id);
-    action.subscribe();
+    action.subscribe({
+      error: () => this.toast.error('Impossible de modifier les favoris'),
+    });
   }
 }

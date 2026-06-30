@@ -37,8 +37,12 @@ export class RecipeCommentService {
   }
 
   addComment(request: RecipeCommentRequest) {
-    return this.http
-      .post<RecipeComment>(this.apiUrl, request)
+    return this.http.post<RecipeComment>(this.apiUrl, request)
       .pipe(tap(() => this._commentsResource.reload()));
+  }
+
+  deleteComment(id : number){
+    return this.http.delete<RecipeComment>(`${this.apiUrl}/${id}`)
+        .pipe(tap(() => this._commentsResource.reload()));
   }
 }

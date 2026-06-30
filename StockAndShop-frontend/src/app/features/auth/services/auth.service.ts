@@ -1,5 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../../../core/models/auth.models';
 import { environment } from '../../../../environments/environment';
 import { catchError, finalize, map, Observable, of, shareReplay, tap } from 'rxjs';
@@ -8,6 +9,7 @@ import { catchError, finalize, map, Observable, of, shareReplay, tap } from 'rxj
 export class AuthService {
 
   private http = inject(HttpClient);
+  private router = inject(Router);
   private apiUrl = `${environment.apiUrl}/auth`;
 
   private readonly _accessToken = signal<string | null>(null);
@@ -56,6 +58,7 @@ export class AuthService {
   logout() {
     this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).subscribe();
     this.clearSession();
+    this.router.navigate(['/auth/login']);
   }
 
   // Several requests can 401 at once when the access token expires; without this guard

@@ -85,6 +85,8 @@ export class DetailShoppingListComponent {
     const action = this.shoppingListService.isFavorited(id)
       ? this.shoppingListService.removeFromFavorite(id)
       : this.shoppingListService.addToFavorite(id);
-    action.subscribe();
+    action.subscribe({
+      error: () => this.toast.error('Impossible de modifier les favoris'),
+    });
   }
 }

@@ -7,7 +7,7 @@ import { ProductService } from '../../../../shared/services/product.service';
 import { ShoppingListService } from '../../services/shopping-list.service';
 import { UnitConversionService } from '../../../../shared/services/unit-conversion.service';
 import { ToastService } from '../../../../core/services/toast.service';
-import { BarcodeScanner } from '../../../../shared/components/barcode-scanner/barcode-scanner';
+import { BarcodeScanner } from '../barcode-scanner/barcode-scanner';
 
 @Component({
   selector: 'app-form-add-product-shopping-list',

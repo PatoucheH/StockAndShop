@@ -1,7 +1,7 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
-import { ShoppingListService } from '../../../features/shopping-list/services/shopping-list.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { ProductItemRequest } from '../../models/productItem.models';
+import { ShoppingListService } from '../../../shopping-list/services/shopping-list.service';
+import { ToastService } from '../../../../core/services/toast.service';
+import { ProductItemRequest } from '../../../../shared/models/productItem.models';
 
 @Component({
   selector: 'app-add-to-list',

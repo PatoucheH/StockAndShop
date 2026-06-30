@@ -33,7 +33,6 @@ export class ItemShoppingList {
   }
 
   deleteItem(){
-    console.log(`delete item : ${this.item().id}`);
     this.shoppingListService.deleteProductFromShoppingList(this.item().id).subscribe();
   }
 }

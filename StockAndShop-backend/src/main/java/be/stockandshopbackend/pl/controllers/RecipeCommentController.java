@@ -5,6 +5,7 @@ import be.stockandshopbackend.pl.DTOs.Response.RecipeCommentResponse;
 import be.stockandshopbackend.pl.DTOs.requests.RecipeCommentRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,5 +43,12 @@ public class RecipeCommentController {
                 RecipeCommentResponse.fromRecipeComment(
                         recipeCommentService.addRecipeComment(recipeCommentRequest, userDetails.getUsername()))
         );
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> deleteRecipeComment(@PathVariable Long recipeCommentId) {
+        recipeCommentService.deleteRecipeComment(recipeCommentId);
+        return ResponseEntity.ok().build();
     }
 }

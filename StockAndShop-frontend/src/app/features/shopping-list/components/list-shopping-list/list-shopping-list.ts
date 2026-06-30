@@ -35,10 +35,4 @@ export class ListShoppingListComponent {
     this.pendingDeleteId.set(null);
   }
 
-  toggleFavorite(id: number) {
-    const action = this.shoppingListService.isFavorited(id)
-      ? this.shoppingListService.removeFromFavorite(id)
-      : this.shoppingListService.addToFavorite(id);
-    action.subscribe();
-  }
 }

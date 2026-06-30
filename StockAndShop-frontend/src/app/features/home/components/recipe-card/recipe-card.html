@@ -36,29 +36,21 @@
       </div>
 
       <!-- Score -->
-      @if (scoreStars()) {
-        <div class="flex items-center gap-1">
-          @for (filled of scoreStars()!; track $index) {
-            <svg class="w-3.5 h-3.5" [class]="filled ? 'text-amber-400' : 'text-emerald-700'"
-                 fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-            </svg>
-          }
-          <span class="ml-0.5 text-xs text-emerald-200">{{ recipe().score | number:'1.1-1' }}</span>
-        </div>
+      @if (recipe().score !== null) {
+        <app-star-rating [score]="recipe().score" size="sm" variant="dark" [showScore]="true" />
       } @else {
         <span class="text-xs text-emerald-400">Non noté</span>
       }
 
-      <!-- Comment count button -->
-      <button (click)="showCommentsModal.set(true)"
+      <!-- Reviews link -->
+      <button (click)="goToReviews()"
               class="ml-auto flex items-center gap-1.5 text-xs text-emerald-200 hover:text-white
                      bg-emerald-700/50 hover:bg-emerald-700 px-2.5 py-1 rounded-full transition-colors cursor-pointer">
         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round"
                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
         </svg>
-        {{ commentCount() }}<span class="hidden min-[400px]:inline"> avis</span>
+        Voir les avis
       </button>
     </div>
 
@@ -112,30 +104,9 @@
       </section>
 
       <!-- Add to shopping list -->
-      <div class="flex flex-col items-center gap-3">
-        @if (isLoadingLists()) {
-          <select disabled><option>Chargement...</option></select>
-        } @else {
-          <select (change)="onSelectChange($event)">
-            <option value="">-- Choisir une liste --</option>
-            @for (sl of allShoppingList(); track sl.id) {
-              <option [value]="sl.id">{{ sl.name }}</option>
-            }
-          </select>
-          <button (click)="addToList()" [disabled]="!selectedListId()"
-                  class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl
-                         text-sm font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-            Ajouter les ingrédients à une liste
-          </button>
-        }
-      </div>
+      <app-add-to-list [products]="ingredientsAsRequest()" />
 
     </div>
   </div>
 </div>
 
-@if (showCommentsModal()) {
-  <app-recipe-comments-modal
-    [recipe]="recipe()"
-    (close)="showCommentsModal.set(false)" />
-}

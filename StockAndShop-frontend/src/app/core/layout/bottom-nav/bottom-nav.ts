@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../features/auth/services/auth.service';
 
 @Component({
@@ -9,10 +9,8 @@ import { AuthService } from '../../../features/auth/services/auth.service';
 })
 export class BottomNavComponent {
   private authService = inject(AuthService);
-  private router = inject(Router);
 
   disconnect() {
     this.authService.logout();
-    this.router.navigate(['/auth/login']);
   }
 }

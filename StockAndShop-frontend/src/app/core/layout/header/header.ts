@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../features/auth/services/auth.service';
 import { ThemeService } from '../../services/theme.service';
 
@@ -10,11 +10,9 @@ import { ThemeService } from '../../services/theme.service';
 })
 export class HeaderComponent {
   private authService = inject(AuthService);
-  private router = inject(Router);
   readonly themeService = inject(ThemeService);
 
   disconnect() {
     this.authService.logout();
-    this.router.navigate(['/auth/login']);
   }
 }

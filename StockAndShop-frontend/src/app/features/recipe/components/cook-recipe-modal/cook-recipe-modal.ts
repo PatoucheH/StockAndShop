@@ -1,11 +1,11 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { forkJoin } from 'rxjs';
-import { HomeService } from '../../../../../../shared/services/home.service';
-import { ToastService } from '../../../../../../core/services/toast.service';
-import { SmartUnitPipe } from '../../../../../../shared/pipes/smart-unit.pipe';
-import { AddToListComponent } from '../../../../../../shared/components/add-to-list/add-to-list';
-import { Recipe, RecipeIngredient } from '../../../../../../shared/models/recipe.models';
-import { ProductItemRequest } from '../../../../../../shared/models/productItem.models';
+import { HomeService } from '../../../../shared/services/home.service';
+import { ToastService } from '../../../../core/services/toast.service';
+import { SmartUnitPipe } from '../../../../shared/pipes/smart-unit.pipe';
+import { AddToListComponent } from '../add-to-list/add-to-list';
+import { Recipe, RecipeIngredient } from '../../../../shared/models/recipe.models';
+import { ProductItemRequest } from '../../../../shared/models/productItem.models';
 
 interface IngredientCheck {
   ingredient: RecipeIngredient;
