@@ -26,7 +26,7 @@ public record RecipeResponse(
                 recipe.getSteps(),
                 recipe.getTiming(),
                 recipe.getScore(),
-                recipe.getTags(),
+                recipe.getTags().stream().map(tag -> tag.getName()).toList(),
                 recipe.getCreatedAt()
         );
     }

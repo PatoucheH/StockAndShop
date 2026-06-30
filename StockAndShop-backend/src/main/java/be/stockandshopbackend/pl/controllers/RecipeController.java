@@ -24,6 +24,11 @@ public class RecipeController {
 
     private final RecipeService recipeService;
 
+    @GetMapping("/tags")
+    public ResponseEntity<List<String>> getAllTags() {
+        return ResponseEntity.ok(recipeService.getAllTags());
+    }
+
     @GetMapping
     public ResponseEntity<PagedRecipeResponse> getAllRecipes(
             @RequestParam(defaultValue = "0") int page,

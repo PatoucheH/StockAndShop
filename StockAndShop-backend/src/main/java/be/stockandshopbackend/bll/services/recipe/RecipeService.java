@@ -15,6 +15,7 @@ public interface RecipeService {
     Recipe getById(UUID id);
     List<Recipe> getSuggestions(UUID homeId);
     List<Recipe> getSuggestionsWithProducts(UUID homeId, List<String> productNames);
+    List<String> getAllTags();
 
     /// ADD / GENERATE
     Recipe generateAndSaveWithProduct(List<ProductStockHome> product);

@@ -35,16 +35,19 @@ public class Recipe extends UuidBaseEntity {
     @Column(nullable = true)
     private Double score;
 
-    @ElementCollection
-    @CollectionTable(name = "recipe_tags", joinColumns = @JoinColumn(name = "recipe_id"))
-    @Column(name = "tag")
-    private List<String> tags = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "recipe_tags",
+            joinColumns = @JoinColumn(name = "recipe_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags = new ArrayList<>();
 
     public Recipe(String title,
                   List<RecipeProduct> recipeProducts,
                   List<String> steps,
                   int timing,
-                  List<String> tags) {
+                  List<Tag> tags) {
         this.title = title;
         this.recipeProducts = recipeProducts;
         this.steps = steps;

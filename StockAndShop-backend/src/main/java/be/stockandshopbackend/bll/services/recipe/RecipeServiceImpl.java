@@ -3,7 +3,9 @@ package be.stockandshopbackend.bll.services.recipe;
 import be.stockandshopbackend.dal.repositories.HomeRepository;
 import be.stockandshopbackend.dal.repositories.ProductRepository;
 import be.stockandshopbackend.dal.repositories.RecipeRepository;
+import be.stockandshopbackend.dal.repositories.TagRepository;
 import be.stockandshopbackend.dl.entities.*;
+import be.stockandshopbackend.dl.entities.Tag;
 import be.stockandshopbackend.exceptions.NotFoundException;
 import be.stockandshopbackend.exceptions.RecipeNotPossibleException;
 import com.anthropic.client.AnthropicClient;
@@ -34,6 +36,7 @@ public class RecipeServiceImpl implements RecipeService {
     private final RecipeRepository recipeRepository;
     private final HomeRepository homeRepository;
     private final ProductRepository productRepository;
+    private final TagRepository tagRepository;
 
     public Page<Recipe> getAllRecipes(Pageable pageable) {
         return recipeRepository.findAll(pageable);
@@ -95,15 +98,24 @@ public class RecipeServiceImpl implements RecipeService {
         List<String> existingTitles = recipeRepository.findAll().stream()
                 .map(Recipe::getTitle)
                 .toList();
-        String claudeResponse = callClaude(buildPrompt(products, existingTitles));
+        List<Tag> availableTags = tagRepository.findAll();
+        String claudeResponse = callClaude(buildPrompt(products, existingTitles, availableTags));
         if (claudeResponse.trim().startsWith("IMPOSSIBLE")) {
             String reason = claudeResponse.trim().replaceFirst("^IMPOSSIBLE[:\\s]*", "").trim();
             throw new RecipeNotPossibleException(reason.isEmpty()
                     ? "Les ingrédients disponibles ne permettent pas de créer une recette cohérente."
                     : reason);
         }
-        Recipe recipe = parseResponse(claudeResponse);
+        Recipe recipe = parseResponse(claudeResponse, availableTags);
         return recipeRepository.save(recipe);
+    }
+
+    @Override
+    public List<String> getAllTags() {
+        return tagRepository.findAll().stream()
+                .map(Tag::getName)
+                .sorted()
+                .toList();
     }
 
     // Claude is told it may use these in recipe steps but must NEVER list them as stock INGREDIENTS,
@@ -117,7 +129,7 @@ public class RecipeServiceImpl implements RecipeService {
             .map(String::trim)
             .collect(Collectors.toUnmodifiableSet());
 
-    private String buildPrompt(List<ProductStockHome> stocks, List<String> existingTitles) {
+    private String buildPrompt(List<ProductStockHome> stocks, List<String> existingTitles, List<Tag> availableTags) {
         StringBuilder sb = new StringBuilder();
         sb.append("You are a head chef. Here are the products currently in the pantry:\n\n");
         stocks.forEach(stock -> sb.append("- ")
@@ -160,6 +172,10 @@ public class RecipeServiceImpl implements RecipeService {
                   Do NOT use brackets [] around any text.
                   Do NOT list staple ingredients (water, salt, pepper, oil, butter, flour, sugar, vinegar) in INGREDIENTS.
                  \s""");
+        String tagList = availableTags.stream().map(Tag::getName).collect(Collectors.joining(", "));
+        sb.append("For the TAGS line, choose 2 to 4 tags from this exact list only (copy the names exactly): ")
+          .append(tagList).append("\n")
+          .append("Do NOT invent new tags. Only use tags from the list above.\n");
         return sb.toString();
     }
 
@@ -177,13 +193,13 @@ public class RecipeServiceImpl implements RecipeService {
                 .collect(Collectors.joining());
     }
 
-    private Recipe parseResponse(String claudeResponse) {
+    private Recipe parseResponse(String claudeResponse, List<Tag> availableTags) {
         String[] sections = claudeResponse.split("\n");
         String title = "";
         List<RecipeProduct> products = new ArrayList<>();
         List<String> steps = new ArrayList<>();
         int timing = 0;
-        List<String> tags = new ArrayList<>();
+        List<Tag> tags = new ArrayList<>();
         String currentSection = "";
         for (String line : sections) {
             line = line.trim();
@@ -202,10 +218,7 @@ public class RecipeServiceImpl implements RecipeService {
                 currentSection = "TAGS";
                 String rawTags = line.replace("TAGS:", "").trim();
                 if (!rawTags.isEmpty()) {
-                    for (String tag : rawTags.split(",")) {
-                        String t = tag.trim();
-                        if (!t.isEmpty()) tags.add(t);
-                    }
+                    resolveTagNames(rawTags.split(","), availableTags, tags);
                 }
             } else if (!line.isEmpty()) {
                 switch (currentSection) {
@@ -226,15 +239,23 @@ public class RecipeServiceImpl implements RecipeService {
                     case "STEPS" ->
                         // Claude occasionally wraps step text in brackets despite instructions — strip them
                             steps.add(line.replaceAll("^\\[|]$", "").trim());
-                    case "TAGS" -> {
-                        for (String tag : line.split(",")) {
-                            String t = tag.trim();
-                            if (!t.isEmpty()) tags.add(t);
-                        }
-                    }
+                    case "TAGS" ->
+                            resolveTagNames(line.split(","), availableTags, tags);
                 }
             }
         }
         return new Recipe(title, products, steps, timing, tags);
+    }
+
+    private void resolveTagNames(String[] rawNames, List<Tag> availableTags, List<Tag> target) {
+        for (String raw : rawNames) {
+            String name = raw.trim();
+            availableTags.stream()
+                    .filter(t -> t.getName().equalsIgnoreCase(name))
+                    .findFirst()
+                    .ifPresent(tag -> {
+                        if (!target.contains(tag)) target.add(tag);
+                    });
+        }
     }
 }
