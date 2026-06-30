@@ -56,6 +56,11 @@ export class RecipeService {
     return this.authService.isLoggedIn() ? `${this.apiUrl}/favorites` : undefined;
   });
 
+  private _tagsResource = httpResource<string[]>(() => {
+    this.authService.authVersion();
+    return this.authService.isLoggedIn() ? `${this.apiUrl}/tags` : undefined;
+  });
+
   readonly isLoading = computed(() => this._resource.isLoading());
   readonly hasError = computed(() => !!this._resource.error());
   readonly recipes = computed(() => this._allRecipes());
@@ -63,6 +68,7 @@ export class RecipeService {
   readonly hasMore = computed(() => this._resource.value()?.hasMore ?? false);
   readonly isGeneratingRecipe = signal(false);
 
+  readonly tags = computed(() => this._tagsResource.value() ?? []);
   readonly favoriteRecipes = computed(() => this._favoritesResource.value() ?? []);
   readonly isFavoritesLoading = computed(() => this._favoritesResource.isLoading());
   readonly hasFavoritesError = computed(() => !!this._favoritesResource.error());

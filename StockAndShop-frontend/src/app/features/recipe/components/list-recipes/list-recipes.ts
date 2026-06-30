@@ -18,16 +18,22 @@ export class ListRecipesComponent {
   loadMore = output<void>();
 
   activeFilters = signal<string[]>([]);
+  activeTags = signal<string[]>([]);
   nameFilter = signal('');
 
   filteredRecipes = computed(() => {
     const filters = this.activeFilters();
+    const tags = this.activeTags();
     const name = this.nameFilter().toLowerCase().trim();
     return this.recipes()
       .filter((r) => !name || r.title.toLowerCase().includes(name))
       .filter((r) =>
         filters.length === 0 ||
         filters.every((f) => r.ingredients.some((i) => i.productName.toLowerCase().includes(f))),
+      )
+      .filter((r) =>
+        tags.length === 0 ||
+        tags.some((t) => r.tags.includes(t)),
       );
   });
 
@@ -35,4 +41,10 @@ export class ListRecipesComponent {
   onFilterAdded(filter: string) { this.activeFilters.update((f) => [...f, filter]); }
   onFilterRemoved(filter: string) { this.activeFilters.update((f) => f.filter((x) => x !== filter)); }
   onFiltersCleared() { this.activeFilters.set([]); }
+  onTagToggled(tag: string) {
+    this.activeTags.update((tags) =>
+      tags.includes(tag) ? tags.filter((t) => t !== tag) : [...tags, tag],
+    );
+  }
+  onTagFiltersCleared() { this.activeTags.set([]); }
 }

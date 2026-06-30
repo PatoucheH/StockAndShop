@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
 import { ProductService } from '../../../../../shared/services/product.service';
+import { RecipeService } from '../../../services/recipe.service';
 
 @Component({
   selector: 'app-recipe-filter-bar',
@@ -11,16 +12,22 @@ import { ProductService } from '../../../../../shared/services/product.service';
 })
 export class RecipeFilterBarComponent {
   private productService = inject(ProductService);
+  readonly recipeService = inject(RecipeService);
 
   activeFilters = input<string[]>([]);
+  activeTags = input<string[]>([]);
   resultCount = input<number>(0);
   filterAdded = output<string>();
   filterRemoved = output<string>();
   filtersCleared = output<void>();
   nameFilterChanged = output<string>();
+  tagToggled = output<string>();
+  tagFiltersCleared = output<void>();
 
   filterInput = signal('');
   filterNameInput = signal('');
+  isFiltersOpen = signal(false);
+  isTagsOpen = signal(false);
 
   filteredSuggestions = toSignal(
     toObservable(this.filterInput).pipe(
