@@ -1,6 +1,6 @@
 package be.stockandshopbackend.pl.DTOs.Response;
 
-import be.stockandshopbackend.dl.entities.RecipeProduct;
+import be.stockandshopbackend.dl.entities.recipe.RecipeProduct;
 
 public record RecipeProductResponse(
         Long productId,

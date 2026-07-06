@@ -1,11 +1,17 @@
 package be.stockandshopbackend.bll.services.home;
 
-import be.stockandshopbackend.bll.services.product.ProductService;
+import be.stockandshopbackend.bll.services.productAndShoppingList.product.ProductService;
 import be.stockandshopbackend.bll.services.base.BaseCRUDService;
-import be.stockandshopbackend.dal.repositories.HomeRepository;
+import be.stockandshopbackend.dal.repositories.home.HomeRepository;
 import be.stockandshopbackend.dl.entities.*;
+import be.stockandshopbackend.dl.entities.home.Home;
+import be.stockandshopbackend.dl.entities.product.Product;
+import be.stockandshopbackend.dl.entities.product.ProductStockHome;
+import be.stockandshopbackend.dl.entities.user.User;
+import be.stockandshopbackend.dl.entities.home.UserHome;
 import be.stockandshopbackend.exceptions.NotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,10 +32,6 @@ public class HomeServiceImpl extends BaseCRUDService<Home, UUID, HomeRepository>
 
     public List<Home> findAllByUser(User user) {
         return repository.findByUsers_User(user);
-    }
-
-    public Home findHomeById(UUID id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException("Home with id: " + id));
     }
 
     public List<ShoppingList> findAllShoppingListsByHomeId(UUID homeId) {

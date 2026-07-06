@@ -11,12 +11,14 @@
 
 .ambient-bg {
   background:
-    radial-gradient(ellipse 80% 55% at 0% 0%, rgba(16, 185, 129, 0.18) 0%, transparent 65%),
+    radial-gradient(ellipse 120% 90% at 0% 0%, rgba(16, 185, 129, 0.18) 0%, transparent 65%),
     #f8fafc;
+  background-attachment: fixed;
 }
 
 .dark .ambient-bg {
   background:
-    radial-gradient(ellipse 80% 55% at 0% 0%, rgba(4, 120, 87, 0.55) 0%, transparent 65%),
+    radial-gradient(ellipse 120% 90% at 0% 0%, rgba(4, 120, 87, 0.55) 0%, transparent 65%),
     #111827;
+  background-attachment: fixed;
 }

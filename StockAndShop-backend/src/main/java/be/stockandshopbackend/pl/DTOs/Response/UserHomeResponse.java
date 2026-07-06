@@ -1,6 +1,6 @@
 package be.stockandshopbackend.pl.DTOs.Response;
 
-import be.stockandshopbackend.dl.entities.UserHome;
+import be.stockandshopbackend.dl.entities.home.UserHome;
 
 import java.util.Set;
 import java.util.UUID;

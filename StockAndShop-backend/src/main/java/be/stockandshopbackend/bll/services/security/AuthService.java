@@ -1,11 +1,11 @@
 package be.stockandshopbackend.bll.services.security;
 
-import be.stockandshopbackend.dal.repositories.RefreshTokenRepository;
-import be.stockandshopbackend.dal.repositories.RoleRepository;
-import be.stockandshopbackend.dal.repositories.UserRepository;
-import be.stockandshopbackend.dl.entities.RefreshToken;
-import be.stockandshopbackend.dl.entities.Role;
-import be.stockandshopbackend.dl.entities.User;
+import be.stockandshopbackend.dal.repositories.user.RefreshTokenRepository;
+import be.stockandshopbackend.dal.repositories.user.RoleRepository;
+import be.stockandshopbackend.dal.repositories.user.UserRepository;
+import be.stockandshopbackend.dl.entities.user.RefreshToken;
+import be.stockandshopbackend.dl.entities.user.Role;
+import be.stockandshopbackend.dl.entities.user.User;
 import be.stockandshopbackend.exceptions.ConflictException;
 import be.stockandshopbackend.pl.DTOs.requests.LoginRequest;
 import be.stockandshopbackend.pl.DTOs.requests.RegisterRequest;

@@ -1,6 +1,6 @@
 package be.stockandshopbackend.pl.DTOs.requests;
 
-import be.stockandshopbackend.dl.entities.ProductStockHome;
+import be.stockandshopbackend.dl.entities.product.ProductStockHome;
 
 import java.util.List;
 

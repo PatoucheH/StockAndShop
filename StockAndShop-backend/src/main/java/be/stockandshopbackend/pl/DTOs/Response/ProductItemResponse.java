@@ -1,7 +1,7 @@
 package be.stockandshopbackend.pl.DTOs.Response;
 
-import be.stockandshopbackend.dl.entities.ProductListItem;
-import be.stockandshopbackend.dl.entities.ProductStockHome;
+import be.stockandshopbackend.dl.entities.product.ProductListItem;
+import be.stockandshopbackend.dl.entities.product.ProductStockHome;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 // Shared DTO for both ProductStockHome (stock) and ProductListItem (shopping list)

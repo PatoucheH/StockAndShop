@@ -1,7 +1,7 @@
 package be.stockandshopbackend.bll.services.security;
 
-import be.stockandshopbackend.dal.repositories.HomeRepository;
-import be.stockandshopbackend.dl.entities.User;
+import be.stockandshopbackend.dal.repositories.home.HomeRepository;
+import be.stockandshopbackend.dl.entities.user.User;
 import be.stockandshopbackend.dl.enums.HomeRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

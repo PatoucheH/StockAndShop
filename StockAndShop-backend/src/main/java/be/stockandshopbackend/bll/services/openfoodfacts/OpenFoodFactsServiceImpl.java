@@ -1,9 +1,9 @@
 package be.stockandshopbackend.bll.services.openfoodfacts;
 
-import be.stockandshopbackend.bll.services.category.CategoryService;
-import be.stockandshopbackend.dal.repositories.ProductRepository;
-import be.stockandshopbackend.dl.entities.Category;
-import be.stockandshopbackend.dl.entities.Product;
+import be.stockandshopbackend.bll.services.productAndShoppingList.category.CategoryService;
+import be.stockandshopbackend.dal.repositories.product.ProductRepository;
+import be.stockandshopbackend.dl.entities.product.Category;
+import be.stockandshopbackend.dl.entities.product.Product;
 import be.stockandshopbackend.dl.enums.Unity;
 import be.stockandshopbackend.pl.DTOs.Response.OpenFoodFactsResponse;
 import lombok.extern.slf4j.Slf4j;

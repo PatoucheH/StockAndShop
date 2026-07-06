@@ -1,6 +1,7 @@
 package be.stockandshopbackend.dl.entities;
 
 import be.stockandshopbackend.dl.entities.base.LongBaseEntity;
+import be.stockandshopbackend.dl.entities.product.ProductListItem;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

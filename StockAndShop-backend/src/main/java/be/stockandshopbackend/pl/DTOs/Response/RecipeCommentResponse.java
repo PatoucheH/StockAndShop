@@ -1,6 +1,6 @@
 package be.stockandshopbackend.pl.DTOs.Response;
 
-import be.stockandshopbackend.dl.entities.RecipeComment;
+import be.stockandshopbackend.dl.entities.recipe.RecipeComment;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

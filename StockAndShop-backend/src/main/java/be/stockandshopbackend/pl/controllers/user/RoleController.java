@@ -1,0 +1,47 @@
+package be.stockandshopbackend.pl.controllers.user;
+
+import be.stockandshopbackend.bll.services.user.role.RoleService;
+import be.stockandshopbackend.dl.entities.user.Role;
+import be.stockandshopbackend.pl.DTOs.Response.RoleResponse;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/role")
+@RequiredArgsConstructor
+public class RoleController {
+
+    private final RoleService roleService;
+
+    //region GET
+
+    @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<RoleResponse>> getAllRoles(){
+        return ResponseEntity.ok(roleService.findAll().stream()
+                .map(RoleResponse::fromRole)
+                .toList());
+    }
+
+    //endregion
+
+    //region CREATE
+
+    @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<RoleResponse> createRole(
+            @RequestParam @Size(min = 2, max = 30) @Pattern(regexp = "^[A-Z_]+$") String roleName
+    ){
+        Role role = roleService.createRole(roleName);
+        return ResponseEntity.status(HttpStatus.CREATED).body(RoleResponse.fromRole(role));
+    }
+
+    //endregion
+}

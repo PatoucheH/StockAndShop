@@ -1,11 +1,14 @@
 package be.stockandshopbackend.bll.services.recipe;
 
-import be.stockandshopbackend.dal.repositories.HomeRepository;
-import be.stockandshopbackend.dal.repositories.ProductRepository;
-import be.stockandshopbackend.dal.repositories.RecipeRepository;
-import be.stockandshopbackend.dal.repositories.TagRepository;
-import be.stockandshopbackend.dl.entities.*;
-import be.stockandshopbackend.dl.entities.Tag;
+import be.stockandshopbackend.dal.repositories.home.HomeRepository;
+import be.stockandshopbackend.dal.repositories.product.ProductRepository;
+import be.stockandshopbackend.dal.repositories.recipe.RecipeRepository;
+import be.stockandshopbackend.dal.repositories.recipe.TagRepository;
+import be.stockandshopbackend.dl.entities.product.ProductStockHome;
+import be.stockandshopbackend.dl.entities.recipe.Recipe;
+import be.stockandshopbackend.dl.entities.recipe.RecipeProduct;
+import be.stockandshopbackend.dl.entities.recipe.Tag;
+import be.stockandshopbackend.dl.entities.home.Home;
 import be.stockandshopbackend.exceptions.NotFoundException;
 import be.stockandshopbackend.exceptions.RecipeNotPossibleException;
 import com.anthropic.client.AnthropicClient;

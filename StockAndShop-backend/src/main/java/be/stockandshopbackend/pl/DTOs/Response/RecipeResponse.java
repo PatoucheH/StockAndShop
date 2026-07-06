@@ -1,6 +1,6 @@
 package be.stockandshopbackend.pl.DTOs.Response;
 
-import be.stockandshopbackend.dl.entities.Recipe;
+import be.stockandshopbackend.dl.entities.recipe.Recipe;
 
 import java.time.LocalDateTime;
 import java.util.List;

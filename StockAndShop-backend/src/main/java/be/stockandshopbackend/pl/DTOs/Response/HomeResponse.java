@@ -1,6 +1,6 @@
 package be.stockandshopbackend.pl.DTOs.Response;
 
-import be.stockandshopbackend.dl.entities.Home;
+import be.stockandshopbackend.dl.entities.home.Home;
 import be.stockandshopbackend.dl.enums.HomeRole;
 
 import java.util.UUID;

@@ -1,6 +1,6 @@
 package be.stockandshopbackend.pl.DTOs.Response;
 
-import be.stockandshopbackend.dl.entities.Role;
+import be.stockandshopbackend.dl.entities.user.Role;
 
 public record RoleResponse(String name) {
     public static RoleResponse fromRole(Role role) {

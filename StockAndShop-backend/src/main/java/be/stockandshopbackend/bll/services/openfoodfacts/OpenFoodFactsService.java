@@ -1,6 +1,6 @@
 package be.stockandshopbackend.bll.services.openfoodfacts;
 
-import be.stockandshopbackend.dl.entities.Product;
+import be.stockandshopbackend.dl.entities.product.Product;
 
 import java.util.Optional;
 

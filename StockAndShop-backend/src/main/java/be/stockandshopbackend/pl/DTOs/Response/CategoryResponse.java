@@ -1,6 +1,6 @@
 package be.stockandshopbackend.pl.DTOs.Response;
 
-import be.stockandshopbackend.dl.entities.Category;
+import be.stockandshopbackend.dl.entities.product.Category;
 
 public record CategoryResponse(
         Long id,

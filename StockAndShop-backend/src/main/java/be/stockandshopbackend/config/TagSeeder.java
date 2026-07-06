@@ -1,7 +1,7 @@
 package be.stockandshopbackend.config;
 
-import be.stockandshopbackend.dal.repositories.TagRepository;
-import be.stockandshopbackend.dl.entities.Tag;
+import be.stockandshopbackend.dal.repositories.recipe.TagRepository;
+import be.stockandshopbackend.dl.entities.recipe.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

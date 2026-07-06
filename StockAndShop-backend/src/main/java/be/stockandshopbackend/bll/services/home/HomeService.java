@@ -1,6 +1,10 @@
 package be.stockandshopbackend.bll.services.home;
 
 import be.stockandshopbackend.dl.entities.*;
+import be.stockandshopbackend.dl.entities.home.Home;
+import be.stockandshopbackend.dl.entities.product.ProductStockHome;
+import be.stockandshopbackend.dl.entities.user.User;
+import be.stockandshopbackend.dl.entities.home.UserHome;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,7 +15,6 @@ public interface HomeService {
     List<Home> findAll();
     Home findById(UUID id);
     List<Home> findAllByUser(User user);
-    Home findHomeById(UUID id);
     List<ShoppingList> findAllShoppingListsByHomeId(UUID homeId);
     List<ProductStockHome> findAllProductStockHomeByHomeId(UUID homeId);
     List<UserHome> findAllUserHomeByHomeId(UUID homeId);

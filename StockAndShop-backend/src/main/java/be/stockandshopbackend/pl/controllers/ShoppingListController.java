@@ -1,10 +1,10 @@
 package be.stockandshopbackend.pl.controllers;
 
-import be.stockandshopbackend.bll.services.product.ProductService;
-import be.stockandshopbackend.bll.services.shoppingList.ShoppingListService;
-import be.stockandshopbackend.dl.entities.ProductListItem;
+import be.stockandshopbackend.bll.services.productAndShoppingList.product.ProductService;
+import be.stockandshopbackend.bll.services.productAndShoppingList.shoppingList.ShoppingListService;
+import be.stockandshopbackend.dl.entities.product.ProductListItem;
 import be.stockandshopbackend.dl.entities.ShoppingList;
-import be.stockandshopbackend.dl.entities.User;
+import be.stockandshopbackend.dl.entities.user.User;
 import be.stockandshopbackend.pl.DTOs.Response.HomeResponse;
 import be.stockandshopbackend.pl.DTOs.Response.ProductItemResponse;
 import be.stockandshopbackend.pl.DTOs.Response.ShoppingListResponse;
@@ -12,7 +12,6 @@ import be.stockandshopbackend.pl.DTOs.requests.ProductItemRequest;
 import be.stockandshopbackend.pl.DTOs.requests.ShoppingListRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

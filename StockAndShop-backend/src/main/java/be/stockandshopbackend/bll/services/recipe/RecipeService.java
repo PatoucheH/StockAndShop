@@ -1,7 +1,7 @@
 package be.stockandshopbackend.bll.services.recipe;
 
-import be.stockandshopbackend.dl.entities.ProductStockHome;
-import be.stockandshopbackend.dl.entities.Recipe;
+import be.stockandshopbackend.dl.entities.product.ProductStockHome;
+import be.stockandshopbackend.dl.entities.recipe.Recipe;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
