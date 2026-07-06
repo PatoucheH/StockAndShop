@@ -11,7 +11,7 @@ import be.stockandshopbackend.dl.entities.product.ProductListItem;
 import be.stockandshopbackend.dl.entities.product.ProductStockHome;
 import be.stockandshopbackend.dl.entities.user.User;
 import be.stockandshopbackend.exceptions.NotFoundException;
-import be.stockandshopbackend.pl.DTOs.Response.ProductItemResponse;
+import be.stockandshopbackend.pl.DTOs.Response.products.ProductItemResponse;
 import be.stockandshopbackend.pl.DTOs.websocket.ShoppingListEventDTO;
 import be.stockandshopbackend.pl.DTOs.websocket.ShoppingListEventType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

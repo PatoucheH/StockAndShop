@@ -5,7 +5,7 @@ import be.stockandshopbackend.dal.repositories.product.ProductRepository;
 import be.stockandshopbackend.dl.entities.product.Category;
 import be.stockandshopbackend.dl.entities.product.Product;
 import be.stockandshopbackend.dl.enums.Unity;
-import be.stockandshopbackend.pl.DTOs.Response.OpenFoodFactsResponse;
+import be.stockandshopbackend.pl.DTOs.Response.products.OpenFoodFactsResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;

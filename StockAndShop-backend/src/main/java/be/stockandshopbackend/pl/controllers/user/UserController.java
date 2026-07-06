@@ -2,7 +2,7 @@ package be.stockandshopbackend.pl.controllers.user;
 
 import be.stockandshopbackend.bll.services.user.role.RoleService;
 import be.stockandshopbackend.bll.services.user.userService.UserService;
-import be.stockandshopbackend.pl.DTOs.Response.UserResponse;
+import be.stockandshopbackend.pl.DTOs.Response.user.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

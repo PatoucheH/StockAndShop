@@ -1,8 +1,8 @@
 package be.stockandshopbackend.pl.controllers.recipe;
 
 import be.stockandshopbackend.bll.services.recipe.recipeComment.RecipeCommentService;
-import be.stockandshopbackend.pl.DTOs.Response.RecipeCommentResponse;
-import be.stockandshopbackend.pl.DTOs.requests.RecipeCommentRequest;
+import be.stockandshopbackend.pl.DTOs.Response.recipe.RecipeCommentResponse;
+import be.stockandshopbackend.pl.DTOs.requests.recipe.RecipeCommentRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

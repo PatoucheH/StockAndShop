@@ -2,7 +2,7 @@ package be.stockandshopbackend.pl.controllers.user;
 
 import be.stockandshopbackend.bll.services.user.userFavorite.UserFavoriteRecipeService;
 import be.stockandshopbackend.dl.entities.user.User;
-import be.stockandshopbackend.pl.DTOs.Response.RecipeResponse;
+import be.stockandshopbackend.pl.DTOs.Response.recipe.RecipeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

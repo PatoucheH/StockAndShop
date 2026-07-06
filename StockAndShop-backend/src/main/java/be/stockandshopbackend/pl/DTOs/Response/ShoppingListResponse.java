@@ -1,6 +1,7 @@
 package be.stockandshopbackend.pl.DTOs.Response;
 
 import be.stockandshopbackend.dl.entities.ShoppingList;
+import be.stockandshopbackend.pl.DTOs.Response.products.ProductItemResponse;
 
 import java.util.Comparator;
 import java.util.List;

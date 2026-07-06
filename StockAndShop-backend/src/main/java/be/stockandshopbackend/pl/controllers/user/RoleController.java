@@ -2,7 +2,7 @@ package be.stockandshopbackend.pl.controllers.user;
 
 import be.stockandshopbackend.bll.services.user.role.RoleService;
 import be.stockandshopbackend.dl.entities.user.Role;
-import be.stockandshopbackend.pl.DTOs.Response.RoleResponse;
+import be.stockandshopbackend.pl.DTOs.Response.user.RoleResponse;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;

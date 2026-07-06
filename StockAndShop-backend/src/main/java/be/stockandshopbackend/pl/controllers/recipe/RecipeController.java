@@ -2,10 +2,10 @@ package be.stockandshopbackend.pl.controllers.recipe;
 
 import be.stockandshopbackend.bll.services.recipe.RecipeService;
 import be.stockandshopbackend.dl.entities.recipe.Recipe;
-import be.stockandshopbackend.pl.DTOs.Response.PagedRecipeResponse;
-import be.stockandshopbackend.pl.DTOs.Response.RecipeResponse;
-import be.stockandshopbackend.pl.DTOs.requests.GenerateRecipeRequest;
-import be.stockandshopbackend.pl.DTOs.requests.SuggestionsWithProductsRequest;
+import be.stockandshopbackend.pl.DTOs.Response.recipe.PagedRecipeResponse;
+import be.stockandshopbackend.pl.DTOs.Response.recipe.RecipeResponse;
+import be.stockandshopbackend.pl.DTOs.requests.recipe.GenerateRecipeRequest;
+import be.stockandshopbackend.pl.DTOs.requests.recipe.SuggestionsWithProductsRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

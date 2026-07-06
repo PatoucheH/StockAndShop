@@ -5,10 +5,10 @@ import be.stockandshopbackend.bll.services.productAndShoppingList.shoppingList.S
 import be.stockandshopbackend.dl.entities.product.ProductListItem;
 import be.stockandshopbackend.dl.entities.ShoppingList;
 import be.stockandshopbackend.dl.entities.user.User;
-import be.stockandshopbackend.pl.DTOs.Response.HomeResponse;
-import be.stockandshopbackend.pl.DTOs.Response.ProductItemResponse;
+import be.stockandshopbackend.pl.DTOs.Response.home.HomeResponse;
+import be.stockandshopbackend.pl.DTOs.Response.products.ProductItemResponse;
 import be.stockandshopbackend.pl.DTOs.Response.ShoppingListResponse;
-import be.stockandshopbackend.pl.DTOs.requests.ProductItemRequest;
+import be.stockandshopbackend.pl.DTOs.requests.products.ProductItemRequest;
 import be.stockandshopbackend.pl.DTOs.requests.ShoppingListRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

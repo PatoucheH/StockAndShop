@@ -4,7 +4,7 @@ import be.stockandshopbackend.bll.services.base.BaseCRUDService;
 import be.stockandshopbackend.dal.repositories.product.CategoryRepository;
 import be.stockandshopbackend.dl.entities.product.Category;
 import be.stockandshopbackend.exceptions.NotFoundException;
-import be.stockandshopbackend.pl.DTOs.requests.CategoryRequest;
+import be.stockandshopbackend.pl.DTOs.requests.products.CategoryRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

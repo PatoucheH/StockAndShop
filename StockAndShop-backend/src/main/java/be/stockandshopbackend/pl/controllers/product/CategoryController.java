@@ -1,8 +1,8 @@
 package be.stockandshopbackend.pl.controllers.product;
 
 import be.stockandshopbackend.bll.services.productAndShoppingList.category.CategoryService;
-import be.stockandshopbackend.pl.DTOs.Response.CategoryResponse;
-import be.stockandshopbackend.pl.DTOs.requests.CategoryRequest;
+import be.stockandshopbackend.pl.DTOs.Response.products.CategoryResponse;
+import be.stockandshopbackend.pl.DTOs.requests.products.CategoryRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

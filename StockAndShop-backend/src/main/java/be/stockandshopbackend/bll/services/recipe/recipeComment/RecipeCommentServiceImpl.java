@@ -7,7 +7,7 @@ import be.stockandshopbackend.dl.entities.recipe.Recipe;
 import be.stockandshopbackend.dl.entities.recipe.RecipeComment;
 import be.stockandshopbackend.dl.entities.user.User;
 import be.stockandshopbackend.exceptions.NotFoundException;
-import be.stockandshopbackend.pl.DTOs.requests.RecipeCommentRequest;
+import be.stockandshopbackend.pl.DTOs.requests.recipe.RecipeCommentRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

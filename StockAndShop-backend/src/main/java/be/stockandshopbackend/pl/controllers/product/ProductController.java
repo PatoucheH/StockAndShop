@@ -5,8 +5,8 @@ import be.stockandshopbackend.bll.services.productAndShoppingList.product.Produc
 import be.stockandshopbackend.dl.entities.product.Category;
 import be.stockandshopbackend.dl.entities.product.Product;
 import be.stockandshopbackend.dl.enums.Unity;
-import be.stockandshopbackend.pl.DTOs.Response.ProductResponse;
-import be.stockandshopbackend.pl.DTOs.requests.ProductRequest;
+import be.stockandshopbackend.pl.DTOs.Response.products.ProductResponse;
+import be.stockandshopbackend.pl.DTOs.requests.products.ProductRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
