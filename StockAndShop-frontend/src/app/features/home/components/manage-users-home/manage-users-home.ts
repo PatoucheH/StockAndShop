@@ -31,9 +31,7 @@ export class ManageUsersHomeComponent {
   }
 
   onUserSubmitted({ user, role }: { user: UserSearchResult; role: 'USER' | 'VIEWER' }) {
-    const homeId = this.home()?.id;
-    if (!homeId) return;
-    this.homeService.addUser(homeId, user.email, role).subscribe({
+    this.homeService.addUser(user.email, role).subscribe({
       next: () => {
         this.showAddForm.set(false);
         this.errorMessage.set(null);
@@ -44,9 +42,7 @@ export class ManageUsersHomeComponent {
   }
 
   onUserRemoved(userId: string) {
-    const homeId = this.home()?.id;
-    if (!homeId) return;
-    this.homeService.removeUser(homeId, userId).subscribe({
+    this.homeService.removeUser(userId).subscribe({
       next: () => this.toast.success('Membre retiré'),
       error: () => this.toast.error('Impossible de retirer ce membre'),
     });

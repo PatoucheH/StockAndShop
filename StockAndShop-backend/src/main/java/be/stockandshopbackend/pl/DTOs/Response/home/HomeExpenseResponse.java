@@ -6,6 +6,7 @@ import be.stockandshopbackend.dl.entities.home.HomeExpense;
 import java.util.List;
 
 public record HomeExpenseResponse(
+        Long id,
         String name,
         int amount,
         List<String> userConcernedName,
@@ -13,6 +14,7 @@ public record HomeExpenseResponse(
 ) {
     public static HomeExpenseResponse fromHomeExpense(HomeExpense he){
         return new HomeExpenseResponse(
+                he.getId(),
                 he.getName(),
                 he.getAmount(),
                 he.getUsersConcerned().stream()

@@ -40,10 +40,12 @@ public class HomeExpensesServiceImpl extends BaseCRUDService<HomeExpense, Long, 
             throw new ConflictException("The payer cannot also be a concerned user");
         }
         Home home = homeExpense.getHome();
-        Set<Long> homeMemberIds = home.getUsers().stream().map(UserHome::getId).collect(Collectors.toSet());
-        boolean allBelongToHome = homeMemberIds.contains(payer.getId())
+        Set<Long> homeMemberIds = home.getUsers().stream()
+                .map(UserHome::getId)
+                .collect(Collectors.toSet());
+        boolean allBelongsToHome = homeMemberIds.contains(payer.getId())
                 && users.stream().allMatch(u -> homeMemberIds.contains(u.getId()));
-        if (!allBelongToHome) {
+        if (!allBelongsToHome) {
             throw new ConflictException("Payer and concerned users must belong to the expense's home");
         }
         int priceByUser = homeExpense.getAmount() / (users.size() + 1);

@@ -2,10 +2,10 @@ package be.stockandshopbackend.pl.controllers.home;
 
 import be.stockandshopbackend.bll.services.home.HomeService;
 import be.stockandshopbackend.bll.services.home.homeExpenses.HomeExpensesService;
-import be.stockandshopbackend.bll.services.home.userHome.UserHomeService;
 import be.stockandshopbackend.dl.entities.home.Home;
 import be.stockandshopbackend.dl.entities.home.HomeExpense;
 import be.stockandshopbackend.dl.entities.home.UserHome;
+import be.stockandshopbackend.exceptions.ConflictException;
 import be.stockandshopbackend.pl.DTOs.Response.home.HomeExpenseResponse;
 import be.stockandshopbackend.pl.DTOs.Response.home.HomeResponse;
 import be.stockandshopbackend.pl.DTOs.requests.home.HomeExpenseRequest;
@@ -27,7 +27,6 @@ public class HomeExpensesController {
 
     private final HomeExpensesService homeExpensesService;
     private final HomeService homeService;
-    private final UserHomeService userHomeService;
 
     @GetMapping("/{homeId}")
     @PreAuthorize("@homeSecurity.isInHome(#homeId, authentication.principal)")
@@ -43,10 +42,16 @@ public class HomeExpensesController {
     @PreAuthorize("@homeSecurity.isInHome(#heRequest.homeId(), authentication.principal)")
     public ResponseEntity<?> createHomeResponse(@RequestBody @Valid HomeExpenseRequest heRequest ){
         Home home = homeService.findById(heRequest.homeId());
-        UserHome payer = userHomeService.findById(heRequest.payerId());
-        Set<UserHome> userConcerned = heRequest.userConcernedId().stream()
-                .map(userHomeService::findById)
-                .collect(Collectors.toSet());;
+        UserHome payer = home.getUsers().stream()
+                .filter(u -> u.getUser().getId().equals(heRequest.payerId()))
+                .findFirst()
+                .orElseThrow(() -> new ConflictException("Payer is not a member of this home"));
+        Set<UserHome> userConcerned = home.getUsers().stream()
+                .filter(u -> heRequest.userConcernedId().contains(u.getUser().getId()))
+                .collect(Collectors.toSet());
+        if (userConcerned.size() != heRequest.userConcernedId().size()) {
+            throw new ConflictException("One or more concerned users are not members of this home");
+        }
         HomeExpense he = new HomeExpense(
                 heRequest.name(), heRequest.amount(), home, payer, userConcerned.stream().toList()
         );

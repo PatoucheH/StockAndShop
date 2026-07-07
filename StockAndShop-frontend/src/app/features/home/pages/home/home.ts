@@ -10,7 +10,7 @@ import { AuthService } from '../../../auth/services/auth.service';
   imports: [AddHomeComponent, RouterLink, FavoriteShoppingListsComponent],
   templateUrl: './home.html',
 })
-export class HomeComponent {
+export class Home {
   private authService = inject(AuthService);
   homeService = inject(HomeService);
 

@@ -7,7 +7,7 @@ import { ListRecipesComponent } from '../../components/list-recipes/list-recipes
   imports: [ListRecipesComponent],
   templateUrl: './recipes-page.html',
 })
-export class RecipesPageComponent {
+export class RecipesPage {
   private recipeService = inject(RecipeService);
 
   showFavorites = signal(true);

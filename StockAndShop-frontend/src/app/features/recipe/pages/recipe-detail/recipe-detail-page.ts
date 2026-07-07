@@ -19,7 +19,7 @@ import { CookRecipeModalComponent } from '../../components/cook-recipe-modal/coo
   imports: [SmartUnitPipe, StarRatingComponent, LoadingComponent, ErrorComponent, AddToListComponent, RecipeCommentItemComponent, AddCommentFormComponent, CookRecipeModalComponent],
   templateUrl: './recipe-detail-page.html',
 })
-export class RecipeDetailPageComponent implements OnInit {
+export class RecipeDetailPage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   recipeService = inject(RecipeService);

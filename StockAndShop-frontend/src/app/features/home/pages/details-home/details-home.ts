@@ -9,14 +9,16 @@ import { ListStock } from '../../components/list-stock/list-stock';
 import { ManageUsersHomeComponent } from '../../components/manage-users-home/manage-users-home';
 import { LoadingComponent } from '../../../../shared/components/loading/loading';
 import { HttpErrorResponse } from '@angular/common/http';
+import { HomeExpensesComponent } from '../../components/home-expenses/home-expenses';
 
 @Component({
   selector: 'app-details-home',
-  imports: [ConfirmModalComponent, ListShoppingListComponent, AddShoppingListComponent, ListStock, ManageUsersHomeComponent, LoadingComponent],
+  imports: [ConfirmModalComponent, ListShoppingListComponent, AddShoppingListComponent, ListStock,
+    ManageUsersHomeComponent, LoadingComponent, HomeExpensesComponent],
   templateUrl: './details-home.html',
 
 })
-export class DetailsHomeComponent implements OnInit {
+export class DetailsHome implements OnInit {
   authService = inject(AuthService);
   router = inject(Router);
   homeService = inject(HomeService);
@@ -27,7 +29,7 @@ export class DetailsHomeComponent implements OnInit {
   stock = this.homeService.stock;
 
   // Resets to the 'list' tab whenever the selected home changes
-  view = linkedSignal<'list' | 'stock' | 'user'>(() => {
+  view = linkedSignal<'list' | 'stock' | 'user' | 'expense'>(() => {
     this.home();
     return 'list';
   });
@@ -57,7 +59,7 @@ export class DetailsHomeComponent implements OnInit {
     this.homeService.selectHome(id);
   }
 
-  changeView(newView: 'list' | 'stock' | 'user') {
+  changeView(newView: 'list' | 'stock' | 'user' | 'expense') {
     this.view.set(newView);
   }
 

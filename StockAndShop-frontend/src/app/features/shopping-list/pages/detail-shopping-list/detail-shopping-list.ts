@@ -16,7 +16,7 @@ import { ToastService } from '../../../../core/services/toast.service';
   templateUrl: './detail-shopping-list.html',
 
 })
-export class DetailShoppingListComponent {
+export class DetailShoppingList{
   shoppingListService = inject(ShoppingListService);
   homeService = inject(HomeService);
   route = inject(ActivatedRoute);

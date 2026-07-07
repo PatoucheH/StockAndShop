@@ -17,33 +17,33 @@ export const routes: Routes = [
         path: '',
         title: 'Accueil — Stock&Shop',
         loadComponent: () => import('./features/home/pages/home/home')
-          .then((m) => m.HomeComponent),
+          .then((m) => m.Home),
       },
       {
         path: 'home/:id',
         canActivate: [homeGuard],
         loadComponent: () =>
           import('./features/home/pages/details-home/details-home')
-            .then((m) => m.DetailsHomeComponent),
+            .then((m) => m.DetailsHome),
       },
       {
         path: 'recipes',
         title: 'Recettes — Stock&Shop',
         loadComponent: () =>
           import('./features/recipe/pages/recipes/recipes-page')
-            .then((m) => m.RecipesPageComponent),
+            .then((m) => m.RecipesPage),
       },
       {
         path: 'recipes/:id',
         loadComponent: () =>
           import('./features/recipe/pages/recipe-detail/recipe-detail-page')
-            .then((m) => m.RecipeDetailPageComponent),
+            .then((m) => m.RecipeDetailPage),
       },
       {
         path: 'shopping-list/:id',
         loadComponent: () =>
           import('./features/shopping-list/pages/detail-shopping-list/detail-shopping-list')
-            .then((m) => m.DetailShoppingListComponent,
+            .then((m) => m.DetailShoppingList,
           ),
       },
     ],

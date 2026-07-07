@@ -12,6 +12,6 @@ public record HomeExpenseRequest(
         @NotBlank String name,
         @Min(0) int amount,
         @NotNull UUID homeId,
-        @NotNull Long payerId,
-        @NotEmpty List<Long> userConcernedId
+        @NotNull UUID payerId,
+        @NotEmpty List<UUID> userConcernedId
 ) {}
