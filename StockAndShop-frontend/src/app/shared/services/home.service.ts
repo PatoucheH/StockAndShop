@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, linkedSignal } from '@angular/core';
+import { computed, effect, inject, Injectable, linkedSignal, signal } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Home, HomeRequest } from '../../features/home/models/home.models';
@@ -8,7 +8,11 @@ import { User, UserSearchResult } from '../models/user.models';
 import { ProductStock, ProductStockDecrese } from '../models/productStock.models';
 import { AuthService } from '../../features/auth/services/auth.service';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { HomeExpense, HomeExpenseRequest } from '../../features/home/models/home-expense.model';
+import {
+  HomeExpense,
+  HomeExpenseRequest,
+  PagedHomeExpenseResponse,
+} from '../../features/home/models/home-expense.model';
 
 @Injectable({
   providedIn: 'root',
@@ -45,9 +49,15 @@ export class HomeService {
     this._selectedHomeId() ? `${this.apiUrl}/${this._selectedHomeId()}/stock` : undefined,
   );
 
-  readonly expenseResource = httpResource<HomeExpense[]>(() =>
+  private readonly expensePageSize = 20;
+  private _expensePage = signal(0);
+  private _allExpenses = signal<HomeExpense[]>([]);
+
+  readonly expenseResource = httpResource<PagedHomeExpenseResponse>(() =>
     // take the betginning of the apoi url and add -expense to get the right route
-    this._selectedHomeId() ? `${this.apiUrl}-expense/${this._selectedHomeId()}` : undefined,
+    this._selectedHomeId()
+      ? `${this.apiUrl}-expense/${this._selectedHomeId()}?page=${this._expensePage()}&size=${this.expensePageSize}`
+      : undefined,
   );
 
   readonly homes = computed(() => this.homesResource.value() ?? []);
@@ -55,7 +65,9 @@ export class HomeService {
   readonly shoppingLists = computed(() => this.shoppingListsResource.value() ?? []);
   readonly users = computed(() => this.usersResource.value() ?? []);
   readonly stock = computed(() => this.stockResource.value() ?? []);
-  readonly expense = computed(() => this.expenseResource.value() ?? null);
+  readonly expense = computed(() => this._allExpenses());
+  readonly expenseHasMore = computed(() => this.expenseResource.value()?.hasMore ?? false);
+  readonly expenseIsLoading = computed(() => this.expenseResource.isLoading());
 
   readonly isViewer = computed(() => {
     const email = this.authService.getUserEmail();
@@ -72,10 +84,32 @@ export class HomeService {
           this.homesResource.reload();
         }
       });
+
+    // page 0 means a fresh load (new home selected, or reload after a mutation); any other page appends for "load more"
+    effect(
+      () => {
+        if (this.expenseResource.isLoading()) return;
+        const response = this.expenseResource.value();
+        if (!response) return;
+        if (this._expensePage() === 0) {
+          this._allExpenses.set(response.expenses);
+        } else {
+          this._allExpenses.update((prev) => [...prev, ...response.expenses]);
+        }
+      },
+      { allowSignalWrites: true },
+    );
   }
 
   selectHome(id: string) {
     this._selectedHomeId.set(id);
+    this._expensePage.set(0);
+    this._allExpenses.set([]);
+  }
+
+  loadMoreExpenses() {
+    if (!this.expenseHasMore() || this.expenseIsLoading()) return;
+    this._expensePage.update((p) => p + 1);
   }
 
   createNewHome(data: HomeRequest) {
@@ -112,8 +146,15 @@ export class HomeService {
   }
 
   addExpense(heRequest: HomeExpenseRequest) {
-    return this.http
-      .post(`${this.apiUrl}-expense/`, heRequest)
-      .pipe(tap(() => this.expenseResource.reload()));
+    return this.http.post(`${this.apiUrl}-expense/`, heRequest).pipe(
+      tap(() => {
+        // Reset to the first page so the new expense (most recent) shows up at the top
+        if (this._expensePage() === 0) {
+          this.expenseResource.reload();
+        } else {
+          this._expensePage.set(0);
+        }
+      }),
+    );
   }
 }

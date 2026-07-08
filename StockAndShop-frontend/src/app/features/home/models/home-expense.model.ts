@@ -3,7 +3,16 @@ export interface HomeExpense {
   name: string,
   amount: number,
   userConcernedName: string[],
-  payerName: string
+  payerName: string,
+  createdAt: string
+}
+
+export interface PagedHomeExpenseResponse {
+  expenses: HomeExpense[];
+  total: number;
+  page: number;
+  size: number;
+  hasMore: boolean;
 }
 
 export interface HomeExpenseRequest {

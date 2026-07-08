@@ -7,6 +7,8 @@ import be.stockandshopbackend.dl.entities.home.Home;
 import be.stockandshopbackend.dl.entities.home.HomeExpense;
 import be.stockandshopbackend.dl.entities.home.UserHome;
 import be.stockandshopbackend.exceptions.ConflictException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,7 +61,7 @@ public class HomeExpensesServiceImpl extends BaseCRUDService<HomeExpense, Long, 
         repository.save(homeExpense);
     }
 
-    public List<HomeExpense> findByHomeId(UUID homeId) {
-        return repository.findByHomeId(homeId);
+    public Page<HomeExpense> findByHomeId(UUID homeId, Pageable pageable) {
+        return repository.findByHomeIdOrderByCreatedAtDesc(homeId, pageable);
     }
 }

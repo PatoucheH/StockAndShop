@@ -2,7 +2,8 @@ export interface User{
   id: string,
   name: string,
   email: string,
-  homeRole: string | null
+  homeRole: string | null,
+  balance: number
 }
 
 export interface UserSearchResult {

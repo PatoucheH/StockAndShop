@@ -11,7 +11,8 @@ public record UserHomeResponse(
         String name,
         String email,
         String homeRole,
-        Set<String> roles
+        Set<String> roles,
+        int balance
 ) {
     public static UserHomeResponse fromUserHome(UserHome u) {
         return new UserHomeResponse(
@@ -19,7 +20,8 @@ public record UserHomeResponse(
                 u.getUser().getDisplayName(),
                 u.getUser().getUsername(),
                 u.getHomeRole().toString(),
-                u.getUser().getAuthorities().stream().map(Object::toString).collect(Collectors.toSet())
+                u.getUser().getAuthorities().stream().map(Object::toString).collect(Collectors.toSet()),
+                u.getBalance()
         );
     }
 }

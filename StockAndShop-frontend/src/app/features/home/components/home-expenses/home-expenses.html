@@ -1,128 +1,85 @@
-<div class="max-w-4xl mx-auto px-4 sm:px-6 py-5 flex flex-col gap-5">
-  <!-- Expense list -->
-  @if (expenses() && expenses()!.length > 0) {
-    <ul class="flex flex-col gap-2">
-      @for (expense of expenses(); track expense.id) {
-        <li class="flex flex-col gap-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl px-4 py-3 shadow-sm">
-          <div class="flex items-center justify-between gap-3">
-            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ expense.name }}</span>
-            <span class="text-sm font-semibold text-emerald-700 dark:text-emerald-400">{{ expense.amount | centsToEuros }}</span>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-5 flex flex-col gap-6">
+  <!-- Balances -->
+  <div class="flex flex-col gap-3">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Comptes</h2>
+      <button type="button" (click)="modalIsOpen.set(true)"
+              class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-white
+                     bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-sm cursor-pointer">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+        </svg>
+        Nouvelle dépense
+      </button>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      @for(user of userInHome(); track user.id){
+        <div class="flex items-center justify-between gap-3 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl px-4 py-3.5 shadow-sm">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
+              <span class="text-sm font-semibold text-emerald-700 dark:text-emerald-400">{{ user.name.charAt(0).toUpperCase() }}</span>
+            </div>
+            <span class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ user.name }}</span>
           </div>
-          <div class="flex flex-wrap items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+          <div class="flex flex-col items-end shrink-0">
+            <span class="text-sm font-semibold"
+                  [class]="user.balance > 0
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : user.balance < 0
+                    ? 'text-red-500 dark:text-red-400'
+                    : 'text-gray-400 dark:text-gray-500'">
+              {{ user.balance | centsToEuros }}
+            </span>
+            <span class="text-[11px] text-gray-400 dark:text-gray-500">
+              {{ user.balance > 0 ? 'à recevoir' : user.balance < 0 ? 'à payer' : 'réglé' }}
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (modalIsOpen()) {
+    <app-add-home-expense-modal (closeModal)="modalIsOpen.set(false)" />
+  }
+  <!-- Expense list -->
+  @if (expenses().length > 0) {
+  <h2 class="text-center text-2xl font-bold">Historique</h2>
+  <ul class="flex flex-col gap-2">
+    @for (expense of expenses(); track expense.id) {
+    <li class="flex flex-col gap-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl px-4 py-3 shadow-sm">
+      <div class="flex items-center justify-between gap-3">
+        <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ expense.name }}</span>
+        <span class="text-sm font-semibold text-emerald-700 dark:text-emerald-400">{{ expense.amount | centsToEuros }}</span>
+      </div>
+      <div class="flex flex-wrap items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
             <span class="px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 font-medium">
               Payé par {{ expense.payerName }}
             </span>
-            @for (name of expense.userConcernedName; track name) {
-              <span class="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700">{{ name }}</span>
-            }
-          </div>
-        </li>
-      }
-    </ul>
-  } @else {
-    <div class="flex flex-col items-center justify-center py-12 text-center">
-      <div class="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-gray-700 flex items-center justify-center mb-4">
-        <svg class="w-8 h-8 text-slate-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 10v2m0-16a9 9 0 100 18 9 9 0 000-18z"/>
-        </svg>
-      </div>
-      <p class="text-sm text-gray-500 dark:text-gray-400">Pas de dépenses dans cette maison</p>
-    </div>
-  }
-
-  <!-- Add expense form -->
-  <form (submit)="$event.preventDefault(); onSubmit()"
-        class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-5 shadow-sm flex flex-col gap-4">
-    <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Nouvelle dépense</h3>
-
-    <div class="flex flex-col gap-1.5">
-      <label for="expenseName" class="text-sm font-medium text-gray-700 dark:text-gray-200">Nom</label>
-      <input type="text" id="expenseName" [formField]="expenseForm.name"
-             placeholder="Ex : Courses, Électricité..."
-             class="border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2.5 text-sm
-                    text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700
-                    placeholder:text-gray-400 dark:placeholder:text-gray-500
-                    focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"/>
-      @if (expenseForm.name().invalid() && expenseForm.name().touched()) {
-        <p class="text-xs text-red-500">{{ expenseForm.name().errors()[0]?.message ?? 'Requis' }}</p>
-      }
-    </div>
-
-    <div class="flex flex-col gap-1.5">
-      <label for="expenseAmount" class="text-sm font-medium text-gray-700 dark:text-gray-200">Montant</label>
-      <input type="number" id="expenseAmount" [formField]="expenseForm.amount" step="0.01"
-             placeholder="0.00"
-             class="border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2.5 text-sm
-                    text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700
-                    placeholder:text-gray-400 dark:placeholder:text-gray-500
-                    focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"/>
-      @if (expenseForm.amount().invalid() && expenseForm.amount().touched()) {
-        <p class="text-xs text-red-500">{{ expenseForm.amount().errors()[0]?.message ?? 'Montant invalide' }}</p>
-      }
-    </div>
-
-    <div class="flex flex-col gap-1.5">
-      <label for="payerId" class="text-sm font-medium text-gray-700 dark:text-gray-200">Payeur</label>
-      <select id="payerId" [formField]="expenseForm.payerId"
-              class="border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2.5 text-sm
-                     text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700
-                     focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all">
-        <option value="" disabled>Choisir un payeur...</option>
-        @for (user of userInHome(); track user.id) {
-          <option [value]="user.id">{{ user.name }}</option>
+        @for (name of expense.userConcernedName; track name) {
+        <span class="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700">{{ name }}</span>
         }
-      </select>
-      @if (expenseForm.payerId().invalid() && expenseForm.payerId().touched()) {
-        <p class="text-xs text-red-500">{{ expenseForm.payerId().errors()[0]?.message ?? 'Requis' }}</p>
-      }
-    </div>
-    <div class="flex flex-col gap-1.5">
-      <label class="text-sm font-medium text-gray-700 dark:text-gray-200">Utilisateurs concernés</label>
-      @if (selectedUsers().length > 0) {
-        <div class="flex flex-wrap gap-1.5 mb-1">
-          @for (user of selectedUsers(); track user.id) {
-            <span class="flex items-center gap-1.5 pl-3 pr-1.5 py-1 rounded-full text-xs font-medium
-                         bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
-              {{ user.name }}
-              <button type="button" (click)="removeUserFromExpense(user.id)"
-                      class="w-4 h-4 rounded-full flex items-center justify-center hover:bg-emerald-200 dark:hover:bg-emerald-800 transition-colors cursor-pointer">
-                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-              </button>
-            </span>
-          }
-        </div>
-      }
-
-      <div class="flex gap-2">
-        <select [value]="selectedUserId() ?? ''"
-                (change)="onSelectUserChange($any($event.target).value)"
-                class="flex-1 min-w-0 border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2.5 text-sm
-                       text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700
-                       focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all">
-          <option value="" disabled>Choisir un utilisateur...</option>
-          @for (user of usersToAdd(); track user.id) {
-            <option [value]="user.id">{{ user.name }}</option>
-          }
-        </select>
-        <button type="button" (click)="addUserToExpense()" [disabled]="!selectedUserId()"
-                class="px-4 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200
-                       border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700
-                       transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
-          Ajouter
-        </button>
+        <span class="ml-auto text-gray-400 dark:text-gray-500">{{ expense.createdAt | date: 'dd/MM/yyyy' }}</span>
       </div>
-      @if (expenseForm.userConcernedId().invalid() && expenseForm.userConcernedId().touched()) {
-        <p class="text-xs text-red-500">{{ expenseForm.userConcernedId().errors()[0]?.message ?? 'Requis' }}</p>
-      }
+    </li>
+    }
+  </ul>
+  @if (hasMoreExpenses()) {
+  <button type="button" (click)="loadMoreExpenses()" [disabled]="expensesLoading()"
+          class="self-center px-4 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200
+                 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700
+                 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+    {{ expensesLoading() ? 'Chargement...' : 'Voir plus' }}
+  </button>
+  }
+  } @else {
+  <div class="flex flex-col items-center justify-center py-12 text-center">
+    <div class="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-gray-700 flex items-center justify-center mb-4">
+      <svg class="w-8 h-8 text-slate-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 10v2m0-16a9 9 0 100 18 9 9 0 000-18z"/>
+      </svg>
     </div>
-
-    <button type="submit" [disabled]="expenseForm().invalid() || submitting()"
-            class="self-end px-5 py-2 rounded-xl text-sm font-semibold text-white
-                   bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-sm cursor-pointer
-                   disabled:opacity-40 disabled:cursor-not-allowed">
-      {{ submitting() ? 'Ajout...' : 'Ajouter la dépense' }}
-    </button>
-  </form>
+    <p class="text-sm text-gray-500 dark:text-gray-400">Pas de dépenses dans cette maison</p>
+  </div>
+  }
 </div>

@@ -7,10 +7,12 @@ import be.stockandshopbackend.dl.entities.home.HomeExpense;
 import be.stockandshopbackend.dl.entities.home.UserHome;
 import be.stockandshopbackend.exceptions.ConflictException;
 import be.stockandshopbackend.pl.DTOs.Response.home.HomeExpenseResponse;
-import be.stockandshopbackend.pl.DTOs.Response.home.HomeResponse;
+import be.stockandshopbackend.pl.DTOs.Response.home.PagedHomeExpenseResponse;
 import be.stockandshopbackend.pl.DTOs.requests.home.HomeExpenseRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -30,12 +32,22 @@ public class HomeExpensesController {
 
     @GetMapping("/{homeId}")
     @PreAuthorize("@homeSecurity.isInHome(#homeId, authentication.principal)")
-    public ResponseEntity<List<HomeExpenseResponse>> getHomeExpenses(@PathVariable UUID homeId){
-        return ResponseEntity.ok(
-                homeExpensesService.findByHomeId(homeId).stream()
-                        .map(HomeExpenseResponse::fromHomeExpense)
-                        .toList()
-        );
+    public ResponseEntity<PagedHomeExpenseResponse> getHomeExpenses(
+            @PathVariable UUID homeId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ){
+        Page<HomeExpense> expensePage = homeExpensesService.findByHomeId(homeId, PageRequest.of(page, size));
+        List<HomeExpenseResponse> expenses = expensePage.getContent().stream()
+                .map(HomeExpenseResponse::fromHomeExpense)
+                .toList();
+        return ResponseEntity.ok(new PagedHomeExpenseResponse(
+                expenses,
+                expensePage.getTotalElements(),
+                page,
+                size,
+                expensePage.hasNext()
+        ));
     }
 
     @PostMapping("/")

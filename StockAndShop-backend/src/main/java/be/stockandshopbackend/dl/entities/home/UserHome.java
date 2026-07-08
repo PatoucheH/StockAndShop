@@ -23,9 +23,8 @@ public class UserHome extends LongBaseEntity {
     @Column(nullable = false)
     private int balance;
 
-    public int changeBalance(int amount) {
+    public void changeBalance(int amount) {
         this.balance += amount;
-        return balance;
     }
 
 }

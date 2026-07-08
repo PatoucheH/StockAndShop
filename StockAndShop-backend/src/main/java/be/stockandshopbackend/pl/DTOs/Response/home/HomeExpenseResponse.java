@@ -2,7 +2,7 @@ package be.stockandshopbackend.pl.DTOs.Response.home;
 
 import be.stockandshopbackend.dl.entities.home.HomeExpense;
 
-
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record HomeExpenseResponse(
@@ -10,7 +10,8 @@ public record HomeExpenseResponse(
         String name,
         int amount,
         List<String> userConcernedName,
-        String payerName
+        String payerName,
+        LocalDateTime createdAt
 ) {
     public static HomeExpenseResponse fromHomeExpense(HomeExpense he){
         return new HomeExpenseResponse(
@@ -20,7 +21,8 @@ public record HomeExpenseResponse(
                 he.getUsersConcerned().stream()
                         .map(u -> u.getUser().getDisplayName())
                         .toList(),
-                he.getPayer().getUser().getDisplayName()
+                he.getPayer().getUser().getDisplayName(),
+                he.getCreatedAt()
         );
     }
 }

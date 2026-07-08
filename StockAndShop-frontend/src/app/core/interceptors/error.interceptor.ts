@@ -22,7 +22,7 @@ export const errorInterceptor: HttpInterceptorFn = (
     catchError((error: HttpErrorResponse) => {
       // On first 401, try to refresh the token and retry the request once
       // X-Retry header prevents an infinite loop if the retried request also returns 401
-      if (error.status === 401 && !req.headers.has("x-Retry")) {
+      if (error.status === 401 && !req.headers.has("X-Retry")) {
         return auth.tryRestoreSession().pipe(
           switchMap(ok => {
             if(!ok){
@@ -30,14 +30,22 @@ export const errorInterceptor: HttpInterceptorFn = (
               router.navigate(['/auth/login']);
               return throwError(() => error);
             }
-            return next(req.clone({ setHeaders: {'X-Retry': 'true'} }));
+            // The retry travels the full interceptor chain again, so it needs its own
+            // catchError — otherwise a 401 on the retry itself would bypass this handler
+            // entirely and reach the caller as a raw, unhandled error.
+            return next(req.clone({ setHeaders: {'X-Retry': 'true'} })).pipe(
+              catchError((retryError: HttpErrorResponse) => {
+                if (retryError.status === 401) {
+                  auth.clearSession();
+                  router.navigate(['/auth/login']);
+                } else {
+                  toast.error(extractErrorMessage(retryError));
+                }
+                return throwError(() => retryError);
+              })
+            );
           })
         );
-      }
-      if(error.status === 401 && req.headers.has("X-Retry")) {
-        auth.clearSession();
-        router.navigate(['/auth/login']);
-        return throwError(() => error);
       }
       toast.error(extractErrorMessage(error));
       return throwError(() => error);

@@ -5,5 +5,4 @@ import be.stockandshopbackend.dl.entities.home.UserHome;
 public interface UserHomeService {
 
     UserHome findById(Long id);
-
 }
