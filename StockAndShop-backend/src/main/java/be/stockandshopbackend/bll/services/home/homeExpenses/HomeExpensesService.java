@@ -10,5 +10,6 @@ public interface HomeExpensesService {
 
     void createHomeExpense(HomeExpense homeExpense);
     Page<HomeExpense> findByHomeId(UUID homeId, Pageable pageable);
+    void refundUser(UUID homeId, UUID payerUserId, UUID receiverUserId, int amount);
 
 }

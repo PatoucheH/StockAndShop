@@ -7,6 +7,7 @@ import be.stockandshopbackend.dl.entities.home.Home;
 import be.stockandshopbackend.dl.entities.home.HomeExpense;
 import be.stockandshopbackend.dl.entities.home.UserHome;
 import be.stockandshopbackend.exceptions.ConflictException;
+import be.stockandshopbackend.exceptions.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -63,5 +64,19 @@ public class HomeExpensesServiceImpl extends BaseCRUDService<HomeExpense, Long, 
 
     public Page<HomeExpense> findByHomeId(UUID homeId, Pageable pageable) {
         return repository.findByHomeIdOrderByCreatedAtDesc(homeId, pageable);
+    }
+
+    @Transactional
+    public void refundUser(UUID homeId, UUID payerUserId, UUID receiverUserId, int amount) {
+        UserHome payer = userHomeRepository.findByHomeIdAndUserId(homeId, payerUserId).orElseThrow(
+                () ->  new NotFoundException("Payer not found")
+        );
+        UserHome receiver = userHomeRepository.findByHomeIdAndUserId(homeId, receiverUserId).orElseThrow(
+                () ->  new NotFoundException("Receiver not found")
+        );
+        payer.changeBalance(amount);
+        receiver.changeBalance(-amount);
+        userHomeRepository.save(payer);
+        userHomeRepository.save(receiver);
     }
 }

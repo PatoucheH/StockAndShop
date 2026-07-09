@@ -70,4 +70,15 @@ public class HomeExpensesController {
         homeExpensesService.createHomeExpense(he);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{homeId}/refund/{payerId}/{receiverId}")
+    @PreAuthorize("@homeSecurity.isInHome(#homeId, authentication.principal)")
+    public ResponseEntity<?> refundUser(
+            @PathVariable UUID homeId,
+            @PathVariable UUID payerId,
+            @PathVariable UUID receiverId,
+            @RequestParam int amount){
+        homeExpensesService.refundUser(homeId, payerId, receiverId, amount);
+        return ResponseEntity.ok().build();
+    }
 }
