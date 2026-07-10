@@ -3,10 +3,11 @@ import { DatePipe } from '@angular/common';
 import { HomeService } from '../../../../shared/services/home.service';
 import { CentsToEurosPipe } from '../../../../shared/pipes/cents-to-euros.pipe';
 import { AddHomeExpenseModalComponent } from './add-home-expense-modal/add-home-expense-modal';
+import { ModalRefundComponent } from '../modal-refund/modal-refund';
 
 @Component({
   selector: 'app-home-expenses',
-  imports: [CentsToEurosPipe, AddHomeExpenseModalComponent, DatePipe],
+  imports: [CentsToEurosPipe, AddHomeExpenseModalComponent, ModalRefundComponent, DatePipe],
   templateUrl: './home-expenses.html',
 })
 export class HomeExpensesComponent {
@@ -18,6 +19,7 @@ export class HomeExpensesComponent {
   expensesLoading = this.homeService.expenseIsLoading;
 
   modalIsOpen = signal(false);
+  refundModalIsOpen = signal(false);
 
   loadMoreExpenses() {
     this.homeService.loadMoreExpenses();

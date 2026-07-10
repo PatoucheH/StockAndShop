@@ -157,4 +157,14 @@ export class HomeService {
       }),
     );
   }
+
+  refundUser(amount: number, payerId: string, receiverId: string) {
+    return this.http
+      .post(
+        `${environment.apiUrl}/home-expense/${this._selectedHomeId()}/refund/${payerId}/${receiverId}`,
+        null,
+        { params: { amount } },
+      )
+      .pipe(tap(() => this.usersResource.reload()));
+  }
 }
