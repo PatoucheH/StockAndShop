@@ -1,11 +1,14 @@
 package be.stockandshopbackend.pl.controllers.recipe;
 
+import be.stockandshopbackend.bll.services.productAndShoppingList.product.ProductService;
 import be.stockandshopbackend.bll.services.recipe.RecipeService;
+import be.stockandshopbackend.dl.entities.product.ProductStockHome;
 import be.stockandshopbackend.dl.entities.recipe.Recipe;
 import be.stockandshopbackend.pl.DTOs.Response.recipe.PagedRecipeResponse;
 import be.stockandshopbackend.pl.DTOs.Response.recipe.RecipeResponse;
 import be.stockandshopbackend.pl.DTOs.requests.recipe.GenerateRecipeRequest;
 import be.stockandshopbackend.pl.DTOs.requests.recipe.SuggestionsWithProductsRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +26,7 @@ import java.util.UUID;
 public class RecipeController {
 
     private final RecipeService recipeService;
+    private final ProductService productService;
 
     @GetMapping("/tags")
     public ResponseEntity<List<String>> getAllTags() {
@@ -78,12 +82,18 @@ public class RecipeController {
     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<RecipeResponse> generateRecipe(
             @PathVariable UUID id,
-            @RequestBody(required = false) GenerateRecipeRequest request) {
+            @RequestBody(required = false) @Valid GenerateRecipeRequest request) {
         Recipe recipe;
         if (request != null
                 && request.products() != null
                 && !request.products().isEmpty()) {
-            recipe = recipeService.generateAndSaveWithProduct(request.products());
+            // Resolve real products from the DB — never trust client-provided entities
+            List<ProductStockHome> products = request.products().stream()
+                    .map(p -> new ProductStockHome(
+                            productService.findOneByName(p.name()),
+                            p.quantity()))
+                    .toList();
+            recipe = recipeService.generateAndSaveWithProduct(products);
         } else {
             recipe = recipeService.generateAndSave(id);
         }

@@ -39,7 +39,11 @@ public class RecipeCommentController {
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(
                 RecipeCommentResponse.fromRecipeComment(
-                        recipeCommentService.addRecipeComment(recipeCommentRequest, userDetails.getUsername()))
+                        recipeCommentService.addRecipeComment(
+                                recipeCommentRequest.recipeId(),
+                                recipeCommentRequest.comment(),
+                                recipeCommentRequest.score(),
+                                userDetails.getUsername()))
         );
     }
 

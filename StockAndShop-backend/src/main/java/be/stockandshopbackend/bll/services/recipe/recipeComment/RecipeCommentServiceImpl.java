@@ -7,7 +7,6 @@ import be.stockandshopbackend.dl.entities.recipe.Recipe;
 import be.stockandshopbackend.dl.entities.recipe.RecipeComment;
 import be.stockandshopbackend.dl.entities.user.User;
 import be.stockandshopbackend.exceptions.NotFoundException;
-import be.stockandshopbackend.pl.DTOs.requests.recipe.RecipeCommentRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -29,19 +28,19 @@ public class RecipeCommentServiceImpl implements RecipeCommentService {
     }
 
     @Transactional
-    public RecipeComment addRecipeComment(RecipeCommentRequest request, String username) {
+    public RecipeComment addRecipeComment(UUID recipeId, String commentText, int score, String username) {
         // username = Spring Security principal name = email in this app
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new NotFoundException("User not found: " + username));
-        Recipe recipe = recipeRepository.findById(request.recipeId())
-                .orElseThrow(() -> new NotFoundException("Recipe not found: " + request.recipeId()));
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new NotFoundException("Recipe not found: " + recipeId));
 
         if(recipeCommentRepository.existsByRecipe_IdAndUser_id(recipe.getId(), user.getId())){
             throw new IllegalStateException("Vous avez déjà noté cette recette");
         }
-            RecipeComment comment = new RecipeComment();
-        comment.setComment(request.comment());
-        comment.setScore(request.score());
+        RecipeComment comment = new RecipeComment();
+        comment.setComment(commentText);
+        comment.setScore(score);
         comment.setRecipe(recipe);
         comment.setUser(user);
 

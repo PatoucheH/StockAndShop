@@ -4,7 +4,6 @@ import be.stockandshopbackend.bll.services.base.BaseCRUDService;
 import be.stockandshopbackend.dal.repositories.product.CategoryRepository;
 import be.stockandshopbackend.dl.entities.product.Category;
 import be.stockandshopbackend.exceptions.NotFoundException;
-import be.stockandshopbackend.pl.DTOs.requests.products.CategoryRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,12 +21,12 @@ public class CategoryServiceImpl extends BaseCRUDService<Category, Long, Categor
     }
 
     @Transactional
-    public Category updateCategory(Long id, CategoryRequest request){
+    public Category updateCategory(Long id, String name, String description){
         Category category = repository.findById(id).orElseThrow(
                 () ->  new NotFoundException("Category with id " + id + " not found")
         );
-        category.setName(request.name());
-        category.setDescription(request.description());
+        category.setName(name);
+        category.setDescription(description);
         return repository.save(category);
     }
 }

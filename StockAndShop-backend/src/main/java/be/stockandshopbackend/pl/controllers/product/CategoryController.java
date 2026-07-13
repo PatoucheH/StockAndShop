@@ -36,7 +36,7 @@ public class CategoryController {
     public ResponseEntity<CategoryResponse> update(@PathVariable Long id, @RequestBody @Valid CategoryRequest categoryRequest) {
         return ResponseEntity.ok(
                 CategoryResponse.fromCategory(
-                        categoryService.updateCategory(id,categoryRequest)
+                        categoryService.updateCategory(id, categoryRequest.name(), categoryRequest.description())
                 )
         );
     }

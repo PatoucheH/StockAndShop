@@ -7,8 +7,6 @@ import be.stockandshopbackend.dl.entities.user.RefreshToken;
 import be.stockandshopbackend.dl.entities.user.Role;
 import be.stockandshopbackend.dl.entities.user.User;
 import be.stockandshopbackend.exceptions.ConflictException;
-import be.stockandshopbackend.pl.DTOs.requests.auth.LoginRequest;
-import be.stockandshopbackend.pl.DTOs.requests.auth.RegisterRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
@@ -44,16 +42,16 @@ public class AuthService implements UserDetailsService {
     }
 
     @Transactional
-    public AuthResult register(RegisterRequest registerRequest) {
-        if(userRepository.findByEmail(registerRequest.email()).isPresent()) {
-            throw new ConflictException("Email already in use: " + registerRequest.email());
+    public AuthResult register(String username, String email, String password) {
+        if(userRepository.findByEmail(email).isPresent()) {
+            throw new ConflictException("Email already in use: " + email);
         }
         Role userRole = roleRepository.findByName("USER")
                 .orElseGet(() -> roleRepository.save(new Role("USER")));
         User user = new User(
-                registerRequest.username(),
-                registerRequest.email(),
-                passwordEncoder.encode(registerRequest.password()),
+                username,
+                email,
+                passwordEncoder.encode(password),
                 Set.of(userRole)
         );
         userRepository.save(user);
@@ -61,10 +59,10 @@ public class AuthService implements UserDetailsService {
     }
 
     @Transactional
-    public AuthResult login(LoginRequest loginRequest) {
-        User user = userRepository.findByEmail(loginRequest.email())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found : " + loginRequest.email()));
-        if(!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
+    public AuthResult login(String email, String password) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found : " + email));
+        if(!passwordEncoder.matches(password, user.getPassword())) {
             throw new BadCredentialsException("Incorrect password");
         }
         return buildAuthResult(user);

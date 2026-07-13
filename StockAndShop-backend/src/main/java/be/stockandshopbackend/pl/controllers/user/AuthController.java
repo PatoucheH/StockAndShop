@@ -35,7 +35,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> registerUser(@RequestBody @Valid RegisterRequest request,
                                                      HttpServletResponse response) {
-        AuthResult result = authService.register(request);
+        AuthResult result = authService.register(request.username(), request.email(), request.password());
         setRefreshTokenCookie(response, result.refreshToken());
         return ResponseEntity.status(HttpStatus.CREATED).body(toAuthResponse(result));
     }
@@ -43,7 +43,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> loginUser(@RequestBody @Valid LoginRequest request,
                                                   HttpServletResponse response) {
-        AuthResult result = authService.login(request);
+        AuthResult result = authService.login(request.email(), request.password());
         setRefreshTokenCookie(response, result.refreshToken());
         return ResponseEntity.status(HttpStatus.OK).body(toAuthResponse(result));
     }
