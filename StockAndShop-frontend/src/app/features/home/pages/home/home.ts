@@ -12,7 +12,7 @@ import { AuthService } from '../../../auth/services/auth.service';
 })
 export class Home {
   private authService = inject(AuthService);
-  homeService = inject(HomeService);
+  private homeService = inject(HomeService);
 
   homes = this.homeService.homes;
   modalIsOpen = signal(false);
