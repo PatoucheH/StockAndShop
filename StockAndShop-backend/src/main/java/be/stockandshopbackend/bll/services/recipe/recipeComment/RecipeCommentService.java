@@ -1,6 +1,7 @@
 package be.stockandshopbackend.bll.services.recipe.recipeComment;
 
 import be.stockandshopbackend.dl.entities.recipe.RecipeComment;
+import be.stockandshopbackend.dl.entities.user.User;
 import be.stockandshopbackend.pl.DTOs.requests.recipe.RecipeCommentRequest;
 
 import java.util.List;
@@ -12,6 +13,6 @@ public interface RecipeCommentService {
 
     RecipeComment addRecipeComment(RecipeCommentRequest request, String username);
 
-    void deleteRecipeComment(Long recipeCommentId);
+    void deleteRecipeComment(Long recipeCommentId, User currentUser);
 
 }

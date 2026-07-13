@@ -52,6 +52,7 @@ public class HomeController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<HomeResponse> getHomeById(@PathVariable UUID id){
         return ResponseEntity.ok(HomeResponse.fromHome(homeService.findById(id)));
     }

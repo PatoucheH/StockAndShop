@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static be.stockandshopbackend.pl.DTOs.websocket.ShoppingListEventType.*;
@@ -57,19 +58,17 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
 
     public List<ShoppingList> findByUser(User userDetails){
         List<Home> homes = homeRepository.findByUsers_User(userDetails);
-        List<ShoppingList> sl = homes.stream()
+        return homes.stream()
                 .map(Home::getShoppingLists)
                 .flatMap(List::stream)
                 .toList();
-        System.out.println(sl);
-        return sl;
     }
 
     //region WEBSOCKET
 
     // SecurityContextHolder used here because @AuthenticationPrincipal is only available at controller level.
     private String currentUsername(){
-        return SecurityContextHolder.getContext().getAuthentication().getName();
+        return Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
     }
 
     /**

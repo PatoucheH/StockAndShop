@@ -51,11 +51,17 @@ public class HomeExpensesServiceImpl extends BaseCRUDService<HomeExpense, Long, 
         if (!allBelongsToHome) {
             throw new ConflictException("Payer and concerned users must belong to the expense's home");
         }
-        int priceByUser = homeExpense.getAmount() / (users.size() + 1);
-        int payerCredit = priceByUser * users.size();
+        // Integer division in cents: the remainder (at most totalParticipants - 1 cents)
+        // is spread one cent at a time over the first concerned users so no cent is lost
+        // and the sum of all balance changes stays exactly zero.
+        int totalParticipants = users.size() + 1;
+        int priceByUser = homeExpense.getAmount() / totalParticipants;
+        int remainder = homeExpense.getAmount() % totalParticipants;
+        int payerCredit = priceByUser * users.size() + remainder;
         payer.changeBalance(payerCredit);
-        for (UserHome user : users) {
-            user.changeBalance(-priceByUser);
+        for (int i = 0; i < users.size(); i++) {
+            int share = priceByUser + (i < remainder ? 1 : 0);
+            users.get(i).changeBalance(-share);
         }
         userHomeRepository.save(payer);
         userHomeRepository.saveAll(users);

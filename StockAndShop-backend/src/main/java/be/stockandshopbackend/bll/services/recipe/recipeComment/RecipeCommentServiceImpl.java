@@ -9,6 +9,7 @@ import be.stockandshopbackend.dl.entities.user.User;
 import be.stockandshopbackend.exceptions.NotFoundException;
 import be.stockandshopbackend.pl.DTOs.requests.recipe.RecipeCommentRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,9 +51,15 @@ public class RecipeCommentServiceImpl implements RecipeCommentService {
     }
 
     @Transactional
-    public void deleteRecipeComment(Long recipeCommentId) {
+    public void deleteRecipeComment(Long recipeCommentId, User currentUser) {
         RecipeComment comment = recipeCommentRepository.findById(recipeCommentId)
                 .orElseThrow(() -> new NotFoundException("Comment not found: " + recipeCommentId));
+        // Only the comment's author (or an admin) may delete it
+        boolean isAdmin = currentUser.getAuthorities().stream()
+                .anyMatch(a -> "ADMIN".equals(a.getAuthority()));
+        if (!isAdmin && !comment.getUser().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("You can only delete your own comments");
+        }
         Recipe recipe = comment.getRecipe();
         recipeCommentRepository.delete(comment);
         recomputeScore(recipe);

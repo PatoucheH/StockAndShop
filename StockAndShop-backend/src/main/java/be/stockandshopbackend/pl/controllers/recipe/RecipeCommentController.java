@@ -1,6 +1,7 @@
 package be.stockandshopbackend.pl.controllers.recipe;
 
 import be.stockandshopbackend.bll.services.recipe.recipeComment.RecipeCommentService;
+import be.stockandshopbackend.dl.entities.user.User;
 import be.stockandshopbackend.pl.DTOs.Response.recipe.RecipeCommentResponse;
 import be.stockandshopbackend.pl.DTOs.requests.recipe.RecipeCommentRequest;
 import jakarta.validation.Valid;
@@ -44,8 +45,9 @@ public class RecipeCommentController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Void> deleteRecipeComment(@PathVariable Long recipeCommentId) {
-        recipeCommentService.deleteRecipeComment(recipeCommentId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> deleteRecipeComment(@PathVariable Long id,
+                                                    @AuthenticationPrincipal UserDetails userDetails) {
+        recipeCommentService.deleteRecipeComment(id, (User) userDetails);
+        return ResponseEntity.noContent().build();
     }
 }
