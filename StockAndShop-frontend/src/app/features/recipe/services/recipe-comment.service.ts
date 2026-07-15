@@ -3,7 +3,8 @@ import { HttpClient, httpResource } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { RecipeComment, RecipeCommentRequest } from '../../../shared/models/recipe.models';
 import { AuthService } from '../../auth/services/auth.service';
-import { tap } from 'rxjs';
+import { skip, tap } from 'rxjs';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 
 @Injectable({ providedIn: 'root' })
 export class RecipeCommentService {
@@ -17,6 +18,14 @@ export class RecipeCommentService {
     const id = this._recipeId();
     return id ? `${this.apiUrl}/recipe/${id}` : undefined;
   });
+
+  constructor() {
+    // The request URL doesn't change on login/logout, so httpResource won't refetch on its own —
+    // force a reload so a same-tab account switch doesn't keep showing the previous user's comments.
+    toObservable(this.authService.identityVersion).pipe(skip(1), takeUntilDestroyed()).subscribe(() => {
+      this._commentsResource.reload();
+    });
+  }
 
   readonly comments = computed(() =>
     [...(this._commentsResource.value() ?? [])].sort(
