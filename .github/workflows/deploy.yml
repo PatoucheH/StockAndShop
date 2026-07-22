@@ -1,0 +1,76 @@
+name: Deploy to Raspberry Pi
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'StockAndShop-backend/**'
+      - 'StockAndShop-frontend/**'
+      - 'docker-compose.yml'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+# Un seul déploiement à la fois : un nouveau push annule celui en cours
+concurrency:
+  group: deploy-stockandshop
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build & deploy on the Pi
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.PI_HOST }}
+          username: ${{ secrets.PI_USER }}
+          key: ${{ secrets.PI_SSH_KEY }}
+          port: 2222
+          command_timeout: 30m
+          script: |
+            set -e
+            cd /opt/stockandshop
+
+            echo "::group::Recuperation du code"
+            git fetch --all --prune
+            git checkout main
+            git reset --hard origin/main
+            git --no-pager log --oneline -1
+            echo "::endgroup::"
+
+            echo "::group::Build et demarrage des conteneurs"
+            docker compose up -d --build
+            echo "::endgroup::"
+
+            echo "Attente du demarrage du backend..."
+            ok=0
+            for i in $(seq 1 40); do
+              if curl -sf http://127.0.0.1:8080/actuator/health | grep -q '"status":"UP"'; then
+                ok=1
+                echo "Backend UP apres $((i * 3))s"
+                break
+              fi
+              sleep 3
+            done
+
+            if [ "$ok" -ne 1 ]; then
+              echo "ECHEC : le backend n'a pas atteint l'etat UP en 120s"
+              docker compose logs --tail=40 backend
+              exit 1
+            fi
+
+            if curl -sfI http://127.0.0.1:5001 > /dev/null; then
+              echo "Frontend OK"
+            else
+              echo "ECHEC : le frontend ne repond pas sur le port 5001"
+              docker compose logs --tail=20 frontend
+              exit 1
+            fi
+
+            echo "Nettoyage des images orphelines..."
+            docker image prune -f
+
+            echo "Deploiement termine avec succes."

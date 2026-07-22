@@ -123,9 +123,12 @@ export class HomeService {
     return this.http
       .delete(`${this.apiUrl}/${id}`)
       .pipe(
-        tap(() =>
-          this.homesResource.update((homes) => (homes ?? []).filter((home) => home.id !== id)),
-        ),
+        tap(() => {
+          this.homesResource.update((homes) => (homes ?? []).filter((home) => home.id !== id));
+          if (this._selectedHomeId() === id) {
+            this._selectedHomeId.set(undefined);
+          }
+        }),
       );
   }
 
