@@ -1,7 +1,8 @@
 -- Rôles
 INSERT INTO role (id, name, created_at, updated_at) VALUES
     (1, 'ADMIN', NOW(), NOW()),
-    (2, 'USER',  NOW(), NOW())
+    (2, 'USER',  NOW(), NOW()),
+    (3, 'PREMIUM', NOW(), NOW())
 ON CONFLICT (id) DO NOTHING;
 
 -- Catégories

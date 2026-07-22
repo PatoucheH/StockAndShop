@@ -3,6 +3,7 @@ package be.stockandshopbackend.advisor;
 import be.stockandshopbackend.exceptions.AlreadyExistsException;
 import be.stockandshopbackend.exceptions.ConflictException;
 import be.stockandshopbackend.exceptions.NotFoundException;
+import be.stockandshopbackend.exceptions.PremiumRequiredException;
 import be.stockandshopbackend.exceptions.RecipeNotPossibleException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +48,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RecipeNotPossibleException.class)
     public ResponseEntity<String> handleRecipeNotPossible(RecipeNotPossibleException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PremiumRequiredException.class)
+    public ResponseEntity<String> handlePremiumRequired(PremiumRequiredException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

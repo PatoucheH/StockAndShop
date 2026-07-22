@@ -4,6 +4,7 @@ import be.stockandshopbackend.bll.services.productAndShoppingList.product.Produc
 import be.stockandshopbackend.bll.services.recipe.RecipeService;
 import be.stockandshopbackend.dl.entities.product.ProductStockHome;
 import be.stockandshopbackend.dl.entities.recipe.Recipe;
+import be.stockandshopbackend.exceptions.PremiumRequiredException;
 import be.stockandshopbackend.pl.DTOs.Response.recipe.PagedRecipeResponse;
 import be.stockandshopbackend.pl.DTOs.Response.recipe.RecipeResponse;
 import be.stockandshopbackend.pl.DTOs.requests.recipe.GenerateRecipeRequest;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +29,7 @@ public class RecipeController {
 
     private final RecipeService recipeService;
     private final ProductService productService;
+    private static final String PREMIUM_AUTHORITY = "PREMIUM";
 
     @GetMapping("/tags")
     public ResponseEntity<List<String>> getAllTags() {
@@ -82,7 +85,18 @@ public class RecipeController {
     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<RecipeResponse> generateRecipe(
             @PathVariable UUID id,
-            @RequestBody(required = false) @Valid GenerateRecipeRequest request) {
+            @RequestBody(required = false) @Valid GenerateRecipeRequest request,
+            Authentication authentication) {
+        // AI generation hits the paid Anthropic API — restricted to premium members.
+        // Checked here rather than in @PreAuthorize so the client gets an explicit,
+        // actionable message instead of a generic 403.
+        boolean isPremium = authentication.getAuthorities().stream()
+                .anyMatch(a -> PREMIUM_AUTHORITY.equals(a.getAuthority()));
+        if (!isPremium) {
+            throw new PremiumRequiredException(
+                    "La génération de recettes par IA est réservée aux membres premium.");
+        }
+
         Recipe recipe;
         if (request != null
                 && request.products() != null
