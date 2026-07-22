@@ -1,4 +1,4 @@
-package be.stockandshopbackend.bll.services.security;
+package be.stockandshopbackend.bll.services.security.services;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

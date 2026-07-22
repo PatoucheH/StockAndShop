@@ -21,7 +21,8 @@ export class WebSocketService implements OnDestroy {
   private liveSubscriptions = new Map<string, StompSubscription>();
 
   private client = new Client({
-    brokerURL: environment.wsUrl,
+    brokerURL:
+      environment.wsUrl || `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`,
     reconnectDelay: 5000,
     heartbeatIncoming: 10000,
     heartbeatOutgoing: 10000,
@@ -54,9 +55,12 @@ export class WebSocketService implements OnDestroy {
   }
 
   private subscribeTopic(topic: string) {
-    this.liveSubscriptions.set(topic, this.client.subscribe(topic, msg => {
-      this.activeTopics.get(topic)?.forEach(cb => cb(msg));
-    }));
+    this.liveSubscriptions.set(
+      topic,
+      this.client.subscribe(topic, (msg) => {
+        this.activeTopics.get(topic)?.forEach((cb) => cb(msg));
+      }),
+    );
   }
 
   /**
@@ -64,7 +68,7 @@ export class WebSocketService implements OnDestroy {
    * The STOMP subscription is created lazily and torn down when all observers unsubscribe.
    */
   subscribe(topic: string): Observable<IMessage> {
-    return new Observable(observer => {
+    return new Observable((observer) => {
       const callback = (msg: IMessage) => observer.next(msg);
       let callbacks = this.activeTopics.get(topic);
       if (!callbacks) {

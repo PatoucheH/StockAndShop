@@ -1,7 +1,7 @@
 package be.stockandshopbackend.filters;
 
-import be.stockandshopbackend.bll.services.security.JwtService;
-import be.stockandshopbackend.bll.services.security.AuthService;
+import be.stockandshopbackend.bll.services.security.services.JwtService;
+import be.stockandshopbackend.bll.services.security.services.AuthService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;

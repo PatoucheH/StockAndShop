@@ -1,4 +1,4 @@
-package be.stockandshopbackend.bll.services.security;
+package be.stockandshopbackend.bll.services.security.records;
 
 import java.util.List;
 

@@ -1,5 +1,7 @@
-package be.stockandshopbackend.bll.services.security;
+package be.stockandshopbackend.bll.services.security.services;
 
+import be.stockandshopbackend.bll.services.security.records.AuthResult;
+import be.stockandshopbackend.bll.services.security.records.RefreshResult;
 import be.stockandshopbackend.dal.repositories.user.RefreshTokenRepository;
 import be.stockandshopbackend.dal.repositories.user.RoleRepository;
 import be.stockandshopbackend.dal.repositories.user.UserRepository;

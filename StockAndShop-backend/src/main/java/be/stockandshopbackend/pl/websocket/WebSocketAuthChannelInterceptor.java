@@ -1,6 +1,6 @@
 package be.stockandshopbackend.pl.websocket;
 
-import be.stockandshopbackend.bll.services.security.JwtService;
+import be.stockandshopbackend.bll.services.security.services.JwtService;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

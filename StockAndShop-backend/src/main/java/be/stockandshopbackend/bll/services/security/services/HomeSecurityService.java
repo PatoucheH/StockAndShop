@@ -1,4 +1,4 @@
-package be.stockandshopbackend.bll.services.security;
+package be.stockandshopbackend.bll.services.security.services;
 
 import be.stockandshopbackend.dal.repositories.home.HomeRepository;
 import be.stockandshopbackend.dl.entities.user.User;

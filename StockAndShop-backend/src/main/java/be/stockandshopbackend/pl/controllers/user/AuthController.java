@@ -1,11 +1,11 @@
 package be.stockandshopbackend.pl.controllers.user;
 
-import be.stockandshopbackend.bll.services.security.AuthResult;
-import be.stockandshopbackend.bll.services.security.AuthService;
+import be.stockandshopbackend.bll.services.security.records.AuthResult;
+import be.stockandshopbackend.bll.services.security.services.AuthService;
 import be.stockandshopbackend.pl.DTOs.Response.auth.AuthResponse;
 import be.stockandshopbackend.pl.DTOs.requests.auth.LoginRequest;
 import be.stockandshopbackend.pl.DTOs.requests.auth.RegisterRequest;
-import be.stockandshopbackend.bll.services.security.RefreshResult;
+import be.stockandshopbackend.bll.services.security.records.RefreshResult;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
