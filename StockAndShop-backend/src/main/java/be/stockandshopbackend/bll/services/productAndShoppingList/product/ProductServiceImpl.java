@@ -35,7 +35,7 @@ public class ProductServiceImpl extends BaseCRUDService<Product, Long, ProductRe
 
     public Product findOneByName(String name){
         return repository.findByName(name)
-                .orElseThrow(() -> new NotFoundException("Product not found with name : " + name));
+                .orElseThrow(() -> new NotFoundException("Produit introuvable avec le nom : " + name));
     }
 
     public Unity[] findAllUnities(){

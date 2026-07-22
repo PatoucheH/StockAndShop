@@ -120,7 +120,13 @@ export class HomeService {
   }
 
   deleteHome(id: string) {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    return this.http
+      .delete(`${this.apiUrl}/${id}`)
+      .pipe(
+        tap(() =>
+          this.homesResource.update((homes) => (homes ?? []).filter((home) => home.id !== id)),
+        ),
+      );
   }
 
   decreseStock(productStock: ProductStockDecrese) {

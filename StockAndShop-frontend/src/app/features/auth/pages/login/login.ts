@@ -41,7 +41,7 @@ export class LoginComponent {
         this.loading.set(false);
       },
       error: () => {
-        this.error.set('Email ou password incorrect');
+        this.error.set('Email ou mot de passe incorrect');
         this.loading.set(false);
       },
     });

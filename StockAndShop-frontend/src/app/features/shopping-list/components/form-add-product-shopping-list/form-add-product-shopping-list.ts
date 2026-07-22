@@ -3,6 +3,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { startWith, debounceTime, distinctUntilChanged, switchMap, of, tap, map } from 'rxjs';
 import { ProductItemRequest } from '../../../../shared/models/productItem.models';
+import { Product } from '../../../../shared/models/product.models';
 import { ProductService } from '../../../../shared/services/product.service';
 import { ShoppingListService } from '../../services/shopping-list.service';
 import { UnitConversionService } from '../../../../shared/services/unit-conversion.service';
@@ -34,7 +35,9 @@ export class FormAddProductShoppingList {
     this.productService.getByBarcode(barcode).subscribe({
       next: (product) => {
         this.isLoadingBarcode.set(false);
-        this.form.patchValue({ nameProduct: product.name });
+        this.form.patchValue({ nameProduct: product.name, quantity: null });
+        this.explicitProduct.set(product);
+        this.isExplicitlySelected.set(true);
         this.toast.success(`${product.name} trouvé - ajustez la quantité et validez`);
       },
       error: () => {
@@ -49,10 +52,15 @@ export class FormAddProductShoppingList {
     quantity: new FormControl<number | null>(null, [Validators.required, Validators.min(0.001)]),
   });
 
+  explicitProduct = signal<Product | null>(null);
+
   nameProduct = toSignal(
     this.form.controls.nameProduct.valueChanges.pipe(
       startWith(''),
-      tap(() => this.isExplicitlySelected.set(false))
+      tap(() => {
+        this.isExplicitlySelected.set(false);
+        this.explicitProduct.set(null);
+      })
     ),
     { initialValue: '' }
   );
@@ -80,6 +88,8 @@ export class FormAddProductShoppingList {
 
   selectedProduct = computed(() => {
     const name = this.nameProduct()?.toLowerCase();
+    const explicit = this.explicitProduct();
+    if (explicit && explicit.name.toLowerCase() === name) return explicit;
     return this.filteredProducts().find((p) => p.name.toLowerCase() === name);
   });
 
@@ -95,8 +105,9 @@ export class FormAddProductShoppingList {
     this.unitConversion.getDefaultSubUnit(this.selectedProduct()?.unity ?? '')
   );
 
-  selectProduct(name: string) {
-    this.form.controls.nameProduct.setValue(name);
+  selectProduct(product: Product) {
+    this.form.controls.nameProduct.setValue(product.name);
+    this.explicitProduct.set(product);
     this.isExplicitlySelected.set(true);
     this.isFocused.set(false);
   }

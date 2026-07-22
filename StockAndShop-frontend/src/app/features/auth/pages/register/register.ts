@@ -56,7 +56,7 @@ export class RegisterComponent {
         this.loading.set(false);
       },
       error: () => {
-        this.error.set('Email, username ou password incorrect');
+        this.error.set('Email, pseudo ou mot de passe incorrect');
         this.loading.set(false);
       },
     });

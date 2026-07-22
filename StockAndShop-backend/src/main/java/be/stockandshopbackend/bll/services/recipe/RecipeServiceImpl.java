@@ -53,7 +53,7 @@ public class RecipeServiceImpl implements RecipeService {
     @Transactional
     public List<Recipe> getSuggestions(UUID homeId) {
         Home home = homeRepository.findById(homeId).orElseThrow(
-                () -> new NotFoundException("Home not found with id: " + homeId)
+                () -> new NotFoundException("Maison introuvable avec l'id : " + homeId)
         );
         List<String> stockProductNames = home.getStocks().stream()
                 .map(s -> s.getProduct().getName())
@@ -89,10 +89,10 @@ public class RecipeServiceImpl implements RecipeService {
     public Recipe generateAndSave(UUID homeId) {
         Home home = homeRepository.findById(homeId)
                 .orElseThrow(() -> new NotFoundException(
-                        "Home not found with id: " + homeId));
+                        "Maison introuvable avec l'id : " + homeId));
         if (home.getStocks().isEmpty()) {
             throw new IllegalStateException(
-                    "Stock of this home: " + homeId + " is empty");
+                    "Le stock de cette maison est vide.");
         }
         return generateRecipe(home.getStocks());
     }
