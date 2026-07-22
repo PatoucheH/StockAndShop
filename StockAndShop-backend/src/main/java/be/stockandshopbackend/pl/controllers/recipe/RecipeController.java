@@ -2,9 +2,9 @@ package be.stockandshopbackend.pl.controllers.recipe;
 
 import be.stockandshopbackend.bll.services.productAndShoppingList.product.ProductService;
 import be.stockandshopbackend.bll.services.recipe.RecipeService;
+import be.stockandshopbackend.bll.services.security.services.PremiumSecurityService;
 import be.stockandshopbackend.dl.entities.product.ProductStockHome;
 import be.stockandshopbackend.dl.entities.recipe.Recipe;
-import be.stockandshopbackend.exceptions.PremiumRequiredException;
 import be.stockandshopbackend.pl.DTOs.Response.recipe.PagedRecipeResponse;
 import be.stockandshopbackend.pl.DTOs.Response.recipe.RecipeResponse;
 import be.stockandshopbackend.pl.DTOs.requests.recipe.GenerateRecipeRequest;
@@ -29,7 +29,7 @@ public class RecipeController {
 
     private final RecipeService recipeService;
     private final ProductService productService;
-    private static final String PREMIUM_AUTHORITY = "PREMIUM";
+    private final PremiumSecurityService premiumSecurity;
 
     @GetMapping("/tags")
     public ResponseEntity<List<String>> getAllTags() {
@@ -61,7 +61,9 @@ public class RecipeController {
 
     @GetMapping("/{id}/suggestions")
     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
-    public ResponseEntity<List<RecipeResponse>> getSuggestions(@PathVariable UUID id) {
+    public ResponseEntity<List<RecipeResponse>> getSuggestions(
+            @PathVariable UUID id, Authentication authentication) {
+        premiumSecurity.require(authentication);
         return ResponseEntity.ok(
                 recipeService.getSuggestions(id).stream()
                         .map(RecipeResponse::fromRecipe)
@@ -73,7 +75,9 @@ public class RecipeController {
     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<List<RecipeResponse>> getSuggestionsWithProducts(
             @PathVariable UUID id,
-            @RequestBody SuggestionsWithProductsRequest request) {
+            @RequestBody SuggestionsWithProductsRequest request,
+            Authentication authentication) {
+        premiumSecurity.require(authentication);
         return ResponseEntity.ok(
                 recipeService.getSuggestionsWithProducts(id, request.productNames()).stream()
                         .map(RecipeResponse::fromRecipe)
@@ -87,15 +91,8 @@ public class RecipeController {
             @PathVariable UUID id,
             @RequestBody(required = false) @Valid GenerateRecipeRequest request,
             Authentication authentication) {
-        // AI generation hits the paid Anthropic API — restricted to premium members.
-        // Checked here rather than in @PreAuthorize so the client gets an explicit,
-        // actionable message instead of a generic 403.
-        boolean isPremium = authentication.getAuthorities().stream()
-                .anyMatch(a -> PREMIUM_AUTHORITY.equals(a.getAuthority()));
-        if (!isPremium) {
-            throw new PremiumRequiredException(
-                    "La génération de recettes par IA est réservée aux membres premium.");
-        }
+        premiumSecurity.require(authentication,
+                "La génération de recettes par IA est réservée aux membres premium.");
 
         Recipe recipe;
         if (request != null
