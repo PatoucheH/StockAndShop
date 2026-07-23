@@ -22,8 +22,7 @@ public class OpenFoodFactsServiceImpl implements OpenFoodFactsService {
 
     // Catégories génériques en début de nom
     private static final Pattern CATEGORY_PREFIX =
-            Pattern.compile("^(boissons?|jus\\s+de\\s+fruits?|jus|eaux?|laits?|bi[eè]res?)\\s+", Pattern.CASE_INSENSITIVE);
-    // Quantités partout dans le nom (33cl, 1.5l, 500g…)
+            Pattern.compile("^boissons?.*$", Pattern.CASE_INSENSITIVE);    // Quantités partout dans le nom (33cl, 1.5l, 500g…)
     private static final Pattern QUANTITY =
             Pattern.compile("\\s*\\d+[,.]?\\d*\\s*(ml|cl|l|g|kg|oz|lb)\\b", Pattern.CASE_INSENSITIVE);
     // Mots d'emballage en fin de nom
