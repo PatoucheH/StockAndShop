@@ -29,9 +29,10 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, body, { withCredentials: true });
   }
 
-  saveToken(token: string, email: string) {
+  saveToken(token: string, email: string, displayName: string) {
     this._accessToken.set(token);
     localStorage.setItem('userEmail', email);
+    localStorage.setItem('displayName', displayName);
     this.authVersion.update(v => v + 1);
     this.identityVersion.update(v => v + 1);
   }
@@ -44,6 +45,10 @@ export class AuthService {
     return localStorage.getItem('userEmail');
   }
 
+  getDisplayName(): string | null {
+    return localStorage.getItem('displayName');
+  }
+
   isLoggedIn(): boolean {
     return this._accessToken() !== null;
   }
@@ -51,6 +56,7 @@ export class AuthService {
   clearSession(){
     this._accessToken.set(null);
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('displayName');
     this.authVersion.update(v => v + 1);
     this.identityVersion.update(v => v + 1);
   }

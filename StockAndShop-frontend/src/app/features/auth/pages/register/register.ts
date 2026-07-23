@@ -51,7 +51,7 @@ export class RegisterComponent {
 
     this.authService.register(request).subscribe({
       next: (response) => {
-        this.authService.saveToken(response.token, response.email);
+        this.authService.saveToken(response.token, response.email, response.displayName);
         this.router.navigate(['/']);
         this.loading.set(false);
       },

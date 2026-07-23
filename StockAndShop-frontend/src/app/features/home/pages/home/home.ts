@@ -17,11 +17,7 @@ export class Home {
   homes = this.homeService.homes;
   modalIsOpen = signal(false);
 
-  readonly userName = computed(() => {
-    const email = this.authService.getUserEmail() ?? '';
-    const raw = email.split('@')[0];
-    return raw.charAt(0).toUpperCase() + raw.slice(1);
-  });
+  readonly userName = computed(() => this.authService.getDisplayName() ?? '');
 
   openModal() {
     this.modalIsOpen.set(true);

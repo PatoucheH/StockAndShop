@@ -36,7 +36,7 @@ export class LoginComponent {
     const request: LoginRequest = this.form.getRawValue() as LoginRequest;
     this.authService.login(request).subscribe({
       next: (response) => {
-        this.authService.saveToken(response.token, response.email);
+        this.authService.saveToken(response.token, response.email, response.displayName);
         this.router.navigate(['/']);
         this.loading.set(false);
       },
