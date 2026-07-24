@@ -47,7 +47,7 @@ export class ShoppingListService {
   readonly isFavoritesLoading = computed(() => this._favoritesResource.isLoading());
   readonly hasFavoritesError = computed(() => !!this._favoritesResource.error());
 
-  isFavorited(id: number): boolean {
+  isFavorite(id: number): boolean {
     return this.favoriteShoppingLists().some((sl) => sl.id === id);
   }
 

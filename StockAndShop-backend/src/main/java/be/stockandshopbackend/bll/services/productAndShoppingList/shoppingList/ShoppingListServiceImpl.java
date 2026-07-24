@@ -120,6 +120,9 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
         List<ProductListItem> checkedItems = shoppingList.getProducts().stream()
                 .filter(ProductListItem::isChecked)
                 .toList();
+        if (checkedItems.isEmpty()) {
+            throw new IllegalStateException("Aucun produit coché à ajouter au stock");
+        }
         for (ProductListItem item : checkedItems) {
             home.addProductStock(new ProductStockHome(item.getProduct(), item.getQuantity()));
             shoppingList.getProducts().remove(item);

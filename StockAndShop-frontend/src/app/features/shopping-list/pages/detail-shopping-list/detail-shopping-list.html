@@ -16,7 +16,7 @@
         @if (list.id) {
           <button (click)="toggleFavorite(list.id)"
                   class="p-2 rounded-xl transition-colors cursor-pointer"
-                  [class]="shoppingListService.isFavorited(list.id)
+                  [class]="shoppingListService.isFavorite(list.id)
                     ? 'text-amber-400 bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30'
                     : 'text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100
                         dark:hover:bg-gray-700'">

@@ -77,16 +77,13 @@ export class DetailShoppingList{
         this.homeService.stockResource.reload();
         this.toast.success('Produits ajoutés au stock');
       },
-      error: () => this.toast.error('Impossible de mettre à jour le stock'),
     });
   }
 
   toggleFavorite(id: number) {
-    const action = this.shoppingListService.isFavorited(id)
+    const action = this.shoppingListService.isFavorite(id)
       ? this.shoppingListService.removeFromFavorite(id)
       : this.shoppingListService.addToFavorite(id);
-    action.subscribe({
-      error: () => this.toast.error('Impossible de modifier les favoris'),
-    });
+    action.subscribe();
   }
 }

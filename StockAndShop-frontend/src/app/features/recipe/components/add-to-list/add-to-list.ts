@@ -28,7 +28,6 @@ export class AddToListComponent {
     if (!listId) return;
     this.shoppingListService.addListProductsToShoppingList(this.products(), listId).subscribe({
       next: () => this.toast.success('Produits ajoutés à la liste'),
-      error: () => this.toast.error("Problème lors de l'ajout des produits à la liste"),
     });
   }
 }

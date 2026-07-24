@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { Recipe } from '../../../../shared/models/recipe.models';
 import { ProductItemRequest } from '../../../../shared/models/productItem.models';
 import { RecipeService } from '../../../recipe/services/recipe.service';
-import { ToastService } from '../../../../core/services/toast.service';
 import { StarRatingComponent } from '../../../../shared/components/star-rating/star-rating';
 import { AddToListComponent } from '../../../recipe/components/add-to-list/add-to-list';
 
@@ -15,7 +14,6 @@ import { AddToListComponent } from '../../../recipe/components/add-to-list/add-t
 export class RecipeCardComponent {
   recipeService = inject(RecipeService);
   private router = inject(Router);
-  private toast = inject(ToastService);
 
   recipe = input.required<Recipe>();
   close = output<void>();
@@ -32,8 +30,6 @@ export class RecipeCardComponent {
     const action = this.recipeService.isFavorited(recipeId)
       ? this.recipeService.removeFromFavoriteRecipe(recipeId)
       : this.recipeService.addToFavoriteRecipe(recipeId);
-    action.subscribe({
-      error: () => this.toast.error('Impossible de modifier les favoris'),
-    });
+    action.subscribe();
   }
 }

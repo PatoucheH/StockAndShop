@@ -44,7 +44,6 @@ export class ManageUsersHomeComponent {
   onUserRemoved(userId: string) {
     this.homeService.removeUser(userId).subscribe({
       next: () => this.toast.success('Membre retiré'),
-      error: () => this.toast.error('Impossible de retirer ce membre'),
     });
   }
 }

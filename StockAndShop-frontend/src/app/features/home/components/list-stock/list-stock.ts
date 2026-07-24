@@ -86,7 +86,6 @@ export class ListStock {
         this.homeService.stockResource.reload();
         this.toast.success('Stock mis à jour');
       },
-      error: () => this.toast.error('Impossible de mettre à jour le stock'),
     });
   }
 

@@ -119,7 +119,7 @@ export class FormAddProductShoppingList {
     if (this.form.invalid || !this.selectedProduct()) return;
     const quantity = this.unitConversion.toBaseUnit(Number(this.form.value.quantity), this.subUnit());
     const payload: ProductItemRequest = {
-      name: this.form.value.nameProduct!,
+      name: this.form.value.nameProduct!.toLowerCase(),
       quantity,
     };
     this.shoppingListService
@@ -129,7 +129,6 @@ export class FormAddProductShoppingList {
           this.form.reset();
           this.toast.success('Produit ajouté à la liste');
         },
-        error: () => this.toast.error("Impossible d'ajouter le produit"),
       });
   }
 }

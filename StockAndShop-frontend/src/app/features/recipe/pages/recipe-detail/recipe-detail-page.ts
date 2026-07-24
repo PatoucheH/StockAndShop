@@ -6,7 +6,6 @@ import { Recipe } from '../../../../shared/models/recipe.models';
 import { ProductItemRequest } from '../../../../shared/models/productItem.models';
 import { RecipeService } from '../../services/recipe.service';
 import { RecipeCommentService } from '../../services/recipe-comment.service';
-import { ToastService } from '../../../../core/services/toast.service';
 import { LoadingComponent } from '../../../../shared/components/loading/loading';
 import { ErrorComponent } from '../../../../shared/components/error/error';
 import { AddToListComponent } from '../../components/add-to-list/add-to-list';
@@ -24,7 +23,6 @@ export class RecipeDetailPage implements OnInit {
   private router = inject(Router);
   recipeService = inject(RecipeService);
   private commentService = inject(RecipeCommentService);
-  private toast = inject(ToastService);
 
   readonly recipeId = this.route.snapshot.paramMap.get('id')!;
 
@@ -70,8 +68,6 @@ export class RecipeDetailPage implements OnInit {
     const action = this.recipeService.isFavorited(id)
       ? this.recipeService.removeFromFavoriteRecipe(id)
       : this.recipeService.addToFavoriteRecipe(id);
-    action.subscribe({
-      error: () => this.toast.error('Impossible de modifier les favoris'),
-    });
+    action.subscribe();
   }
 }

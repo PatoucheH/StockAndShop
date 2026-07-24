@@ -30,7 +30,6 @@ export class ListShoppingListComponent {
         this.homeService.shoppingListsResource.reload();
         this.toast.success('Liste supprimée');
       },
-      error: () => this.toast.error('Impossible de supprimer la liste'),
     });
     this.pendingDeleteId.set(null);
   }

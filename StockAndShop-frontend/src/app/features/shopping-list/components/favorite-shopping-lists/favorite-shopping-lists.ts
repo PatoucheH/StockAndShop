@@ -32,7 +32,6 @@ export class FavoriteShoppingListsComponent {
   removeFromFavorite(id: number) {
     this.shoppingListService.removeFromFavorite(id).subscribe({
       next: () => this.toast.success('Retiré des favoris'),
-      error: () => this.toast.error('Impossible de retirer des favoris'),
     });
   }
 }

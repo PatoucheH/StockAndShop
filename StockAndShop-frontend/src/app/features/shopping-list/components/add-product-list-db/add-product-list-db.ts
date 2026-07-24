@@ -74,10 +74,11 @@ export class AddProductListDb {
               this.toast.success('Produit créé et ajouté à la liste');
               this.closeModal.emit();
             },
+            // Kept distinct from the interceptor's generic toast: it conveys that the product
+            // itself was created even though attaching it to the list failed.
             error: () => this.toast.error("Produit créé mais impossible de l'ajouter à la liste"),
           });
       },
-      error: () => this.toast.error('Impossible de créer le produit'),
     });
   }
 }

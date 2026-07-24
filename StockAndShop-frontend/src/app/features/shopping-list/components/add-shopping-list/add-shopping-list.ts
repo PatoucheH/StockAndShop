@@ -41,7 +41,6 @@ export class AddShoppingListComponent {
         this.toast.success('Liste créée');
         this.closeModal.emit();
       },
-      error: () => this.toast.error('Impossible de créer la liste'),
     });
   }
 }

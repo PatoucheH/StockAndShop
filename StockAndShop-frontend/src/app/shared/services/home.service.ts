@@ -85,7 +85,7 @@ export class HomeService {
         }
       });
 
-    // page 0 means a fresh load (new home selected, or reload after a mutation); any other page appends for "load more"
+    // page 0 means a fresh load  any other page appends for load more
     effect(
       () => {
         if (this.expenseResource.isLoading()) return;
