@@ -77,7 +77,7 @@
         <div class="flex flex-wrap gap-2">
           @for (ingredient of recipe().ingredients; track ingredient.productId) {
             <div class="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 rounded-full px-3 py-1 text-sm">
-              <span class="font-semibold text-emerald-800 dark:text-emerald-300">{{ ingredient.quantity }} {{ ingredient.unity }}</span>
+              <span class="font-semibold text-emerald-800 dark:text-emerald-300">{{ ingredient.quantity | smartUnit: ingredient.unity }}</span>
               <span class="text-emerald-300 dark:text-emerald-600">·</span>
               <span class="text-emerald-700 dark:text-emerald-400">{{ ingredient.productName }}</span>
             </div>

@@ -5,10 +5,11 @@ import { ProductItemRequest } from '../../../../shared/models/productItem.models
 import { RecipeService } from '../../../recipe/services/recipe.service';
 import { StarRatingComponent } from '../../../../shared/components/star-rating/star-rating';
 import { AddToListComponent } from '../../../recipe/components/add-to-list/add-to-list';
+import { SmartUnitPipe } from '../../../../shared/pipes/smart-unit.pipe';
 
 @Component({
   selector: 'app-recipe-card',
-  imports: [StarRatingComponent, AddToListComponent],
+  imports: [StarRatingComponent, AddToListComponent, SmartUnitPipe],
   templateUrl: './recipe-card.html',
 })
 export class RecipeCardComponent {
