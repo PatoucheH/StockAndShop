@@ -166,6 +166,6 @@ CREATE EXTENSION IF NOT EXISTS unaccent;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE OR REPLACE FUNCTION f_unaccent(text) RETURNS text
   LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT AS
-$$ SELECT unaccent('unaccent'::regdictionary, $1) $$;
+$$ SELECT public.unaccent('public.unaccent'::regdictionary, $1) $$;
 CREATE INDEX IF NOT EXISTS idx_product_search
   ON product USING gin (f_unaccent(lower(name)) gin_trgm_ops);
