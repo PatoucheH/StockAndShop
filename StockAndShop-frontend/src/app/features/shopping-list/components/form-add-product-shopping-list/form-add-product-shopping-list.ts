@@ -67,7 +67,7 @@ export class FormAddProductShoppingList {
 
   filteredProducts = toSignal(
     toObservable(this.nameProduct).pipe(
-      debounceTime(300),
+      debounceTime(150),
       distinctUntilChanged(),
       switchMap(term => (term && term.length >= 2)
         ? this.productService.searchByName(term)

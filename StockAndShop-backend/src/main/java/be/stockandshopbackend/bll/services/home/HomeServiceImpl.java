@@ -9,6 +9,8 @@ import be.stockandshopbackend.dl.entities.product.Product;
 import be.stockandshopbackend.dl.entities.product.ProductStockHome;
 import be.stockandshopbackend.dl.entities.user.User;
 import be.stockandshopbackend.dl.entities.home.UserHome;
+import be.stockandshopbackend.dl.enums.HomeRole;
+import be.stockandshopbackend.exceptions.ConflictException;
 import be.stockandshopbackend.exceptions.NotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -104,6 +106,9 @@ public class HomeServiceImpl extends BaseCRUDService<Home, UUID, HomeRepository>
                 .filter(u -> u.getUser().getId().equals(userId))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("User not found in home: " + userId));
+        if (userHome.getHomeRole() == HomeRole.OWNER) {
+            throw new ConflictException("Le propriétaire de la maison ne peut pas être retiré.");
+        }
         home.getUsers().remove(userHome);
         repository.save(home);
     }

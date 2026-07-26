@@ -45,6 +45,7 @@ public class AuthService implements UserDetailsService {
 
     @Transactional
     public AuthResult register(String username, String email, String password) {
+        email = email.trim().toLowerCase();   // canonical lowercase storage
         if(userRepository.findByEmail(email).isPresent()) {
             throw new ConflictException("Email already in use: " + email);
         }

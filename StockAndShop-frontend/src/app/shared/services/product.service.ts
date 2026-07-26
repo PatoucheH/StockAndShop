@@ -26,7 +26,7 @@ export class ProductService {
   }
 
   searchByName(name: string): Observable<Product[]> {
-    return this.http.get<Product[]>(`${this.apiUrl}?name=${encodeURIComponent(name)}`);
+    return this.http.get<Product[]>(`${this.apiUrl}/search?name=${encodeURIComponent(name)}`);
   }
 
   getByBarcode(barcode: string) {

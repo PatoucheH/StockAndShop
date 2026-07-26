@@ -20,10 +20,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
       nativeQuery = true)
     List<Product> searchByName(@Param("term") String term);
 
-    Optional<Product> findByName(String name);
+    // Case-insensitive: names are stored with their original casing (e.g. "Pâtes Panzani"),
+    // but callers may pass a lowercased name.
+    @Query("SELECT p FROM Product p WHERE LOWER(p.name) = LOWER(:name)")
+    Optional<Product> findByName(@Param("name") String name);
 
     Optional<Product> findByBarcode(String barcode);
 
-    boolean existsByName(String name);
+    @Query("SELECT COUNT(p) > 0 FROM Product p WHERE LOWER(p.name) = LOWER(:name)")
+    boolean existsByName(@Param("name") String name);
 
 }

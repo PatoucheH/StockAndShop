@@ -6,6 +6,7 @@ import be.stockandshopbackend.dl.entities.product.Category;
 import be.stockandshopbackend.dl.entities.product.Product;
 import be.stockandshopbackend.dl.enums.Unity;
 import be.stockandshopbackend.pl.DTOs.Response.products.ProductResponse;
+import be.stockandshopbackend.pl.DTOs.Response.products.ProductSearchResponse;
 import be.stockandshopbackend.pl.DTOs.requests.products.ProductRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,17 @@ public class ProductController {
                 : productService.findAll();
         return ResponseEntity.ok(products.stream()
                 .map(ProductResponse::fromProduct)
+                .toList());
+    }
+
+    // Lightweight autocomplete search: returns only id/name/unity/category to minimize payload.
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductSearchResponse>> search(
+            @RequestParam(value = "name", required = false) String name
+    ) {
+        if (name == null || name.isBlank()) return ResponseEntity.ok(List.of());
+        return ResponseEntity.ok(productService.findAllByName(name).stream()
+                .map(ProductSearchResponse::fromProduct)
                 .toList());
     }
 

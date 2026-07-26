@@ -76,12 +76,16 @@ CONSERVE_KW = ["conserve","thon","sardine","maquereau","mais","haricot","pois ch
                "petit pois","ravioli","cassoulet","flageolet"]
 SNACK_KW    = ["chips","cracker","tuc","curly","pop corn","popcorn","bretzel"]
 LIQUID_KW   = ["lait","jus","eau","soda","cola","limonade","boisson","sirop","nectar",
-               "smoothie","vin","biere","cidre","huile","vinaigre","sauce","coulis",
-               "creme liquide","bouillon","ice tea","the glace","liquide vaisselle",
-               "lessive","shampoing","shampooing","gel douche","javel","adoucissant"]
+               "smoothie","huile","vinaigre","creme liquide","bouillon","ice tea",
+               "the glace","liquide vaisselle","lessive","shampoing","shampooing",
+               "gel douche","javel","adoucissant"]
+# Alcools -> vendus à la bouteille/cannette, pas au ml
+ALCOHOL_KW  = ["biere","pils","lager","ipa","stout","vin","cidre","champagne","prosecco",
+               "whisky","vodka","rhum","pastis","liqueur","cognac","armagnac","gin",
+               "tequila","aperitif","spiritueux"]
 
 def _compile(kws): return [re.compile(r"\b" + re.escape(k) + r"s?\b") for k in kws]
-_EGG,_BREAD,_CONS,_SNACK,_LIQUID = map(_compile,[EGG_KW,BREAD_KW,CONSERVE_KW,SNACK_KW,LIQUID_KW])
+_EGG,_BREAD,_CONS,_SNACK,_LIQUID,_ALCO = map(_compile,[EGG_KW,BREAD_KW,CONSERVE_KW,SNACK_KW,LIQUID_KW,ALCOHOL_KW])
 def _m(pats,name): return any(p.search(name) for p in pats)
 
 def _liquid_from_quantity(q):
@@ -111,14 +115,17 @@ def display_name(raw):
 
 
 def map_unity(name, category_id, quantity_str=None):
+    if _m(_ALCO, name):                           return "BOTTLE"   # bières, vins, spiritueux
     if _m(_EGG, name):                            return "PIECE"
     if category_id == 5 or _m(_BREAD, name):      return "PIECE"
     if category_id == 3 or _m(_CONS, name):       return "CAN"
     if _m(_SNACK, name):                          return "PACKET"
-    if _m(_LIQUID, name):                         return "MILLILITER"
+    # La quantité de l'emballage prime sur les mots-clés ambigus
+    # (ex: "Boulettes sauce tomate 400 g" = solide, pas du ml)
     liq = _liquid_from_quantity(quantity_str)
-    if liq is True:                               return "MILLILITER"
     if liq is False:                              return "GRAMS"
+    if liq is True:                               return "MILLILITER"
+    if _m(_LIQUID, name):                         return "MILLILITER"
     if category_id == 4:                          return "MILLILITER"
     return "GRAMS"
 
