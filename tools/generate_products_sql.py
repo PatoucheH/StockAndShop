@@ -21,7 +21,7 @@ OUTPUT_SQL = r"C:\Users\HugoP\Documents\Dev\Projects\StockAndShop\data\products_
 CHUNK_SIZE       = 50_000
 BATCH_SIZE       = 500
 MIN_COMPLETENESS = 0.5      # qualité minimale de la fiche OFF (0..1)
-MIN_SCANS        = 10       # popularité mini (unique_scans_n) ; 0 = filtre désactivé
+MIN_SCANS        = 100      # popularité mini (unique_scans_n) ; 0 = filtre désactivé
 COUNTRIES        = ("en:france", "en:belgium", "en:luxembourg")
 # --------------------------------------------------------------------------- #
 
@@ -41,6 +41,8 @@ _QTY_RE = re.compile(
 _PAREN_RE = re.compile(r"\([^)]*\)")
 _MULTISPACE_RE = re.compile(r"\s+")
 _KEEP_RE = re.compile(r"[^a-z0-9 ]")
+# Lettres que le français n'utilise pas -> nom probablement étranger (espagnol, portugais...)
+_FOREIGN_CHARS = set("áíóúñÁÍÓÚÑãõÃÕåÅøØ¿¡ßłŁðþŠŽšžșțŞȘ")
 
 def strip_accents(text):
     text = text.translate(_LIGATURES)
@@ -51,6 +53,8 @@ def normalize_name(raw):
         return ""
     name = str(raw).strip()
     if not name or name.lower() == "nan":
+        return ""
+    if any(c in _FOREIGN_CHARS for c in name):   # nom étranger -> écarté
         return ""
     name = _PAREN_RE.sub(" ", name)
     name = strip_accents(name).lower().replace("'", " ")
