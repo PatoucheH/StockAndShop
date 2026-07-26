@@ -86,8 +86,7 @@ public class ProductController {
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,
                                                          @RequestBody @Valid ProductRequest p){
         Product product = productService.findById(id);
-        // Stored lowercase so lookups are case-insensitive without needing LOWER() in every query
-        product.setName(p.name().toLowerCase());
+        product.setName(p.name().trim());
         product.setUnity(Unity.fromValue(p.unity()));
         Category category = categoryService.findByNameOrCreate(p.category());
         product.setCategory(category);

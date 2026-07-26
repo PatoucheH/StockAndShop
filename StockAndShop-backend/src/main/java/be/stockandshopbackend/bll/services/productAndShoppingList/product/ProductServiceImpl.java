@@ -30,7 +30,9 @@ public class ProductServiceImpl extends BaseCRUDService<Product, Long, ProductRe
     }
 
     public List<Product> findAllByName(String name){
-        return  repository.findProductsByNameContaining(name);
+        String term = name == null ? "" : name.replaceAll("[^\\p{L}\\p{N} ]", " ").trim();
+        if (term.isEmpty()) return List.of();
+        return repository.searchByName(term);
     }
 
     public Product findOneByName(String name){
@@ -57,8 +59,7 @@ public class ProductServiceImpl extends BaseCRUDService<Product, Long, ProductRe
         if(repository.existsByName(name)) throw new AlreadyExistsException("This product exists already");
         Category category = categoryService.findByNameOrCreate(categoryName);
         Product product = new Product();
-        // Stored lowercase so lookups are case-insensitive without needing LOWER() in every query
-        product.setName(name.toLowerCase());
+        product.setName(name.trim());
         product.setUnity(Unity.fromValue(unity));
         product.setCategory(category);
         return repository.save(product);

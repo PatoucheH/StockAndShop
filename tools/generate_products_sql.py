@@ -1,296 +1,226 @@
-import pandas as pd
-import math
-import sys
-import os
+# -*- coding: utf-8 -*-
+"""
+Génère products_off_import.sql à partir du dump CSV d'Open Food Facts.
 
-INPUT_CSV = r"C:\Users\HugoP\Documents\Dev\Projects\StockAndShop\data\en.openfoodfacts.org.products.csv"
+Objectifs :
+  * NOMS NORMALISÉS  : minuscule, sans accents, sans quantité, sans ponctuation.
+                       -> recherche insensible casse/accents, et dédoublonnage fiable.
+  * DÉDOUBLONNAGE    : deux noms quasi-identiques ("Coca-Cola 33cl", "COCA COLA",
+                       "coca cola") = un seul produit ; on garde la version la plus complète.
+  * UNITÉS COHÉRENTES: liquide -> MILLILITER, solide -> GRAMS ;
+                       exceptions -> conserves=CAN, chips/snacks=PACKET,
+                       œufs & pain/viennoiseries=PIECE.
+"""
+import pandas as pd
+import math, re, sys, os, unicodedata
+
+# --------------------------------------------------------------------------- #
+INPUT_CSV  = r"C:\Users\HugoP\Documents\Dev\Projects\StockAndShop\data\en.openfoodfacts.org.products.csv"
 OUTPUT_SQL = r"C:\Users\HugoP\Documents\Dev\Projects\StockAndShop\data\products_off_import.sql"
 
-CHUNK_SIZE = 50_000
-BATCH_SIZE = 500
-MIN_COMPLETENESS = 0.4
+CHUNK_SIZE       = 50_000
+BATCH_SIZE       = 500
+MIN_COMPLETENESS = 0.5      # qualité minimale de la fiche OFF (0..1)
+MIN_SCANS        = 10       # popularité mini (unique_scans_n) ; 0 = filtre désactivé
+COUNTRIES        = ("en:france", "en:belgium", "en:luxembourg")
+# --------------------------------------------------------------------------- #
 
 PNNS_TO_CATEGORY_ID = {
-    "Beverages":                    4,
-    "Milk and dairy products":      6,
-    "Fruits and vegetables":        8,
-    "Cereals and potatoes":         2,
-    "Fish Meat Eggs":               9,
-    "Sugary snacks":               11,
-    "Salty snacks":                11,
-    "Fat and sauces":               2,
-    "Composite foods":              2,
+    "Beverages": 4, "Milk and dairy products": 6, "Fruits and vegetables": 8,
+    "Cereals and potatoes": 2, "Fish Meat Eggs": 9, "Sugary snacks": 11,
+    "Salty snacks": 11, "Fat and sauces": 2, "Composite foods": 2,
 }
 DEFAULT_CATEGORY_ID = 1
 VALID_GRADES = {'a', 'b', 'c', 'd', 'e'}
 
-# Défaut d'unité par catégorie — utilisé si aucun mot-clé ne matche
-CATEGORY_DEFAULT_UNITY = {
-    1:  "PIECE",    # autres
-    2:  "PACKET",   # épicerie
-    3:  "CAN",      # conserves
-    4:  "BOTTLE",   # boissons
-    5:  "PIECE",    # boulangerie
-    6:  "PIECE",    # produits laitiers
-    7:  "PACKET",   # surgelés
-    8:  "GRAMS",    # fruits et légumes (matière première pesée)
-    9:  "GRAMS",    # boucherie et charcuterie (matière première pesée)
-    10: "BOTTLE",   # hygiène
-    11: "PACKET",   # confiserie et snack
-}
+# ============================ NORMALISATION ================================= #
+_LIGATURES = str.maketrans({"œ": "oe", "æ": "ae", "Œ": "oe", "Æ": "ae"})
+_QTY_RE = re.compile(
+    r"\b\d+[.,]?\d*\s?(?:l|cl|ml|dl|kg|g|gr|mg|cc|oz|lb|pcs?|pieces?)\b"
+    r"|\bx\s?\d+\b|\b\d+\s?x\b|\d+\s?%", re.IGNORECASE)
+_PAREN_RE = re.compile(r"\([^)]*\)")
+_MULTISPACE_RE = re.compile(r"\s+")
+_KEEP_RE = re.compile(r"[^a-z0-9 ]")
 
-# Mots-clés dans le nom du produit → unité (ordre = priorité)
-NAME_KEYWORDS_TO_UNITY = [
-    # GRAMS — matières premières traitées (override explicite)
-    (["râpé", "haché", "émincé", "effiloché", "concassé"], "GRAMS"),
+def strip_accents(text):
+    text = text.translate(_LIGATURES)
+    return "".join(c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c))
 
-    # BOTTLE — liquides en bouteille
-    (["lait ", "lait d", "lait e", "lait c", "lait 1", "lait 2",
-      "jus ", "jus d", "jus de", "eau ", "eau m", "eau p",
-      "soda", "cola", "limonade", "smoothie", "nectar",
-      "vin ", "bière", "cidre", "champagne", "prosecco",
-      "huile ", "vinaigre", "ketchup", "sauce ", "sirop ",
-      "shampoing", "shampooing", "gel douche", "après-shampoing",
-      "liquide vaisselle", "lessive ", "eau de javel",
-      "mayonnaise", "moutarde"], "BOTTLE"),
+def normalize_name(raw):
+    if raw is None or (isinstance(raw, float) and math.isnan(raw)):
+        return ""
+    name = str(raw).strip()
+    if not name or name.lower() == "nan":
+        return ""
+    name = _PAREN_RE.sub(" ", name)
+    name = strip_accents(name).lower().replace("'", " ")
+    name = _QTY_RE.sub(" ", name)
+    name = _KEEP_RE.sub(" ", name)
+    tokens = [t for t in name.split() if not t.isdigit()]
+    name = _MULTISPACE_RE.sub(" ", " ".join(tokens)).strip()
+    if len(name) < 3 or len(name) > 50:
+        return ""
+    if not any(t.isalpha() and len(t) >= 3 for t in tokens):
+        return ""
+    return name
 
-    # JAR — bocaux et conserves en pot
-    (["confiture", "marmelade", "gelée de", "miel ", "miel d",
-      "compote", "pâte à tartiner", "nutella", "speculoos",
-      "cornichon", "câpre", "olive", "tapenade",
-      "purée d'amande", "purée de noisette", "tahini"], "JAR"),
+# ============================== UNITÉS ===================================== #
+EGG_KW      = ["oeuf"]
+BREAD_KW    = ["pain","baguette","croissant","brioche","viennoiserie","chausson",
+               "ficelle","biscotte","pain de mie","pain au chocolat"]
+CONSERVE_KW = ["conserve","thon","sardine","maquereau","mais","haricot","pois chiche",
+               "petit pois","ravioli","cassoulet","flageolet"]
+SNACK_KW    = ["chips","cracker","tuc","curly","pop corn","popcorn","bretzel"]
+LIQUID_KW   = ["lait","jus","eau","soda","cola","limonade","boisson","sirop","nectar",
+               "smoothie","vin","biere","cidre","huile","vinaigre","sauce","coulis",
+               "creme liquide","bouillon","ice tea","the glace","liquide vaisselle",
+               "lessive","shampoing","shampooing","gel douche","javel","adoucissant"]
 
-    # BOX — boîtes (glaces, chocolats assortis)
-    (["glace ", "sorbet", "crème glacée", "bac de glace",
-      "assortiment de chocolat", "chocolats assortis"], "BOX"),
+def _compile(kws): return [re.compile(r"\b" + re.escape(k) + r"s?\b") for k in kws]
+_EGG,_BREAD,_CONS,_SNACK,_LIQUID = map(_compile,[EGG_KW,BREAD_KW,CONSERVE_KW,SNACK_KW,LIQUID_KW])
+def _m(pats,name): return any(p.search(name) for p in pats)
 
-    # PIECE — fruits et légumes individuels
-    (["pomme ", "poire ", "banane", "orange ", "citron",
-      "pamplemousse", "mangue", "ananas", "kiwi", "avocat",
-      "oignon", "ail ", "échalote", "courgette", "poivron",
-      "concombre", "aubergine", "tomate ", "tomates cerises",
-      "salade ", "laitue", "endive", "poireau", "navet",
-      "chou-fleur", "brocoli", "chou ", "épinard"], "PIECE"),
+def _liquid_from_quantity(q):
+    if not q or (isinstance(q, float) and math.isnan(q)): return None
+    q = str(q).lower()
+    if re.search(r"\d\s?(?:ml|cl|dl)\b", q) or re.search(r"\d\s?l\b", q) or "litre" in q: return True
+    if re.search(r"\d\s?(?:g|kg|gr|mg)\b", q): return False
+    return None
 
-    # PIECE — produits laitiers individuels
-    (["yaourt", "yogourt", "yoghourt", "skyr", "fromage blanc",
-      "petit-suisse", "faisselle", "danette", "activia",
-      "camembert", "brie ", "chèvre ", "roquefort", "munster",
-      "reblochon", "livarot", "maroilles", "époisses",
-      "oeuf", "oeufs"], "PIECE"),
+def display_name(raw):
+    """Joli nom AFFICHÉ : accents conservés, quantité retirée, casse corrigée."""
+    if raw is None or (isinstance(raw, float) and math.isnan(raw)):
+        return ""
+    s = str(raw).strip()
+    if not s or s.lower() == "nan":
+        return ""
+    s = _PAREN_RE.sub(" ", s)
+    s = _QTY_RE.sub(" ", s)
+    s = "".join(c if (c.isalnum() or c in " '-") else " " for c in s)
+    s = " ".join(t for t in s.split() if not t.isdigit())
+    s = _MULTISPACE_RE.sub(" ", s).strip()
+    if not s:
+        return ""
+    if not any(c.islower() for c in s):
+        s = s.title()
+    return (s[0].upper() + s[1:])[:120]
 
-    # PIECE — boulangerie et plats individuels
-    (["pain ", "pain d", "baguette", "ficelle", "brioche",
-      "croissant", "pain au chocolat", "chausson",
-      "pizza ", "quiche", "tarte ", "tourte",
-      "cake ", "moelleux", "fondant au"], "PIECE"),
 
-    # PACKET — charcuterie conditionnée
-    (["jambon ", "jambon b", "jambon c", "jambon d",
-      "saucisson", "lardons", "chipolata", "merguez",
-      "knack", "saucisse", "chorizo", "coppa",
-      "bacon", "pancetta", "bresaola"], "PACKET"),
+def map_unity(name, category_id, quantity_str=None):
+    if _m(_EGG, name):                            return "PIECE"
+    if category_id == 5 or _m(_BREAD, name):      return "PIECE"
+    if category_id == 3 or _m(_CONS, name):       return "CAN"
+    if _m(_SNACK, name):                          return "PACKET"
+    if _m(_LIQUID, name):                         return "MILLILITER"
+    liq = _liquid_from_quantity(quantity_str)
+    if liq is True:                               return "MILLILITER"
+    if liq is False:                              return "GRAMS"
+    if category_id == 4:                          return "MILLILITER"
+    return "GRAMS"
 
-    # PACKET — épicerie sèche
-    (["pâtes", "pasta", "spaghetti", "tagliatelle", "penne",
-      "fusilli", "macaroni", "riz ", "semoule", "boulgour",
-      "quinoa", "lentille", "pois chiche", "haricot sec",
-      "farine ", "sucre ", "sel ", "poivre",
-      "levure", "fécule", "maïzena",
-      "céréales", "muesli", "granola", "flocons d",
-      "biscuit", "gâteau", "cookie", "crackers", "chips",
-      "café ", "café m", "café e", "thé ", "infusion",
-      "tisane", "cacao", "chocolat en poudre",
-      "chocolat noir", "chocolat au lait", "tablette de"], "PACKET"),
-
-    # MILLILITER — seuls les produits vraiment mesurés en ml (cuisine)
-    (["crème fraîche", "crème liquide", "crème épaisse",
-      "crème entière", "crème allégée", "lait de coco",
-      "bouillon de"], "MILLILITER"),
-]
-
+# ============================== HELPERS ==================================== #
+def category_of(pnns, tags):
+    tags = str(tags).lower()
+    if "en:frozen" in tags:                                  return 7
+    if "en:canned" in tags or "en:jarred" in tags:           return 3
+    return PNNS_TO_CATEGORY_ID.get(str(pnns).strip(), DEFAULT_CATEGORY_ID)
 
 def normalize_grade(val):
-    if not val or (isinstance(val, float) and math.isnan(val)):
-        return None
+    if not val or (isinstance(val, float) and math.isnan(val)): return None
     v = str(val).strip().lower()
     return v if v in VALID_GRADES else None
-
-
-def map_unity(name, quantity_str, category_id):
-    name_lower = name.lower()
-
-    # 1. Mots-clés dans le nom — priorité absolue
-    for keywords, unity in NAME_KEYWORDS_TO_UNITY:
-        if any(kw in name_lower for kw in keywords):
-            return unity
-
-    # 2. Champ quantity du CSV — si informatif
-    unity_from_qty = _unity_from_quantity(quantity_str)
-    if unity_from_qty not in ("PIECE", "GRAMS", "MILLILITER"):
-        # Bouteille, boîte, paquet, bocal détectés dans le packaging → fiable
-        return unity_from_qty
-
-    # 3. Défaut par catégorie
-    return CATEGORY_DEFAULT_UNITY.get(category_id, "PIECE")
-
-
-def _unity_from_quantity(quantity_str):
-    if not quantity_str or (isinstance(quantity_str, float) and math.isnan(quantity_str)):
-        return "PIECE"
-    q = str(quantity_str).lower()
-    if "bouteille" in q or "bottle" in q:
-        return "BOTTLE"
-    if "boîte" in q or "boite" in q or " can" in q:
-        return "CAN"
-    if "paquet" in q or "packet" in q or "sachet" in q:
-        return "PACKET"
-    if "bocal" in q or "jar" in q:
-        return "JAR"
-    if "ml" in q or "cl" in q or " l" in q or q.endswith("l"):
-        return "MILLILITER"
-    if " g" in q or "kg" in q or q.endswith("g"):
-        return "GRAMS"
-    return "PIECE"
-
 
 def sql_val(val):
     if val is None or (isinstance(val, float) and math.isnan(val)) or str(val).strip() == "":
         return "NULL"
     return "'" + str(val).replace("'", "''").strip()[:255] + "'"
 
+def to_float(v, default=0.0):
+    try: return float(v)
+    except (ValueError, TypeError): return default
 
-def get_name(row):
-    name = str(row.get("product_name", "")).strip()
-    return name if name != "nan" else ""
-
-
-def get_image(row):
-    val = row.get("image_url")
-    if val and not (isinstance(val, float) and math.isnan(val)) and str(val).strip():
-        return val
-    return None
-
-
+# ================================ MAIN ===================================== #
 def process():
     print(f"Lecture de {INPUT_CSV}...")
-
     header = pd.read_csv(INPUT_CSV, sep="\t", nrows=0)
     available = set(header.columns)
-    print(f"Colonnes disponibles dans le CSV : {len(available)}")
-
-    wanted = [
-        "code", "product_name", "brands",
-        "quantity", "image_url",
-        "nutriscore_grade", "environmental_score_grade", "pnns_groups_1",
-        "categories_tags", "countries_tags", "completeness"
-    ]
+    wanted = ["code","product_name","brands","quantity","image_url","nutriscore_grade",
+              "environmental_score_grade","pnns_groups_1","categories_tags",
+              "countries_tags","completeness","unique_scans_n"]
     cols = [c for c in wanted if c in available]
-    missing = [c for c in wanted if c not in available]
-    if missing:
-        print(f"Colonnes absentes du CSV (seront ignorées) : {missing}")
+    has_scans = "unique_scans_n" in available
+    print(f"Colonnes utilisées : {cols}")
+    if not has_scans and MIN_SCANS > 0:
+        print("  (unique_scans_n absent -> filtre popularité ignoré)")
 
+    best = {}            # nom_normalisé -> (score, tuple_valeurs_sql)
     seen_barcodes = set()
-    seen_names = set()
-    total_imported = 0
+    read = kept = 0
 
+    for chunk in pd.read_csv(INPUT_CSV, sep="\t", usecols=cols, chunksize=CHUNK_SIZE,
+                             low_memory=False, on_bad_lines="skip"):
+        for _, row in chunk.iterrows():
+            read += 1
+            barcode = str(row.get("code", "")).strip()
+            if not barcode.isdigit() or len(barcode) < 8:                 continue
+            if barcode in seen_barcodes:                                  continue
+            countries = str(row.get("countries_tags", "")).lower()
+            if not any(c in countries for c in COUNTRIES):                continue
+            if to_float(row.get("completeness")) < MIN_COMPLETENESS:      continue
+            if MIN_SCANS > 0 and has_scans and to_float(row.get("unique_scans_n")) < MIN_SCANS:
+                continue
+
+            key = normalize_name(row.get("product_name"))   # clé de dédoublonnage
+            if not key:                                                   continue
+            disp = display_name(row.get("product_name"))        # nom affiché
+            if not disp:                                                  continue
+
+            completeness = to_float(row.get("completeness"))
+            scans = to_float(row.get("unique_scans_n")) if has_scans else 0.0
+            score = (completeness, scans)
+
+            prev = best.get(key)
+            if prev and prev[0] >= score:
+                continue  # on garde déjà une meilleure version
+
+            category_id = category_of(row.get("pnns_groups_1"), row.get("categories_tags"))
+            unity = map_unity(key, category_id, row.get("quantity"))
+            values = (
+                sql_val(disp), f"'{unity}'", str(category_id), sql_val(barcode),
+                sql_val(row.get("brands")), sql_val(row.get("image_url")),
+                sql_val(row.get("quantity")),
+                sql_val(normalize_grade(row.get("nutriscore_grade"))),
+                sql_val(normalize_grade(row.get("environmental_score_grade"))),
+            )
+            if prev is None:
+                seen_barcodes.add(barcode)
+                kept += 1
+            best[key] = (score, values)
+        print(f"  lus={read:>9}  gardés(uniques)={len(best):>7}", end="\r")
+
+    print(f"\nÉcriture de {len(best)} produits uniques dans {OUTPUT_SQL}...")
+    rows = [v for _, v in best.values()]
     with open(OUTPUT_SQL, "w", encoding="utf-8") as out:
-        out.write("-- Import Open Food Facts — généré automatiquement\n")
-        out.write("-- Exécuter UNE SEULE FOIS sur une DB vierge de produits OFF\n\n")
+        out.write("-- Import Open Food Facts (normalisé + dédoublonné) — généré automatiquement\n")
+        out.write("-- À exécuter UNE fois sur une table product vierge de produits OFF.\n")
         out.write("SET client_encoding = 'UTF8';\n\n")
-
-        rows_buffer = []
-
-        for chunk_num, chunk in enumerate(pd.read_csv(
-            INPUT_CSV, sep="\t", usecols=cols,
-            chunksize=CHUNK_SIZE, low_memory=False, on_bad_lines="skip"
-        )):
-            for _, row in chunk.iterrows():
-                barcode = str(row.get("code", "")).strip()
-                if not barcode or barcode == "nan":
-                    continue
-                if not barcode.isdigit() or len(barcode) < 8:
-                    continue
-
-                countries = str(row.get("countries_tags", "")).lower()
-                if "en:france" not in countries and "en:belgium" not in countries and "en:luxembourg" not in countries:
-                    continue
-
-                name = get_name(row)
-                if not name or name == "nan":
-                    continue
-
-                try:
-                    completeness = float(row.get("completeness", 0))
-                except (ValueError, TypeError):
-                    completeness = 0
-                if completeness < MIN_COMPLETENESS:
-                    continue
-
-                barcode_lower = barcode.lower()
-                name_lower = name.lower()
-                if barcode_lower in seen_barcodes or name_lower in seen_names:
-                    continue
-                seen_barcodes.add(barcode_lower)
-                seen_names.add(name_lower)
-
-                pnns = str(row.get("pnns_groups_1", "")).strip()
-                tags = str(row.get("categories_tags", "")).lower()
-                if "en:frozen-foods" in tags or "en:frozen" in tags:
-                    category_id = 7
-                elif "en:canned-foods" in tags or "en:canned" in tags or "en:jarred-foods" in tags:
-                    category_id = 3
-                else:
-                    category_id = PNNS_TO_CATEGORY_ID.get(pnns, DEFAULT_CATEGORY_ID)
-
-                unity = map_unity(name, row.get("quantity"), category_id)
-                image = get_image(row)
-
-                rows_buffer.append((
-                    sql_val(name_lower),
-                    f"'{unity}'",
-                    str(category_id),
-                    sql_val(barcode),
-                    sql_val(row.get("brands")),
-                    sql_val(image),
-                    sql_val(row.get("quantity")),
-                    sql_val(normalize_grade(row.get("nutriscore_grade"))),
-                    sql_val(normalize_grade(row.get("environmental_score_grade"))),
-                ))
-
-                if len(rows_buffer) >= BATCH_SIZE:
-                    write_batch(out, rows_buffer)
-                    total_imported += len(rows_buffer)
-                    rows_buffer = []
-                    print(f"  {total_imported} produits traités...", end="\r")
-
-            print(f"  Chunk {chunk_num + 1} traité, {total_imported} produits jusqu'ici...")
-
-        if rows_buffer:
-            write_batch(out, rows_buffer)
-            total_imported += len(rows_buffer)
-
+        for i in range(0, len(rows), BATCH_SIZE):
+            write_batch(out, rows[i:i+BATCH_SIZE])
         out.write("\n-- Réinitialisation de la séquence après import\n")
-        out.write("SELECT setval(pg_get_serial_sequence('product', 'id'), COALESCE(MAX(id), 1), true) FROM product;\n")
-
-    print(f"\nTerminé : {total_imported} produits exportés dans {OUTPUT_SQL}")
-
+        out.write("SELECT setval(pg_get_serial_sequence('product','id'), COALESCE(MAX(id),1), true) FROM product;\n")
+    print(f"Terminé : {read} lignes lues -> {len(best)} produits uniques.")
 
 def write_batch(out, rows):
-    out.write(
-        "INSERT INTO product (name, unity, category_id, barcode, brand, image_url, package_quantity, "
-        "nutriscore_grade, ecoscore_grade, created_at, updated_at) VALUES\n"
-    )
-    lines = []
-    for r in rows:
-        lines.append(f"  ({r[0]}, {r[1]}, {r[2]}, {r[3]}, {r[4]}, {r[5]}, {r[6]}, {r[7]}, {r[8]}, NOW(), NOW())")
-    out.write(",\n".join(lines))
+    out.write("INSERT INTO product (name, unity, category_id, barcode, brand, image_url, "
+              "package_quantity, nutriscore_grade, ecoscore_grade, created_at, updated_at) VALUES\n")
+    out.write(",\n".join(
+        f"  ({r[0]}, {r[1]}, {r[2]}, {r[3]}, {r[4]}, {r[5]}, {r[6]}, {r[7]}, {r[8]}, NOW(), NOW())"
+        for r in rows))
     out.write("\nON CONFLICT DO NOTHING;\n\n")
-
 
 if __name__ == "__main__":
     if not os.path.exists(INPUT_CSV):
-        print(f"ERREUR : fichier {INPUT_CSV} introuvable.")
-        print("Télécharger le CSV depuis https://world.openfoodfacts.org/data")
+        print(f"ERREUR : {INPUT_CSV} introuvable.")
+        print("Télécharger le CSV : https://world.openfoodfacts.org/data")
         sys.exit(1)
     process()

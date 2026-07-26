@@ -2,6 +2,8 @@ package be.stockandshopbackend.dal.repositories.product;
 
 import be.stockandshopbackend.dl.entities.product.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,7 +12,11 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    List<Product> findProductsByNameContaining(String name);
+    @Query(
+      value = "SELECT * FROM product WHERE f_unaccent(lower(name)) ~ " +
+              "('(^|[^a-z0-9])' || f_unaccent(lower(:term))) ORDER BY name LIMIT 50",
+      nativeQuery = true)
+    List<Product> searchByName(@Param("term") String term);
 
     Optional<Product> findByName(String name);
 
