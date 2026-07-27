@@ -47,7 +47,13 @@ export const errorInterceptor: HttpInterceptorFn = (
           })
         );
       }
-      toast.error(extractErrorMessage(error));
+      // A 403 on a home GET means the user was removed from that home; the home page
+      // clears the selection, shows a dedicated message and redirects — skip the generic toast.
+      const removedFromHome = error.status === 403 && req.method === 'GET'
+        && /\/home(-expense)?\//.test(req.url);
+      if (!removedFromHome) {
+        toast.error(extractErrorMessage(error));
+      }
       return throwError(() => error);
     })
   );

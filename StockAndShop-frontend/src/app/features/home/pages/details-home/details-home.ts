@@ -10,6 +10,7 @@ import { ManageUsersHomeComponent } from '../../components/manage-users-home/man
 import { LoadingComponent } from '../../../../shared/components/loading/loading';
 import { HttpErrorResponse } from '@angular/common/http';
 import { HomeExpensesComponent } from '../../components/home-expenses/home-expenses';
+import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
   selector: 'app-details-home',
@@ -23,6 +24,7 @@ export class DetailsHome implements OnInit {
   router = inject(Router);
   homeService = inject(HomeService);
   route = inject(ActivatedRoute);
+  private toast = inject(ToastService);
 
   home = this.homeService.selectedHome;
   shoppingLists = this.homeService.shoppingLists;
@@ -45,9 +47,13 @@ export class DetailsHome implements OnInit {
       document.title = home ? `${home.name} — Stock&Shop` : 'Stock&Shop';
     });
 
+    // If the user is removed from this home, its resources start returning 403.
+    // Clear the selection (so they stop refetching), warn once, and go back home.
     effect(() => {
       const err = this.homeService.usersResource.error();
       if (err instanceof HttpErrorResponse && err.status === 403) {
+        this.homeService.clearSelectedHome();
+        this.toast.error('Vous avez été retiré de cette maison.');
         this.router.navigate(['/']);
       }
     });

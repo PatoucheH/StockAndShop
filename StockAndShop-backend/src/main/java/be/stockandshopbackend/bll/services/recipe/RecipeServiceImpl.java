@@ -1,9 +1,9 @@
 package be.stockandshopbackend.bll.services.recipe;
 
 import be.stockandshopbackend.dal.repositories.home.HomeRepository;
-import be.stockandshopbackend.dal.repositories.product.ProductRepository;
 import be.stockandshopbackend.dal.repositories.recipe.RecipeRepository;
 import be.stockandshopbackend.dal.repositories.recipe.TagRepository;
+import be.stockandshopbackend.dl.entities.product.Product;
 import be.stockandshopbackend.dl.entities.product.ProductStockHome;
 import be.stockandshopbackend.dl.entities.recipe.Recipe;
 import be.stockandshopbackend.dl.entities.recipe.RecipeProduct;
@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -38,7 +39,6 @@ public class RecipeServiceImpl implements RecipeService {
     private final AnthropicClient anthropicClient;
     private final RecipeRepository recipeRepository;
     private final HomeRepository homeRepository;
-    private final ProductRepository productRepository;
     private final TagRepository tagRepository;
 
     public Page<Recipe> getAllRecipes(Pageable pageable) {
@@ -109,7 +109,13 @@ public class RecipeServiceImpl implements RecipeService {
                     ? "Les ingrédients disponibles ne permettent pas de créer une recette cohérente."
                     : reason);
         }
-        Recipe recipe = parseResponse(claudeResponse, availableTags);
+        // Only the home's own stock products may be used as ingredients — never the global catalog.
+        Map<String, Product> allowedProducts = products.stream()
+                .collect(Collectors.toMap(
+                        s -> s.getProduct().getName().toLowerCase(),
+                        ProductStockHome::getProduct,
+                        (a, b) -> a));
+        Recipe recipe = parseResponse(claudeResponse, availableTags, allowedProducts);
         return recipeRepository.save(recipe);
     }
 
@@ -196,7 +202,7 @@ public class RecipeServiceImpl implements RecipeService {
                 .collect(Collectors.joining());
     }
 
-    private Recipe parseResponse(String claudeResponse, List<Tag> availableTags) {
+    private Recipe parseResponse(String claudeResponse, List<Tag> availableTags, Map<String, Product> allowedProducts) {
         String[] sections = claudeResponse.split("\n");
         String title = "";
         List<RecipeProduct> products = new ArrayList<>();
@@ -207,7 +213,7 @@ public class RecipeServiceImpl implements RecipeService {
         for (String line : sections) {
             line = line.trim();
             if (line.startsWith("TITLE:")) {
-                title = line.replace("TITLE:", "").trim();
+                title = formatTitle(line.replace("TITLE:", "").trim());
             } else if (line.equals("INGREDIENTS:")) {
                 currentSection = "INGREDIENTS";
             } else if (line.equals("STEPS:")) {
@@ -229,13 +235,14 @@ public class RecipeServiceImpl implements RecipeService {
                         String[] parts = line.split(":");
                         if (parts.length == 2) {
                             String productName = parts[0].trim();
-                            if (!PANTRY_STAPLES_SET.contains(productName)) {
-                                productRepository.findByName(productName).ifPresent(product -> {
-                                    try {
-                                        products.add(new RecipeProduct(product, Integer.parseInt(parts[1].trim())));
-                                    } catch (NumberFormatException ignored) {
-                                    }
-                                });
+                            // Accept ONLY products actually in the home stock (not the global catalog),
+                            // so unavailable ingredients (e.g. "pâte brisée") can never slip in.
+                            Product product = allowedProducts.get(productName.toLowerCase());
+                            if (product != null && !PANTRY_STAPLES_SET.contains(productName)) {
+                                try {
+                                    products.add(new RecipeProduct(product, Integer.parseInt(parts[1].trim())));
+                                } catch (NumberFormatException ignored) {
+                                }
                             }
                         }
                     }
@@ -248,6 +255,15 @@ public class RecipeServiceImpl implements RecipeService {
             }
         }
         return new Recipe(title, products, steps, timing, tags);
+    }
+
+    // AI titles come back in inconsistent casing (lowercase, ALL CAPS…); normalise to sentence case.
+    private String formatTitle(String raw) {
+        String t = raw.trim();
+        if (t.isEmpty()) return t;
+        boolean allCaps = t.chars().filter(Character::isLetter).allMatch(Character::isUpperCase);
+        if (allCaps) t = t.toLowerCase();
+        return Character.toUpperCase(t.charAt(0)) + t.substring(1);
     }
 
     private void resolveTagNames(String[] rawNames, List<Tag> availableTags, List<Tag> target) {

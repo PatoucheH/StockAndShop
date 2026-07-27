@@ -33,7 +33,7 @@ export class ListRecipesComponent {
       )
       .filter((r) =>
         tags.length === 0 ||
-        tags.some((t) => r.tags.includes(t)),
+        tags.every((t) => r.tags.includes(t)),
       );
   });
 

@@ -107,6 +107,12 @@ export class HomeService {
     this._allExpenses.set([]);
   }
 
+  // Clears the current home selection so its resources stop refetching
+  // (used when the user is removed from the home and gets 403s).
+  clearSelectedHome() {
+    this._selectedHomeId.set(undefined);
+  }
+
   loadMoreExpenses() {
     if (!this.expenseHasMore() || this.expenseIsLoading()) return;
     this._expensePage.update((p) => p + 1);
@@ -157,6 +163,8 @@ export class HomeService {
   addExpense(heRequest: HomeExpenseRequest) {
     return this.http.post(`${this.apiUrl}-expense/`, heRequest).pipe(
       tap(() => {
+        // Balances live on the members (usersResource), so refresh them too
+        this.usersResource.reload();
         // Reset to the first page so the new expense (most recent) shows up at the top
         if (this._expensePage() === 0) {
           this.expenseResource.reload();
