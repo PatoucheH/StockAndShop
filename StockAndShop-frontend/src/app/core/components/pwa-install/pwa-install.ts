@@ -12,10 +12,15 @@ interface BeforeInstallPromptEvent extends Event {
   template: `
     @if (visible()) {
       <div class="pwa-install">
-        @if (iosHelp()) {
+        @if (showHelp()) {
           <div class="pwa-help">
-            Pour installer : appuie sur <strong>Partager</strong>, puis
-            <strong>« Sur l'écran d'accueil »</strong>.
+            @if (isIos()) {
+              Pour installer : appuie sur <strong>Partager</strong> puis
+              <strong>« Sur l'écran d'accueil »</strong>.
+            } @else {
+              Pour installer : ouvre le menu <strong>⋮</strong> du navigateur puis
+              <strong>« Installer l'application »</strong> (ou « Ajouter à l'écran d'accueil »).
+            }
           </div>
         }
         <button class="pwa-btn" (click)="onClick()">📲 Installer l'application</button>
@@ -36,26 +41,30 @@ interface BeforeInstallPromptEvent extends Event {
 export class PwaInstallComponent {
   private platformId = inject(PLATFORM_ID);
   readonly visible = signal(false);
-  readonly iosHelp = signal(false);
-  private isIos = false;
+  readonly showHelp = signal(false);
+  readonly isIos = signal(false);
   private deferredPrompt: BeforeInstallPromptEvent | null = null;
 
   constructor() {
     afterNextRender(() => {
       if (!isPlatformBrowser(this.platformId)) return;
+
       const standalone = window.matchMedia('(display-mode: standalone)').matches
         || (window.navigator as any).standalone === true;
-      if (standalone) return;
+      if (standalone) return; // running as an installed app → no button needed
 
       const ua = window.navigator.userAgent.toLowerCase();
-      const ios = /iphone|ipad|ipod/.test(ua);
-      const isSafari = ios && !/crios|fxios|edgios/.test(ua);
-      if (ios && isSafari) { this.isIos = true; this.visible.set(true); }
+      this.isIos.set(/iphone|ipad|ipod/.test(ua) && !/crios|fxios|edgios/.test(ua));
+
+      // Always offer installation when the app is not installed. If Chrome fires
+      // beforeinstallprompt we can trigger the native dialog; otherwise (iOS, or after
+      // a previous install+uninstall where Chrome stops firing the event) the button
+      // falls back to manual instructions.
+      this.visible.set(true);
 
       window.addEventListener('beforeinstallprompt', (e: Event) => {
         e.preventDefault();
         this.deferredPrompt = e as BeforeInstallPromptEvent;
-        this.visible.set(true);
       });
       window.addEventListener('appinstalled', () => {
         this.visible.set(false);
@@ -65,11 +74,15 @@ export class PwaInstallComponent {
   }
 
   async onClick() {
-    if (this.isIos) { this.iosHelp.update(v => !v); return; }
-    if (!this.deferredPrompt) return;
-    await this.deferredPrompt.prompt();
-    await this.deferredPrompt.userChoice;
-    this.deferredPrompt = null;
-    this.visible.set(false);
+    // Native install dialog available (Chrome/Edge/Android) → use it
+    if (this.deferredPrompt) {
+      await this.deferredPrompt.prompt();
+      await this.deferredPrompt.userChoice;
+      this.deferredPrompt = null;
+      this.visible.set(false);
+      return;
+    }
+    // No native prompt (iOS, or Chrome after a previous uninstall) → show manual steps
+    this.showHelp.update(v => !v);
   }
 }
