@@ -16,7 +16,7 @@ services:
       retries: 5
 
   backend:
-    build: ./StockAndShop-backend
+    image: ghcr.io/patoucheh/stockandshop-backend:latest
     restart: unless-stopped
     ports:
       - "127.0.0.1:8080:8080"
@@ -34,7 +34,7 @@ services:
         condition: service_healthy
 
   frontend:
-    build: ./StockAndShop-frontend
+    image: ghcr.io/patoucheh/stockandshop-frontend:latest
     restart: unless-stopped
     ports:
       - "127.0.0.1:5001:80"
