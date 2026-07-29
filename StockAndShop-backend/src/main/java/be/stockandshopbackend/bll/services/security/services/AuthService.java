@@ -63,10 +63,12 @@ public class AuthService implements UserDetailsService {
 
     @Transactional
     public AuthResult login(String email, String password) {
+        // Same generic error for "unknown email" and "wrong password" so an attacker
+        // cannot tell whether an email is registered (avoids user enumeration).
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found : " + email));
-        if(!passwordEncoder.matches(password, user.getPassword())) {
-            throw new BadCredentialsException("Incorrect password");
+                .orElseThrow(() -> new BadCredentialsException("Email ou mot de passe incorrect"));
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new BadCredentialsException("Email ou mot de passe incorrect");
         }
         return buildAuthResult(user);
     }
