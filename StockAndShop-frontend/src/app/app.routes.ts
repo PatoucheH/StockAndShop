@@ -47,6 +47,12 @@ export const routes: Routes = [
             .then((m) => m.DetailShoppingList,
           ),
       },
+      {
+        path: 'profile',
+        title: 'Mon compte — Stock&Shop',
+        loadComponent: () =>
+          import('./features/profile/profile').then((m) => m.ProfileComponent),
+      },
     ],
   },
   { path: '**', redirectTo: 'auth/login' },

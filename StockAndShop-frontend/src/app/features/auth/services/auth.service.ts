@@ -67,6 +67,23 @@ export class AuthService {
     this.router.navigate(['/auth/login']);
   }
 
+  updateUsername(username: string) {
+    return this.http
+      .put(`${environment.apiUrl}/user/me/username`, { username })
+      .pipe(tap(() => localStorage.setItem('displayName', username)));
+  }
+
+  changePassword(currentPassword: string, newPassword: string) {
+    return this.http.put(`${environment.apiUrl}/user/me/password`, { currentPassword, newPassword });
+  }
+
+  // Anonymizes the account server-side, then clears the local session
+  deleteAccount() {
+    return this.http
+      .delete(`${environment.apiUrl}/user/me`)
+      .pipe(tap(() => this.clearSession()));
+  }
+
   // Several requests can 401 at once when the access token expires; without this guard
   // each one would fire its own /auth/refresh call and race on the single-use refresh cookie.
   private refreshInFlight$: Observable<boolean> | null = null;

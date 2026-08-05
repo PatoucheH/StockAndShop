@@ -13,4 +13,5 @@ public interface UserFavoriteShoppingListRepository extends JpaRepository<UserFa
     List<UserFavoriteShoppingList> findByUser(User user);
     boolean existsByUserAndShoppingList(User user, ShoppingList shoppingList);
     void deleteByUserAndShoppingList(User user, ShoppingList shoppingList);
+    void deleteByUser(User user);
 }

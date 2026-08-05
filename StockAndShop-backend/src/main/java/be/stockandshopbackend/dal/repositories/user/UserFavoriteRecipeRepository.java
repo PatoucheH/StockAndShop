@@ -13,4 +13,5 @@ public interface UserFavoriteRecipeRepository extends JpaRepository<UserFavorite
     List<UserFavoriteRecipe> findByUser(User user);
     boolean existsByUserAndRecipe(User user, Recipe recipe);
     void deleteByUserAndRecipe(User user, Recipe recipe);
+    void deleteByUser(User user);
 }
