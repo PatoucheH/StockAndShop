@@ -182,6 +182,28 @@ export class HomeService {
         null,
         { params: { amount } },
       )
-      .pipe(tap(() => this.usersResource.reload()));
+      .pipe(
+        tap(() => {
+          // Refresh balances AND the history (the refund is now recorded as a REFUND line)
+          this.usersResource.reload();
+          if (this._expensePage() === 0) {
+            this.expenseResource.reload();
+          } else {
+            this._expensePage.set(0);
+          }
+        }),
+      );
+  }
+
+  transferOwnership(homeId: string, newOwnerId: string) {
+    return this.http
+      .put(`${this.apiUrl}/${homeId}/transfer-ownership/${newOwnerId}`, null)
+      .pipe(
+        tap(() => {
+          // Reload members (roles changed) AND the home (ownerEmail changed → isOwner recomputes)
+          this.usersResource.reload();
+          this.selectedHomeResource.reload();
+        }),
+      );
   }
 }

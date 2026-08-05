@@ -29,4 +29,7 @@ public interface HomeService {
     void decreaseStockProduct(UUID homeId, ProductStockHome request);
     void deleteUserHome(UUID homeId, UUID userId);
 
+    /// ROLES
+    void transferOwnership(UUID homeId, UUID newOwnerUserId);
+
 }

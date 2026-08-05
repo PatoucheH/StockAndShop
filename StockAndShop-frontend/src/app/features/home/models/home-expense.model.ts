@@ -1,9 +1,12 @@
+export type ExpenseType = 'EXPENSE' | 'REFUND';
+
 export interface HomeExpense {
   id: number,
   name: string,
   amount: number,
   userConcernedName: string[],
   payerName: string,
+  type: ExpenseType,
   createdAt: string
 }
 

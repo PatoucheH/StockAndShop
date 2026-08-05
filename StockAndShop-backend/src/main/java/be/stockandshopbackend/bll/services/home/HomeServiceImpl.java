@@ -114,4 +114,32 @@ public class HomeServiceImpl extends BaseCRUDService<Home, UUID, HomeRepository>
     }
 
     //endregion
+
+    //region ROLES
+
+    /**
+     * Transfers the OWNER role of a home to another existing member.
+     * The current owner(s) are demoted to USER so there is always exactly one OWNER.
+     * Caller must already be the owner (enforced at the controller via @homeSecurity.isOwner).
+     */
+    @Transactional
+    public void transferOwnership(UUID homeId, UUID newOwnerUserId){
+        Home home = repository.findById(homeId).orElseThrow(
+                ()->new NotFoundException("Home not found with the id : " + homeId)
+        );
+        UserHome newOwner = home.getUsers().stream()
+                .filter(u -> u.getUser().getId().equals(newOwnerUserId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("User not found in home: " + newOwnerUserId));
+        if (newOwner.getHomeRole() == HomeRole.OWNER) {
+            throw new ConflictException("Cet utilisateur est déjà propriétaire de la maison.");
+        }
+        home.getUsers().stream()
+                .filter(u -> u.getHomeRole() == HomeRole.OWNER)
+                .forEach(u -> u.setHomeRole(HomeRole.USER));
+        newOwner.setHomeRole(HomeRole.OWNER);
+        repository.save(home);
+    }
+
+    //endregion
 }

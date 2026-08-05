@@ -19,5 +19,6 @@
   <app-home-member-list
     [users]="users()"
     [isOwner]="isOwner()"
-    (userRemoved)="onUserRemoved($event)"/>
+    (userRemoved)="onUserRemoved($event)"
+    (transferOwnership)="onTransferOwnership($event)"/>
 </div>

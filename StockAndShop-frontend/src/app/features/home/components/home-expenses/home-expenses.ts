@@ -1,9 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { HomeService } from '../../../../shared/services/home.service';
 import { CentsToEurosPipe } from '../../../../shared/pipes/cents-to-euros.pipe';
 import { AddHomeExpenseModalComponent } from './add-home-expense-modal/add-home-expense-modal';
 import { ModalRefundComponent } from '../modal-refund/modal-refund';
+
+type ExpenseFilter = 'ALL' | 'EXPENSE' | 'REFUND';
 
 @Component({
   selector: 'app-home-expenses',
@@ -20,6 +22,19 @@ export class HomeExpensesComponent {
 
   modalIsOpen = signal(false);
   refundModalIsOpen = signal(false);
+
+  // Filtre client sur les lignes déjà chargées : Tout / Dépenses / Remboursements
+  filter = signal<ExpenseFilter>('ALL');
+  filterOptions: { value: ExpenseFilter; label: string }[] = [
+    { value: 'ALL', label: 'Tout' },
+    { value: 'EXPENSE', label: 'Dépenses' },
+    { value: 'REFUND', label: 'Remboursements' },
+  ];
+  filteredExpenses = computed(() => {
+    const f = this.filter();
+    const all = this.expenses();
+    return f === 'ALL' ? all : all.filter((e) => e.type === f);
+  });
 
   loadMoreExpenses() {
     this.homeService.loadMoreExpenses();

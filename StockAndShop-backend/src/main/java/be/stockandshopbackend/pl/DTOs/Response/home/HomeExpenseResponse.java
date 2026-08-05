@@ -11,6 +11,7 @@ public record HomeExpenseResponse(
         int amount,
         List<String> userConcernedName,
         String payerName,
+        String type,
         LocalDateTime createdAt
 ) {
     public static HomeExpenseResponse fromHomeExpense(HomeExpense he){
@@ -22,6 +23,7 @@ public record HomeExpenseResponse(
                         .map(u -> u.getUser().getDisplayName())
                         .toList(),
                 he.getPayer().getUser().getDisplayName(),
+                he.getType().name(),
                 he.getCreatedAt()
         );
     }

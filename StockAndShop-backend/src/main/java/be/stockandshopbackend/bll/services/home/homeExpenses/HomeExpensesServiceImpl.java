@@ -2,10 +2,12 @@ package be.stockandshopbackend.bll.services.home.homeExpenses;
 
 import be.stockandshopbackend.bll.services.base.BaseCRUDService;
 import be.stockandshopbackend.dal.repositories.home.HomeExpensesRepository;
+import be.stockandshopbackend.dal.repositories.home.HomeRepository;
 import be.stockandshopbackend.dal.repositories.home.UserHomeRepository;
 import be.stockandshopbackend.dl.entities.home.Home;
 import be.stockandshopbackend.dl.entities.home.HomeExpense;
 import be.stockandshopbackend.dl.entities.home.UserHome;
+import be.stockandshopbackend.dl.enums.ExpenseType;
 import be.stockandshopbackend.exceptions.ConflictException;
 import be.stockandshopbackend.exceptions.NotFoundException;
 import org.springframework.data.domain.Page;
@@ -23,13 +25,16 @@ public class HomeExpensesServiceImpl extends BaseCRUDService<HomeExpense, Long, 
                                 implements HomeExpensesService {
 
     private final UserHomeRepository userHomeRepository;
+    private final HomeRepository homeRepository;
 
     public HomeExpensesServiceImpl(
             HomeExpensesRepository homeExpensesRepository,
-            UserHomeRepository userHomeRepository
+            UserHomeRepository userHomeRepository,
+            HomeRepository homeRepository
     ) {
         super(homeExpensesRepository);
         this.userHomeRepository = userHomeRepository;
+        this.homeRepository = homeRepository;
     }
 
     @Transactional
@@ -84,5 +89,15 @@ public class HomeExpensesServiceImpl extends BaseCRUDService<HomeExpense, Long, 
         receiver.changeBalance(-amount);
         userHomeRepository.save(payer);
         userHomeRepository.save(receiver);
+
+        // Record the reimbursement as a REFUND line so it shows up in the shared history
+        Home home = homeRepository.findById(homeId).orElseThrow(
+                () -> new NotFoundException("Home not found")
+        );
+        HomeExpense refund = new HomeExpense(
+                "Remboursement", amount, home, payer, List.of(receiver)
+        );
+        refund.setType(ExpenseType.REFUND);
+        repository.save(refund);
     }
 }

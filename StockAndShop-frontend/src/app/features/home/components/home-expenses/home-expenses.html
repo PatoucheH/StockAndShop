@@ -56,19 +56,46 @@
   <!-- Expense list -->
   @if (expenses().length > 0) {
   <h2 class="text-center text-2xl font-bold">Historique</h2>
+  <!-- Filtre Tout / Dépenses / Remboursements -->
+  <div class="flex items-center justify-center gap-1 p-1 rounded-xl bg-gray-100 dark:bg-gray-800 self-center">
+    @for (opt of filterOptions; track opt.value) {
+    <button type="button" (click)="filter.set(opt.value)"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+            [class]="filter() === opt.value
+              ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
+      {{ opt.label }}
+    </button>
+    }
+  </div>
   <ul class="flex flex-col gap-2">
-    @for (expense of expenses(); track expense.id) {
+    @for (expense of filteredExpenses(); track expense.id) {
     <li class="flex flex-col gap-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl px-4 py-3 shadow-sm">
       <div class="flex items-center justify-between gap-3">
-        <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ expense.name }}</span>
-        <span class="text-sm font-semibold text-emerald-700 dark:text-emerald-400">{{ expense.amount | centsToEuros }}</span>
+        <span class="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+          @if (expense.type === 'REFUND') {
+          <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300">Remboursement</span>
+          } @else {
+          {{ expense.name }}
+          }
+        </span>
+        <span class="text-sm font-semibold"
+              [class]="expense.type === 'REFUND' ? 'text-indigo-600 dark:text-indigo-300' : 'text-emerald-700 dark:text-emerald-400'">
+          {{ expense.amount | centsToEuros }}
+        </span>
       </div>
       <div class="flex flex-wrap items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
-            <span class="px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 font-medium">
-              Payé par {{ expense.payerName }}
-            </span>
+        @if (expense.type === 'REFUND') {
+        <span class="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700">
+          {{ expense.payerName }} → {{ expense.userConcernedName[0] }}
+        </span>
+        } @else {
+        <span class="px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 font-medium">
+          Payé par {{ expense.payerName }}
+        </span>
         @for (name of expense.userConcernedName; track name) {
         <span class="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700">{{ name }}</span>
+        }
         }
         <span class="ml-auto text-gray-400 dark:text-gray-500">{{ expense.createdAt | date: 'dd/MM/yyyy' }}</span>
       </div>

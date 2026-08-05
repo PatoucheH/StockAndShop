@@ -21,6 +21,10 @@
             {{ user.homeRole === 'OWNER' ? 'Propriétaire' : user.homeRole === 'VIEWER' ? 'Lecteur' : 'Utilisateur' }}
           </span>
           @if (isOwner() && user.homeRole !== 'OWNER') {
+            <button (click)="confirmTransfer(user.id)"
+                    class="text-xs text-gray-400 dark:text-gray-500 hover:text-amber-600 transition-colors cursor-pointer">
+              Rendre propriétaire
+            </button>
             <button (click)="confirmRemove(user.id)"
                     class="text-xs text-gray-400 dark:text-gray-500 hover:text-red-500 transition-colors cursor-pointer">
               Retirer
@@ -42,4 +46,12 @@
     confirmLabel="Retirer"
     (confirmed)="onRemoveConfirmed()"
     (cancelled)="pendingUserId.set(null)"/>
+}
+
+@if (pendingTransferUserId()) {
+  <app-confirm-modal
+    message="Transférer la propriété de la maison à ce membre ? Vous redeviendrez un utilisateur simple."
+    confirmLabel="Transférer"
+    (confirmed)="onTransferConfirmed()"
+    (cancelled)="pendingTransferUserId.set(null)"/>
 }

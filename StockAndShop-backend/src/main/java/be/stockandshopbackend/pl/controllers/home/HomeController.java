@@ -161,6 +161,14 @@ public class HomeController {
         return ResponseEntity.ok(HomeResponse.fromHome(home));
     }
 
+    // Only the current OWNER can hand over the home; target must be an existing member
+    @PutMapping("/{id}/transfer-ownership/{newOwnerId}")
+    @PreAuthorize("@homeSecurity.isOwner(#id, authentication.principal)")
+    public ResponseEntity<?> transferOwnership(@PathVariable UUID id, @PathVariable UUID newOwnerId){
+        homeService.transferOwnership(id, newOwnerId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping("/{id}/decrease-stock")
     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<?> decreaseStock(@PathVariable UUID id,

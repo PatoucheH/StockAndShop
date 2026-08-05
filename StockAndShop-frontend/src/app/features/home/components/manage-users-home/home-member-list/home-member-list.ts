@@ -11,8 +11,10 @@ export class HomeMemberListComponent {
   users = input.required<User[]>();
   isOwner = input.required<boolean>();
   userRemoved = output<string>();
+  transferOwnership = output<string>();
 
   pendingUserId = signal<string | null>(null);
+  pendingTransferUserId = signal<string | null>(null);
 
   confirmRemove(userId: string) {
     this.pendingUserId.set(userId);
@@ -23,5 +25,16 @@ export class HomeMemberListComponent {
     if (!id) return;
     this.userRemoved.emit(id);
     this.pendingUserId.set(null);
+  }
+
+  confirmTransfer(userId: string) {
+    this.pendingTransferUserId.set(userId);
+  }
+
+  onTransferConfirmed() {
+    const id = this.pendingTransferUserId();
+    if (!id) return;
+    this.transferOwnership.emit(id);
+    this.pendingTransferUserId.set(null);
   }
 }

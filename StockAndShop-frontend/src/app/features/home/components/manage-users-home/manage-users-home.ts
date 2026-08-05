@@ -46,4 +46,13 @@ export class ManageUsersHomeComponent {
       next: () => this.toast.success('Membre retiré'),
     });
   }
+
+  onTransferOwnership(userId: string) {
+    const home = this.home();
+    if (!home) return;
+    this.homeService.transferOwnership(home.id, userId).subscribe({
+      next: () => this.toast.success('Propriété transférée'),
+      error: () => this.toast.error('Impossible de transférer la propriété'),
+    });
+  }
 }
