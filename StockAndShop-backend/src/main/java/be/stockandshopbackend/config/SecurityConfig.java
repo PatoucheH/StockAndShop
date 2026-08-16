@@ -88,6 +88,8 @@ public class SecurityConfig {
                 // /ws/** is open here because WebSocket auth is handled at the STOMP layer by WebSocketAuthChannelInterceptor
                 .requestMatchers(
                     "/api/auth/**",
+                    "/api/privacy",
+                    "/api/terms",
                     "/ws/**",
                     "/actuator/health",
                     "/swagger-ui.html",
