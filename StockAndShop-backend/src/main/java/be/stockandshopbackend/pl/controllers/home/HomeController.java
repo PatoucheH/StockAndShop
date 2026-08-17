@@ -178,7 +178,8 @@ public class HomeController {
     ){
         ProductStockHome productStockHome = new ProductStockHome(
                 productService.findOneByName(productItemRequest.name()),
-                productItemRequest.quantity()
+                productItemRequest.quantity(),
+                Unity.fromValueOrNull(productItemRequest.unity())
         );
         homeService.decreaseStockProduct(id, productStockHome);
         return ResponseEntity.noContent().build();

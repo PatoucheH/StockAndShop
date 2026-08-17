@@ -81,7 +81,7 @@ export class ListStock {
     if (!s) return;
     const unit = this.getUnit(s.id, s.unityProduct);
     const quantity = this.unitConversion.toBaseUnit(this.getAmount(s.id), unit);
-    this.homeService.decreseStock({ name: s.nameProduct, quantity }).subscribe({
+    this.homeService.decreseStock({ name: s.nameProduct, quantity, unity: s.unityProduct }).subscribe({
       next: () => {
         this.homeService.stockResource.reload();
         this.toast.success('Stock mis à jour');

@@ -9,4 +9,5 @@ export interface ProductStock{
 export interface ProductStockDecrese{
   name: string;
   quantity: number;
+  unity?: string;
 }
