@@ -8,6 +8,7 @@ import be.stockandshopbackend.dl.entities.product.ProductStockHome;
 import be.stockandshopbackend.dl.entities.user.User;
 import be.stockandshopbackend.dl.entities.home.UserHome;
 import be.stockandshopbackend.dl.enums.HomeRole;
+import be.stockandshopbackend.dl.enums.Unity;
 import be.stockandshopbackend.pl.DTOs.Response.*;
 import be.stockandshopbackend.pl.DTOs.Response.home.HomeResponse;
 import be.stockandshopbackend.pl.DTOs.Response.home.UserHomeResponse;
@@ -93,7 +94,8 @@ public class HomeController {
     ){
         ProductStockHome productStockHome = new ProductStockHome(
                 productService.findOneByName(productItemRequest.name()),
-                productItemRequest.quantity()
+                productItemRequest.quantity(),
+                Unity.fromValueOrNull(productItemRequest.unity())
         );
         homeService.addProductStock(id, productStockHome);
         return ResponseEntity.status(HttpStatus.CREATED).body(

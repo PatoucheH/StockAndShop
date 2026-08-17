@@ -9,10 +9,11 @@ import { ShoppingListService } from '../../services/shopping-list.service';
 import { UnitConversionService } from '../../../../shared/services/unit-conversion.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { BarcodeScanner } from '../barcode-scanner/barcode-scanner';
+import { UnityLabelPipe } from '../../../../shared/pipes/unity-label.pipe';
 
 @Component({
   selector: 'app-form-add-product-shopping-list',
-  imports: [ReactiveFormsModule, BarcodeScanner],
+  imports: [ReactiveFormsModule, BarcodeScanner, UnityLabelPipe],
   templateUrl: './form-add-product-shopping-list.html',
 })
 export class FormAddProductShoppingList {
@@ -97,12 +98,18 @@ export class FormAddProductShoppingList {
     this.isFocused() && this.filteredProducts().length > 0 && !this.isExplicitlySelected()
   );
 
+  // Unit chosen by the user; defaults to the product's first possible unit and resets when the product changes
+  selectedUnity = linkedSignal(() => {
+    const p = this.selectedProduct();
+    return p?.unities?.[0] ?? p?.unity ?? '';
+  });
+
   isWeightOrVolume = computed(() =>
-    this.unitConversion.isWeightOrVolume(this.selectedProduct()?.unity ?? '')
+    this.unitConversion.isWeightOrVolume(this.selectedUnity())
   );
 
   subUnit = linkedSignal(() =>
-    this.unitConversion.getDefaultSubUnit(this.selectedProduct()?.unity ?? '')
+    this.unitConversion.getDefaultSubUnit(this.selectedUnity())
   );
 
   selectProduct(product: Product) {
@@ -121,6 +128,7 @@ export class FormAddProductShoppingList {
     const payload: ProductItemRequest = {
       name: this.form.value.nameProduct!.toLowerCase(),
       quantity,
+      unity: this.selectedUnity() || undefined,
     };
     this.shoppingListService
       .addProductToShoppingList(payload, Number(this.id()))

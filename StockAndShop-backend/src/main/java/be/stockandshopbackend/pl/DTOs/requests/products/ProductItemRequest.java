@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotBlank;
 
 public record ProductItemRequest(
         @NotBlank String name,
-        @Min(1) int quantity
+        @Min(1) int quantity,
+        // Optional chosen unit (e.g. "bottle"); null/absent -> product default
+        String unity
 ) {
 }

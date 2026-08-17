@@ -134,7 +134,7 @@ def map_unity(name, category_id, quantity_str=None):
 def unities_for(name, category_id, quantity_str=None):
     default = map_unity(name, category_id, quantity_str)
     if category_id == 4:                                          base = ["BOTTLE", "CAN"]           # boissons (catégorie uniquement)
-    elif category_id == 3:                                        base = ["CAN", "JAR", "PIECE", "GRAMS"]  # conserves
+    elif category_id == 3:                                        base = ["TIN", "JAR", "PIECE", "GRAMS"]  # conserves
     elif category_id == 5:                                        base = ["PIECE", "PACKET"]         # boulangerie
     elif category_id == 6:                                        base = ["BOTTLE", "PIECE", "JAR", "GRAMS"]  # laitiers
     elif category_id == 8:                                        base = ["PIECE", "GRAMS", "JAR"]   # fruits & legumes

@@ -5,6 +5,7 @@ import be.stockandshopbackend.bll.services.productAndShoppingList.shoppingList.S
 import be.stockandshopbackend.dl.entities.product.ProductListItem;
 import be.stockandshopbackend.dl.entities.ShoppingList;
 import be.stockandshopbackend.dl.entities.user.User;
+import be.stockandshopbackend.dl.enums.Unity;
 import be.stockandshopbackend.pl.DTOs.Response.home.HomeResponse;
 import be.stockandshopbackend.pl.DTOs.Response.products.ProductItemResponse;
 import be.stockandshopbackend.pl.DTOs.Response.ShoppingListResponse;
@@ -77,7 +78,7 @@ public class ShoppingListController {
     @PreAuthorize("@homeSecurity.isInHome(#id, authentication.principal)")
     public ResponseEntity<ShoppingListResponse> addItemToShoppingList(@PathVariable Long id,
                                                                       @RequestBody @Valid ProductItemRequest request){
-        shoppingListService.addProductToList(id, request.name(), request.quantity());
+        shoppingListService.addProductToList(id, request.name(), request.quantity(), Unity.fromValueOrNull(request.unity()));
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ShoppingListResponse.fromShoppingList(shoppingListService.findById(id))
         );
@@ -92,7 +93,8 @@ public class ShoppingListController {
         List<ProductListItem> products = request.stream()
                         .map(r -> new ProductListItem(
                             productService.findOneByName(r.name()),
-                            r.quantity()
+                            r.quantity(),
+                            Unity.fromValueOrNull(r.unity())
                         ))
                         .toList();
         shoppingListService.addListProductsToList(id, products);

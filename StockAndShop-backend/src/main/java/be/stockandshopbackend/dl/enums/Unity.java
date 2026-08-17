@@ -12,7 +12,8 @@ public enum Unity {
     BOTTLE("bottle"),
     PACKET("packet"),
     BOX("box"),
-    CAN("can");
+    CAN("can"),
+    TIN("tin");
 
     private final String value;
 
@@ -27,5 +28,16 @@ public enum Unity {
             }
         }
         throw new IllegalArgumentException("Unknown unity: " + value);
+    }
+
+    /** Lenient parse used for optional chosen units: null/blank/unknown -> null (fall back to product default). */
+    public static Unity fromValueOrNull(String value) {
+        if (value == null || value.isBlank()) return null;
+        for (Unity u : Unity.values()) {
+            if (u.getValue().equalsIgnoreCase(value.trim()) || u.name().equalsIgnoreCase(value.trim())) {
+                return u;
+            }
+        }
+        return null;
     }
 }

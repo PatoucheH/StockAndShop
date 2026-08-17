@@ -10,4 +10,5 @@ export interface ProductItem {
 export interface ProductItemRequest {
   name: string,
   quantity: number,
+  unity?: string,
 }

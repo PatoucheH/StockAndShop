@@ -10,6 +10,7 @@ import be.stockandshopbackend.dl.entities.home.Home;
 import be.stockandshopbackend.dl.entities.product.ProductListItem;
 import be.stockandshopbackend.dl.entities.product.ProductStockHome;
 import be.stockandshopbackend.dl.entities.user.User;
+import be.stockandshopbackend.dl.enums.Unity;
 import be.stockandshopbackend.exceptions.NotFoundException;
 import be.stockandshopbackend.pl.DTOs.Response.products.ProductItemResponse;
 import be.stockandshopbackend.pl.DTOs.websocket.ShoppingListEventDTO;
@@ -124,7 +125,7 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
             throw new IllegalStateException("Aucun produit coché à ajouter au stock");
         }
         for (ProductListItem item : checkedItems) {
-            home.addProductStock(new ProductStockHome(item.getProduct(), item.getQuantity()));
+            home.addProductStock(new ProductStockHome(item.getProduct(), item.getQuantity(), item.getUnity()));
             shoppingList.getProducts().remove(item);
         }
         homeRepository.save(home);
@@ -148,11 +149,11 @@ public class ShoppingListServiceImpl extends BaseCRUDService<ShoppingList, Long,
     }
 
     @Transactional
-    public void addProductToList(Long shoppingListId, String productName, int quantity){
+    public void addProductToList(Long shoppingListId, String productName, int quantity, Unity unity){
         ShoppingList shoppingList = repository.findById(shoppingListId)
                 .orElseThrow(() -> new NotFoundException("ShoppingList with id " + shoppingListId + " not found"));
         // Keep a reference before adding so we can broadcast the saved item without relying on getLast()
-        ProductListItem newItem = new ProductListItem(productService.findOneByName(productName), quantity);
+        ProductListItem newItem = new ProductListItem(productService.findOneByName(productName), quantity, unity);
         shoppingList.addProduct(newItem);
         repository.save(shoppingList);
         broadcast(shoppingListId, ITEM_ADDED, ProductItemResponse.fromProductListItem(newItem));

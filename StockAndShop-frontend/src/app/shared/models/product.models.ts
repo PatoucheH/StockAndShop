@@ -2,6 +2,7 @@ export interface Product{
   id: number,
   name: string,
   unity: string,
+  unities: string[],
   category: string,
   barcode?: string,
   brand?: string,

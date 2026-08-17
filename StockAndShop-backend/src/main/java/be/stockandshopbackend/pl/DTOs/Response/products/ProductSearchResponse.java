@@ -1,6 +1,9 @@
 package be.stockandshopbackend.pl.DTOs.Response.products;
 
 import be.stockandshopbackend.dl.entities.product.Product;
+import be.stockandshopbackend.dl.enums.Unity;
+
+import java.util.List;
 
 /**
  * Lightweight product view for the autocomplete search dropdown.
@@ -11,6 +14,7 @@ public record ProductSearchResponse(
         Long id,
         String name,
         String unity,
+        List<String> unities,
         String category
 ) {
     public static ProductSearchResponse fromProduct(Product p) {
@@ -18,6 +22,7 @@ public record ProductSearchResponse(
                 p.getId(),
                 p.getName(),
                 p.getUnity().getValue(),
+                p.getUnities().stream().map(Unity::getValue).toList(),
                 p.getCategory().getName()
         );
     }

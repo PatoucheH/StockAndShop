@@ -4,6 +4,7 @@ import be.stockandshopbackend.dl.entities.home.Home;
 import be.stockandshopbackend.dl.entities.product.ProductListItem;
 import be.stockandshopbackend.dl.entities.ShoppingList;
 import be.stockandshopbackend.dl.entities.user.User;
+import be.stockandshopbackend.dl.enums.Unity;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +17,7 @@ public interface ShoppingListService {
 
     /// ADD
     Home createShoppingList(UUID homeId, String name, String description);
-    void addProductToList(Long shoppingListId, String productName, int quantity);
+    void addProductToList(Long shoppingListId, String productName, int quantity, Unity unity);
     void addListProductsToList(Long shoppingListId, List<ProductListItem> products);
 
 

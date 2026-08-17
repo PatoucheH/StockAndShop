@@ -1,11 +1,15 @@
 package be.stockandshopbackend.pl.DTOs.Response.products;
 
 import be.stockandshopbackend.dl.entities.product.Product;
+import be.stockandshopbackend.dl.enums.Unity;
+
+import java.util.List;
 
 public record ProductResponse(
         Long id,
         String name,
         String unity,
+        List<String> unities,
         String category,
         String barcode,
         String brand,
@@ -19,6 +23,7 @@ public record ProductResponse(
                 p.getId(),
                 p.getName(),
                 p.getUnity().getValue(),
+                p.getUnities().stream().map(Unity::getValue).toList(),
                 p.getCategory().getName(),
                 p.getBarcode(),
                 p.getBrand(),

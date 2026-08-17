@@ -1,6 +1,7 @@
 package be.stockandshopbackend.dl.entities.product;
 
 import be.stockandshopbackend.dl.entities.base.LongBaseEntity;
+import be.stockandshopbackend.dl.enums.Unity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -24,9 +25,20 @@ public class ProductListItem extends LongBaseEntity {
     @Column(nullable = false)
     private boolean isChecked;
 
+    // Unit chosen for this list line; null = fall back to the product's default unit
+    @Enumerated(EnumType.STRING)
+    private Unity unity;
+
     public ProductListItem(Product product, int quantity) {
         this.product = product;
         this.quantity = quantity;
+        this.isChecked = false;
+    }
+
+    public ProductListItem(Product product, int quantity, Unity unity) {
+        this.product = product;
+        this.quantity = quantity;
+        this.unity = unity;
         this.isChecked = false;
     }
 
