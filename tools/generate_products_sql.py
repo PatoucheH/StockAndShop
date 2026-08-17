@@ -129,6 +129,25 @@ def map_unity(name, category_id, quantity_str=None):
     if category_id == 4:                          return "MILLILITER"
     return "GRAMS"
 
+# Jeux d'unités possibles par catégorie (1re = défaut). Le défaut "logique" du produit
+# (map_unity) est placé en tête s'il fait partie du jeu ; sinon on garde le jeu de la catégorie.
+def unities_for(name, category_id, quantity_str=None):
+    default = map_unity(name, category_id, quantity_str)
+    if category_id == 4:                                          base = ["BOTTLE", "CAN"]           # boissons (catégorie uniquement)
+    elif category_id == 3:                                        base = ["CAN", "JAR", "PIECE", "GRAMS"]  # conserves
+    elif category_id == 5:                                        base = ["PIECE", "PACKET"]         # boulangerie
+    elif category_id == 6:                                        base = ["BOTTLE", "PIECE", "JAR", "GRAMS"]  # laitiers
+    elif category_id == 8:                                        base = ["PIECE", "GRAMS", "JAR"]   # fruits & legumes
+    elif category_id == 9:                                        base = ["GRAMS", "PACKET", "PIECE"]  # boucherie
+    elif category_id == 11:                                       base = ["PACKET", "GRAMS", "PIECE"]  # snacks
+    elif category_id == 2:                                        base = ["PACKET", "GRAMS", "JAR"]  # epicerie
+    elif category_id == 7:                                        base = ["PACKET", "GRAMS", "PIECE"]  # surgeles
+    elif category_id == 10:                                       base = ["PIECE", "BOTTLE", "GRAMS"]  # hygiene
+    else:                                                         base = ["PIECE", "PACKET", "GRAMS"]  # autres
+    if default in base:
+        return [default] + [u for u in base if u != default]
+    return base
+
 # ============================== HELPERS ==================================== #
 def category_of(pnns, tags):
     tags = str(tags).lower()
@@ -195,9 +214,9 @@ def process():
                 continue  # on garde déjà une meilleure version
 
             category_id = category_of(row.get("pnns_groups_1"), row.get("categories_tags"))
-            unity = map_unity(key, category_id, row.get("quantity"))
+            unities = ",".join(unities_for(key, category_id, row.get("quantity")))
             values = (
-                sql_val(disp), f"'{unity}'", str(category_id), sql_val(barcode),
+                sql_val(disp), f"'{unities}'", str(category_id), sql_val(barcode),
                 sql_val(row.get("brands")), sql_val(row.get("image_url")),
                 sql_val(row.get("quantity")),
                 sql_val(normalize_grade(row.get("nutriscore_grade"))),
@@ -209,20 +228,20 @@ def process():
             best[key] = (score, values)
         print(f"  lus={read:>9}  gardés(uniques)={len(best):>7}", end="\r")
 
-    print(f"\nÉcriture de {len(best)} produits uniques dans {OUTPUT_SQL}...")
+    print(f"\nÉcriture de {len(best)} produits dans {OUTPUT_SQL}...")
     rows = [v for _, v in best.values()]
     with open(OUTPUT_SQL, "w", encoding="utf-8") as out:
-        out.write("-- Import Open Food Facts (normalisé + dédoublonné) — généré automatiquement\n")
-        out.write("-- À exécuter UNE fois sur une table product vierge de produits OFF.\n")
+        out.write("-- Import Open Food Facts (unités possibles par catégorie) — généré automatiquement\n")
+        out.write("-- À exécuter sur une table product vidée de ses produits.\n")
         out.write("SET client_encoding = 'UTF8';\n\n")
         for i in range(0, len(rows), BATCH_SIZE):
             write_batch(out, rows[i:i+BATCH_SIZE])
         out.write("\n-- Réinitialisation de la séquence après import\n")
         out.write("SELECT setval(pg_get_serial_sequence('product','id'), COALESCE(MAX(id),1), true) FROM product;\n")
-    print(f"Terminé : {read} lignes lues -> {len(best)} produits uniques.")
+    print(f"Terminé : {read} lignes lues -> {len(best)} produits.")
 
 def write_batch(out, rows):
-    out.write("INSERT INTO product (name, unity, category_id, barcode, brand, image_url, "
+    out.write("INSERT INTO product (name, unities, category_id, barcode, brand, image_url, "
               "package_quantity, nutriscore_grade, ecoscore_grade, created_at, updated_at) VALUES\n")
     out.write(",\n".join(
         f"  ({r[0]}, {r[1]}, {r[2]}, {r[3]}, {r[4]}, {r[5]}, {r[6]}, {r[7]}, {r[8]}, NOW(), NOW())"
