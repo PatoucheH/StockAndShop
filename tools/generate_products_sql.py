@@ -132,21 +132,27 @@ def map_unity(name, category_id, quantity_str=None):
 # Jeux d'unités possibles par catégorie (1re = défaut). Le défaut "logique" du produit
 # (map_unity) est placé en tête s'il fait partie du jeu ; sinon on garde le jeu de la catégorie.
 def unities_for(name, category_id, quantity_str=None):
-    default = map_unity(name, category_id, quantity_str)
+    # Cas special : les vrais oeufs (poule, caille) se comptent en PIECE, pas au poids.
+    # Le "(^| )" evite "boeuf"/"bœuf" (le oeuf y est colle au b) ; on exclut aussi les
+    # oeufs de poisson (tarama, cabillaud, truite...) qui se vendent au poids/pot.
+    if category_id == 9 and re.search(r'(^| )(œufs?|oeufs?)', name, re.I) \
+            and not re.search(r'tarama|cabillaud|truite|saumon|poisson|lump', name, re.I):
+        return ["PIECE", "GRAMS", "PACKET"]
     if category_id == 4:                                          base = ["BOTTLE", "CAN"]           # boissons (catégorie uniquement)
     elif category_id == 3:                                        base = ["TIN", "JAR", "PIECE", "GRAMS"]  # conserves
     elif category_id == 5:                                        base = ["PIECE", "PACKET"]         # boulangerie
     elif category_id == 6:                                        base = ["BOTTLE", "PIECE", "JAR", "GRAMS"]  # laitiers
     elif category_id == 8:                                        base = ["PIECE", "GRAMS", "JAR"]   # fruits & legumes
-    elif category_id == 9:                                        base = ["GRAMS", "PACKET", "PIECE"]  # boucherie
+    elif category_id == 9:                                        base = ["PACKET", "PIECE", "GRAMS"]  # boucherie
     elif category_id == 11:                                       base = ["PACKET", "GRAMS", "PIECE"]  # snacks
     elif category_id == 2:                                        base = ["PACKET", "GRAMS", "JAR"]  # epicerie
     elif category_id == 7:                                        base = ["PACKET", "GRAMS", "PIECE"]  # surgeles
     elif category_id == 10:                                       base = ["PIECE", "BOTTLE", "GRAMS"]  # hygiene
     else:                                                         base = ["PIECE", "PACKET", "GRAMS"]  # autres
-    if default in base:
-        return [default] + [u for u in base if u != default]
-    return base
+    # La 1re unite = defaut affiche. On garde toujours un contenant/comptage (paquet,
+    # bouteille, piece...) devant et on relegue le poids/volume (GRAMS, MILLILITER) en fin.
+    weight_vol = {"GRAMS", "MILLILITER"}
+    return [u for u in base if u not in weight_vol] + [u for u in base if u in weight_vol]
 
 # ============================== HELPERS ==================================== #
 def category_of(pnns, tags):
