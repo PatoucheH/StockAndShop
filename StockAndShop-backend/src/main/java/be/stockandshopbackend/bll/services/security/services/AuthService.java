@@ -47,7 +47,8 @@ public class AuthService implements UserDetailsService {
     public AuthResult register(String username, String email, String password) {
         email = email.trim().toLowerCase();   // canonical lowercase storage
         if(userRepository.findByEmail(email).isPresent()) {
-            throw new ConflictException("Email already in use: " + email);
+            // Generic message on purpose: never confirm whether an email is already registered (anti-enumeration)
+            throw new ConflictException("Impossible de créer le compte avec ces informations.");
         }
         Role userRole = roleRepository.findByName("USER")
                 .orElseGet(() -> roleRepository.save(new Role("USER")));
