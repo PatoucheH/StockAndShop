@@ -42,6 +42,11 @@ public class ProductListItem extends LongBaseEntity {
         this.isChecked = false;
     }
 
+    // The unit actually shown for this line: the chosen unit, or the product's default when none was chosen.
+    public Unity getEffectiveUnity() {
+        return unity != null ? unity : (product != null ? product.getUnity() : null);
+    }
+
     public void toggleIsChecked() {
         this.isChecked = !this.isChecked;
     }

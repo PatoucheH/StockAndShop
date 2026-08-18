@@ -1,4 +1,5 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { ShoppingListService } from '../../../shopping-list/services/shopping-list.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { ProductItemRequest } from '../../../../shared/models/productItem.models';
@@ -10,6 +11,7 @@ import { ProductItemRequest } from '../../../../shared/models/productItem.models
 export class AddToListComponent {
   private shoppingListService = inject(ShoppingListService);
   private toast = inject(ToastService);
+  private router = inject(Router);
 
   products = input<ProductItemRequest[]>([]);
   label = input('Ajouter à la liste');
@@ -27,7 +29,10 @@ export class AddToListComponent {
     const listId = this.selectedListId();
     if (!listId) return;
     this.shoppingListService.addListProductsToShoppingList(this.products(), listId).subscribe({
-      next: () => this.toast.success('Produits ajoutés à la liste'),
+      next: () => {
+        this.toast.success('Produits ajoutés à la liste');
+        this.router.navigate(['/shopping-list', listId]);
+      },
     });
   }
 }

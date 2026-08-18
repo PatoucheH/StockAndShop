@@ -47,7 +47,7 @@ public class Home extends UuidBaseEntity {
     public void addProductStock(ProductStockHome productStockHome) {
         stocks.stream()
         .filter(s -> s.getProduct().getId().equals(productStockHome.getProduct().getId())
-                && java.util.Objects.equals(s.getUnity(), productStockHome.getUnity()))
+                && java.util.Objects.equals(s.getEffectiveUnity(), productStockHome.getEffectiveUnity()))
         .findFirst()
         .ifPresentOrElse(
                 existing -> existing.setQuantity(existing.getQuantity() + productStockHome.getQuantity()),

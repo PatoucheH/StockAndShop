@@ -54,6 +54,7 @@ export class CookRecipeModalComponent {
     this.missingIngredients().map(c => ({
       name: c.ingredient.productName,
       quantity: c.ingredient.quantity - c.stockQty,
+      unity: c.ingredient.unity,
     }))
   );
 
@@ -79,7 +80,7 @@ export class CookRecipeModalComponent {
     this.isCooking.set(true);
     forkJoin(
       this.recipe().ingredients.map((i: RecipeIngredient) =>
-        this.homeService.decreseStock({ name: i.productName, quantity: i.quantity })
+        this.homeService.decreseStock({ name: i.productName, quantity: i.quantity, unity: i.unity })
       )
     ).subscribe({
       next: () => {

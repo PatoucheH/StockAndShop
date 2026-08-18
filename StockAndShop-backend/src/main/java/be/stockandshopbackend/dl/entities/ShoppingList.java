@@ -43,7 +43,7 @@ public class ShoppingList extends LongBaseEntity {
     public void addProduct(ProductListItem item) {
         products.stream()
                 .filter(p -> p.getProduct().getId().equals(item.getProduct().getId())
-                        && java.util.Objects.equals(p.getUnity(), item.getUnity()))
+                        && java.util.Objects.equals(p.getEffectiveUnity(), item.getEffectiveUnity()))
                 .findFirst()
                 .ifPresentOrElse(
                         existing -> existing.setQuantity(existing.getQuantity() + item.getQuantity()),

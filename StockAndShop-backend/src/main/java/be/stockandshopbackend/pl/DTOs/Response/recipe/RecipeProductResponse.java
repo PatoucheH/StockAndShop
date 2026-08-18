@@ -14,7 +14,9 @@ public record RecipeProductResponse(
                 rProduct.getProduct().getId(),
                 rProduct.getProduct().getName(),
                 rProduct.getQuantity(),
-                rProduct.getProduct().getUnity().name()
+                rProduct.getUnity() != null
+                        ? rProduct.getUnity().name()
+                        : rProduct.getProduct().getUnity().name()
         );
     }
 

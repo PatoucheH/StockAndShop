@@ -90,7 +90,7 @@ public class HomeServiceImpl extends BaseCRUDService<Home, UUID, HomeRepository>
         // if no unit is provided (e.g. cooking a recipe), fall back to matching by product name only.
         ProductStockHome stock = home.getStocks().stream()
                 .filter(s -> s.getProduct().getName().equals(product.getName())
-                        && (request.getUnity() == null || java.util.Objects.equals(s.getUnity(), request.getUnity())))
+                        && (request.getUnity() == null || java.util.Objects.equals(s.getEffectiveUnity(), request.getUnity())))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Product not found in home stock: " + product.getName()));
         stock.setQuantity(stock.getQuantity() - request.getQuantity());

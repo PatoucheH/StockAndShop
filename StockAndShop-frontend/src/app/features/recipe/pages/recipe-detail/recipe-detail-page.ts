@@ -44,7 +44,7 @@ export class RecipeDetailPage implements OnInit {
   showCookModal = signal(false);
 
   ingredientsAsRequest = computed<ProductItemRequest[]>(() =>
-    (this.recipe()?.ingredients ?? []).map(i => ({ name: i.productName, quantity: i.quantity }))
+    (this.recipe()?.ingredients ?? []).map(i => ({ name: i.productName, quantity: i.quantity, unity: i.unity }))
   );
 
   comments = this.commentService.comments;

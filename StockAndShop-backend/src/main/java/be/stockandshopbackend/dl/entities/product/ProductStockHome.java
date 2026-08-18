@@ -37,4 +37,10 @@ public class ProductStockHome extends LongBaseEntity {
         this.unity = unity;
     }
 
+    // The unit actually shown for this line: the chosen unit, or the product's default when none was chosen.
+    // Used for merging so a null line and a "default-valued" line are treated as the same unit.
+    public Unity getEffectiveUnity() {
+        return unity != null ? unity : (product != null ? product.getUnity() : null);
+    }
+
 }

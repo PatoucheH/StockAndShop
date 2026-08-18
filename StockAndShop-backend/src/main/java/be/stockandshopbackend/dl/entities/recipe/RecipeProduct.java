@@ -2,6 +2,7 @@ package be.stockandshopbackend.dl.entities.recipe;
 
 import be.stockandshopbackend.dl.entities.product.Product;
 import be.stockandshopbackend.dl.entities.base.LongBaseEntity;
+import be.stockandshopbackend.dl.enums.Unity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,4 +20,13 @@ public class RecipeProduct extends LongBaseEntity {
 
     @Column(nullable = false)
     private int quantity;
+
+    // Unit of this ingredient (taken from the stock line at generation time); null = product default
+    @Enumerated(EnumType.STRING)
+    private Unity unity;
+
+    public RecipeProduct(Product product, int quantity) {
+        this.product = product;
+        this.quantity = quantity;
+    }
 }

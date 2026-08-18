@@ -9,6 +9,7 @@ import be.stockandshopbackend.dl.entities.recipe.Recipe;
 import be.stockandshopbackend.dl.entities.recipe.RecipeProduct;
 import be.stockandshopbackend.dl.entities.recipe.Tag;
 import be.stockandshopbackend.dl.entities.home.Home;
+import be.stockandshopbackend.dl.enums.Unity;
 import be.stockandshopbackend.exceptions.NotFoundException;
 import be.stockandshopbackend.exceptions.RecipeNotPossibleException;
 import com.anthropic.client.AnthropicClient;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +117,12 @@ public class RecipeServiceImpl implements RecipeService {
                         s -> s.getProduct().getName().toLowerCase(),
                         ProductStockHome::getProduct,
                         (a, b) -> a));
-        Recipe recipe = parseResponse(claudeResponse, availableTags, allowedProducts);
+        // Unit chosen for each product in stock (line unit, or product default) — used to label recipe ingredients
+        Map<String, Unity> unitByName = new HashMap<>();
+        products.forEach(s -> unitByName.putIfAbsent(
+                s.getProduct().getName().toLowerCase(),
+                s.getUnity() != null ? s.getUnity() : s.getProduct().getUnity()));
+        Recipe recipe = parseResponse(claudeResponse, availableTags, allowedProducts, unitByName);
         return recipeRepository.save(recipe);
     }
 
@@ -141,11 +148,15 @@ public class RecipeServiceImpl implements RecipeService {
     private String buildPrompt(List<ProductStockHome> stocks, List<String> existingTitles, List<Tag> availableTags) {
         StringBuilder sb = new StringBuilder();
         sb.append("You are a head chef. Here are the products currently in the pantry:\n\n");
-        stocks.forEach(stock -> sb.append("- ")
-                .append(stock.getProduct().getName())
-                .append(": ").append(stock.getQuantity())
-                .append(" ").append(stock.getProduct().getUnity().name().toLowerCase())
-                .append("\n"));
+        // A product can appear on several stock lines (different units) — list each product only ONCE,
+        // with the actual unit of its line, so the same ingredient is never listed twice.
+        java.util.LinkedHashMap<String, ProductStockHome> uniqueByName = new java.util.LinkedHashMap<>();
+        stocks.forEach(s -> uniqueByName.putIfAbsent(s.getProduct().getName(), s));
+        uniqueByName.values().forEach(stock -> {
+            var unit = stock.getUnity() != null ? stock.getUnity() : stock.getProduct().getUnity();
+            sb.append("- ").append(stock.getProduct().getName())
+              .append(" (unit: ").append(unit.name().toLowerCase()).append(")\n");
+        });
         // Passing existing titles to Claude to avoid generating duplicates
         if (!existingTitles.isEmpty()) {
             sb.append("\nThe following recipes already exist — do NOT suggest any of them:\n");
@@ -161,6 +172,11 @@ public class RecipeServiceImpl implements RecipeService {
                   Rules:
                   - Only use ingredients from the provided stock list (staples are allowed in steps but not in INGREDIENTS).
                   - A recipe must be culinarily coherent, realistic and appetizing.
+                  - Each product appears once with its unit in parentheses. Give each ingredient quantity as an
+                    integer expressed in THAT unit, and it must be a REALISTIC culinary amount:
+                    around 100-500 for grams, 100-1000 for milliliter, and 1-4 for piece/packet/bottle/can/jar/tin.
+                    Never output tiny meaningless amounts (e.g. never "8 grams" of ground meat).
+                  - List each product AT MOST ONCE in the INGREDIENTS section.
                   - If the available products absolutely cannot produce a coherent and appetizing recipe (e.g. random
                     unrelated products, only drinks, incoherent combinations), do NOT force a recipe. Instead, reply
                     with exactly: IMPOSSIBLE: <brief reason in French>. Nothing else.
@@ -202,7 +218,7 @@ public class RecipeServiceImpl implements RecipeService {
                 .collect(Collectors.joining());
     }
 
-    private Recipe parseResponse(String claudeResponse, List<Tag> availableTags, Map<String, Product> allowedProducts) {
+    private Recipe parseResponse(String claudeResponse, List<Tag> availableTags, Map<String, Product> allowedProducts, Map<String, Unity> unitByName) {
         String[] sections = claudeResponse.split("\n");
         String title = "";
         List<RecipeProduct> products = new ArrayList<>();
@@ -240,7 +256,8 @@ public class RecipeServiceImpl implements RecipeService {
                             Product product = allowedProducts.get(productName.toLowerCase());
                             if (product != null && !PANTRY_STAPLES_SET.contains(productName)) {
                                 try {
-                                    products.add(new RecipeProduct(product, Integer.parseInt(parts[1].trim())));
+                                    products.add(new RecipeProduct(product, Integer.parseInt(parts[1].trim()),
+                                            unitByName.get(productName.toLowerCase())));
                                 } catch (NumberFormatException ignored) {
                                 }
                             }

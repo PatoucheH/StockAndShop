@@ -14,8 +14,7 @@ export class BtnAnotherRecipe {
   toast = inject(ToastService);
 
   generateNewRecipe() {
-    this.recipeService.generateNewRecipe(this.homeService.selectedHome()!.id, (msg) => {
-      this.toast.error(msg);
-    });
+    // The global error interceptor handles the error toast
+    this.recipeService.generateNewRecipe(this.homeService.selectedHome()!.id);
   }
 }

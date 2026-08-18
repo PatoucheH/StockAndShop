@@ -99,7 +99,7 @@ export class RecipeService {
       },
       error: (err) => {
         this.isGeneratingRecipe.set(false);
-        onError?.(err?.error ?? 'Impossible de générer une recette.');
+        onError?.(err?.error?.message ?? 'Impossible de générer une recette.');
       },
     });
   }
@@ -119,7 +119,7 @@ export class RecipeService {
       },
       error: (err) => {
         this.isGeneratingRecipe.set(false);
-        onError?.(err?.error ?? 'Impossible de générer une recette.');
+        onError?.(err?.error?.message ?? 'Impossible de générer une recette.');
       },
     });
   }
