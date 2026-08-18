@@ -17,5 +17,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("SELECT u FROM User u WHERE LOWER(u.email) = LOWER(:email)")
     Optional<User> findByEmail(@Param("email") String email);
 
-    List<User> findByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(String username, String email);
+    // Username matched partially; email matched EXACTLY (case-insensitive) so you can't
+    // harvest addresses by typing a fragment of an email — anti-enumeration.
+    List<User> findByUsernameContainingIgnoreCaseOrEmailIgnoreCase(String username, String email);
 }

@@ -51,7 +51,7 @@ public class UserServiceImpl extends BaseCRUDService<User, UUID, UserRepository>
 
     @Override
     public List<User> searchByQuery(String query) {
-        return repository.findByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(query, query);
+        return repository.findByUsernameContainingIgnoreCaseOrEmailIgnoreCase(query, query);
     }
 
     @Override
