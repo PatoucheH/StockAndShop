@@ -9,6 +9,7 @@ import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { AuthService } from './features/auth/services/auth.service';
 import { provideServiceWorker } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -33,7 +34,8 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }), provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
+            // Jamais de SW en natif : en WebView locale il casse le cache/navigation et n'a aucun intérêt.
+            enabled: !isDevMode() && !environment.native,
             registrationStrategy: 'registerWhenStable:30000'
           }),
   ],
