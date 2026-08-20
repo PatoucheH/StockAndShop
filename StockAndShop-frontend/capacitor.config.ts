@@ -15,6 +15,12 @@ const config: CapacitorConfig = {
     CapacitorHttp: {
       enabled: true,
     },
+    // On garde le splash affiche jusqu'a ce que l'app soit prete (hide() appele dans main.ts),
+    // pour eviter un flash blanc pendant le boot.
+    SplashScreen: {
+      launchAutoHide: false,
+      backgroundColor: '#059669',
+    },
   },
 };
 

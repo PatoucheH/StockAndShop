@@ -38,4 +38,9 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Scan de code-barres : html5-qrcode ouvre la camera via la WebView -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- required=false : les appareils sans camera peuvent quand meme installer l'app -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 </manifest>
