@@ -19,7 +19,7 @@ async function initNative(): Promise<void> {
     if (Capacitor.getPlatform() === 'android') {
       // La status bar ne recouvre pas la WebView : le contenu démarre dessous,
       // donc pas de contenu masqué par l'encoche/barre d'état.
-      await StatusBar.setOverlaysWebView({ overlays: false });
+      await StatusBar.setOverlaysWebView({ overlay: false });
       await StatusBar.setBackgroundColor({ color: '#064e3b' });
     }
   } catch {

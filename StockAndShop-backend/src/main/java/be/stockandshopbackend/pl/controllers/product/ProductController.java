@@ -1,5 +1,6 @@
 package be.stockandshopbackend.pl.controllers.product;
 
+import be.stockandshopbackend.bll.services.openfoodfacts.OpenFoodFactsService;
 import be.stockandshopbackend.bll.services.productAndShoppingList.category.CategoryService;
 import be.stockandshopbackend.bll.services.productAndShoppingList.product.ProductService;
 import be.stockandshopbackend.dl.entities.product.Category;
@@ -24,6 +25,7 @@ public class ProductController {
 
     private final ProductService productService;
     private final CategoryService categoryService;
+    private final OpenFoodFactsService openFoodFactsService;
 
     //region GET
 
@@ -62,7 +64,10 @@ public class ProductController {
 
     @GetMapping("/barcode/{barcode}")
     public ResponseEntity<ProductResponse> getProductByBarcode(@PathVariable String barcode){
+        // 1) déjà en base ? 2) sinon fallback Open Food Facts (crée le produit avec
+        //    la bonne catégorie interne + la liste d'unités) ; 3) sinon 404.
         return productService.findByBarcode(barcode)
+                .or(() -> openFoodFactsService.fetchAndSave(barcode))
                 .map(ProductResponse::fromProduct)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

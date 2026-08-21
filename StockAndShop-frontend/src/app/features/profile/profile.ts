@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { Capacitor } from '@capacitor/core';
 import { AuthService } from '../auth/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal';
@@ -99,5 +100,15 @@ export class ProfileComponent {
 
   logout() {
     this.authService.logout();
+  }
+
+  // En natif, on ouvre les liens externes dans un onglet in-app (Custom Tab / SFSafariViewController)
+  // au lieu de laisser Android les router vers la PWA installée ou une autre app.
+  // Sur le web, on ne fait rien : le lien garde son comportement target="_blank".
+  async openExternal(event: Event, url: string) {
+    if (!Capacitor.isNativePlatform()) return;
+    event.preventDefault();
+    const { Browser } = await import('@capacitor/browser');
+    await Browser.open({ url });
   }
 }

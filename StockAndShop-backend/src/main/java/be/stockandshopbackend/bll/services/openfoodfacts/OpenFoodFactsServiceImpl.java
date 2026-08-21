@@ -1,6 +1,6 @@
 package be.stockandshopbackend.bll.services.openfoodfacts;
 
-import be.stockandshopbackend.bll.services.productAndShoppingList.category.CategoryService;
+import be.stockandshopbackend.dal.repositories.product.CategoryRepository;
 import be.stockandshopbackend.dal.repositories.product.ProductRepository;
 import be.stockandshopbackend.dl.entities.product.Category;
 import be.stockandshopbackend.dl.entities.product.Product;
@@ -9,8 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 @Slf4j
@@ -41,16 +44,30 @@ public class OpenFoodFactsServiceImpl implements OpenFoodFactsService {
     private static final Pattern PERCENTAGE =
             Pattern.compile("\\s*\\d+[,.]?\\d*\\s*%\\s*(mg|mat\\.?\\s*gr\\.?)?", Pattern.CASE_INSENSITIVE);
 
+    // ---- Catégorisation & unités : MÊME logique que le script d'import Python ----
+    // PNNS d'Open Food Facts -> id de catégorie interne (1..11)
+    private static final Map<String, Integer> PNNS_TO_CATEGORY_ID = Map.of(
+            "Beverages", 4, "Milk and dairy products", 6, "Fruits and vegetables", 8,
+            "Cereals and potatoes", 2, "Fish Meat Eggs", 9, "Sugary snacks", 11,
+            "Salty snacks", 11, "Fat and sauces", 2, "Composite foods", 2
+    );
+    private static final int DEFAULT_CATEGORY_ID = 1;   // "autres"
+    private static final Set<Unity> WEIGHT_VOL = Set.of(Unity.GRAMS, Unity.MILLILITER);
+    // Vrais œufs (poule/caille) : "(^| )" évite "boeuf"/"bœuf" ; on exclut les œufs de poisson
+    private static final Pattern EGG = Pattern.compile("(^| )(œufs?|oeufs?)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern EGG_EXCLUDE =
+            Pattern.compile("tarama|cabillaud|truite|saumon|poisson|lump", Pattern.CASE_INSENSITIVE);
+
     private final RestClient restClient;
     private final ProductRepository productRepository;
-    private final CategoryService categoryService;
+    private final CategoryRepository categoryRepository;
 
     public OpenFoodFactsServiceImpl(RestClient.Builder restClientBuilder,
                                     ProductRepository productRepository,
-                                    CategoryService categoryService) {
+                                    CategoryRepository categoryRepository) {
         this.restClient = restClientBuilder.build();
         this.productRepository = productRepository;
-        this.categoryService = categoryService;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -97,20 +114,61 @@ public class OpenFoodFactsServiceImpl implements OpenFoodFactsService {
             return productRepository.save(product);
         }
 
+        int categoryId = categoryIdOf(off.pnnsGroups1(), off.categoriesTags());
+
         Product product = new Product();
         product.setBarcode(barcode);
         product.setName(name);
-        product.setUnity(mapUnity(off.packagingTags()));
+        product.setUnities(unitiesFor(name, categoryId));
         product.setBrand(truncate(off.brands(), 255));
         product.setImageUrl(off.imageFrontUrl());
         product.setPackageQuantity(truncate(off.quantity(), 50));
         product.setNutriscoreGrade(off.nutriscoreGrade());
         product.setEcoscoreGrade(off.ecoscoreGrade());
 
-        Category category = categoryService.findByNameOrCreate(resolveCategory(off.categories()));
+        // Catégories 1..11 déjà seed en base ; fallback sur "autres" (1) par sécurité.
+        Category category = categoryRepository.findById((long) categoryId)
+                .or(() -> categoryRepository.findById((long) DEFAULT_CATEGORY_ID))
+                .orElseThrow(() -> new IllegalStateException("Aucune catégorie en base"));
         product.setCategory(category);
+        log.info("OFF: barcode {} -> categorie {} ({}), unites {}", barcode, categoryId, category.getName(), product.getUnities());
 
         return productRepository.save(product);
+    }
+
+    // Réplique de category_of() du script Python : tags frozen/canned prioritaires, sinon table PNNS.
+    private int categoryIdOf(String pnns, List<String> categoriesTags) {
+        String tags = categoriesTags == null ? "" : String.join(",", categoriesTags).toLowerCase();
+        if (tags.contains("en:frozen"))                                 return 7;   // surgelés
+        if (tags.contains("en:canned") || tags.contains("en:jarred"))   return 3;   // conserves
+        if (pnns == null)                                               return DEFAULT_CATEGORY_ID;
+        return PNNS_TO_CATEGORY_ID.getOrDefault(pnns.strip(), DEFAULT_CATEGORY_ID);
+    }
+
+    // Réplique de unities_for() du script Python : liste ordonnée par catégorie,
+    // GRAMS/MILLILITER toujours en fin, cas spécial œufs (pièce).
+    private List<Unity> unitiesFor(String name, int categoryId) {
+        if (categoryId == 9 && EGG.matcher(name).find() && !EGG_EXCLUDE.matcher(name).find()) {
+            return List.of(Unity.PIECE, Unity.GRAMS, Unity.PACKET);
+        }
+        List<Unity> base = switch (categoryId) {
+            case 4  -> List.of(Unity.BOTTLE, Unity.CAN);                          // boissons
+            case 3  -> List.of(Unity.TIN, Unity.JAR, Unity.PIECE, Unity.GRAMS);   // conserves
+            case 5  -> List.of(Unity.PIECE, Unity.PACKET);                        // boulangerie
+            case 6  -> List.of(Unity.BOTTLE, Unity.PIECE, Unity.JAR, Unity.GRAMS);// laitiers
+            case 8  -> List.of(Unity.PIECE, Unity.GRAMS, Unity.JAR);              // fruits & légumes
+            case 9  -> List.of(Unity.PACKET, Unity.PIECE, Unity.GRAMS);           // boucherie
+            case 11 -> List.of(Unity.PACKET, Unity.GRAMS, Unity.PIECE);           // snacks
+            case 2  -> List.of(Unity.PACKET, Unity.GRAMS, Unity.JAR);             // épicerie
+            case 7  -> List.of(Unity.PACKET, Unity.GRAMS, Unity.PIECE);           // surgelés
+            case 10 -> List.of(Unity.PIECE, Unity.BOTTLE, Unity.GRAMS);           // hygiène
+            default -> List.of(Unity.PIECE, Unity.PACKET, Unity.GRAMS);           // autres
+        };
+        // Contenant/comptage devant, poids/volume relégué en fin.
+        List<Unity> ordered = new ArrayList<>();
+        base.stream().filter(u -> !WEIGHT_VOL.contains(u)).forEach(ordered::add);
+        base.stream().filter(WEIGHT_VOL::contains).forEach(ordered::add);
+        return ordered;
     }
 
     private String resolveName(String barcode, OpenFoodFactsResponse.OFFProduct off) {
@@ -134,24 +192,6 @@ public class OpenFoodFactsServiceImpl implements OpenFoodFactsService {
         name = MARKETING_WORD.matcher(name).replaceAll("");
         name = SIZE_WORD.matcher(name).replaceAll("");
         return name.replaceAll("\\s+", " ").strip();
-    }
-
-    // OFF returns categories as a comma-separated hierarchy (most specific last); we take the first (broadest) entry
-    private String resolveCategory(String categories) {
-        if (categories == null || categories.isBlank()) return "other";
-        return categories.split(",")[0].strip();
-    }
-
-    private Unity mapUnity(List<String> packagingTags) {
-        if (packagingTags == null) return Unity.OTHER;
-        for (String tag : packagingTags) {
-            if (tag.contains("bottle")) return Unity.BOTTLE;
-            if (tag.contains("can") || tag.contains("tin")) return Unity.CAN;
-            if (tag.contains("jar")) return Unity.JAR;
-            if (tag.contains("box") || tag.contains("carton")) return Unity.BOX;
-            if (tag.contains("packet") || tag.contains("bag") || tag.contains("sachet")) return Unity.PACKET;
-        }
-        return Unity.OTHER;
     }
 
     private String truncate(String value, int maxLength) {

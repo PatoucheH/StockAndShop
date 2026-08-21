@@ -24,6 +24,9 @@ public record OpenFoodFactsResponse(
             @JsonProperty("image_front_url") String imageFrontUrl,
             @JsonProperty("nutriscore_grade") String nutriscoreGrade,
             @JsonProperty("ecoscore_grade") String ecoscoreGrade,
-            @JsonProperty("packaging_tags") List<String> packagingTags
+            @JsonProperty("packaging_tags") List<String> packagingTags,
+            // Utilisés pour retrouver la catégorie interne (même logique que le script d'import)
+            @JsonProperty("pnns_groups_1") String pnnsGroups1,
+            @JsonProperty("categories_tags") List<String> categoriesTags
     ) {}
 }
