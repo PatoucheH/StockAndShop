@@ -3,6 +3,8 @@ package be.stockandshopbackend.dl.entities.user;
 import be.stockandshopbackend.dl.entities.base.UuidBaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -36,6 +38,8 @@ public class User extends UuidBaseEntity implements UserDetails {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    // Les lignes de la table de jointure users_roles disparaissent avec l'user (pas les rôles eux-mêmes).
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Role> roles = new HashSet<>();
 
     public String getDisplayName(){
