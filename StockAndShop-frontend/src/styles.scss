@@ -22,3 +22,56 @@
     #111827;
   background-attachment: fixed;
 }
+
+/* ---- Scanner natif (ML Kit) ----
+   Pendant le scan, la caméra native est affichée DERRIÈRE la WebView.
+   On rend donc l'app transparente et on ne laisse visible que l'overlay. */
+body.barcode-scanning-active {
+  background: transparent !important;
+}
+body.barcode-scanning-active app-root {
+  visibility: hidden;
+}
+body.barcode-scanning-active .barcode-overlay {
+  visibility: visible;
+}
+
+.barcode-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  pointer-events: none; /* laisse passer, sauf le bouton (pointer-events:auto) */
+}
+
+.barcode-frame {
+  width: min(80vw, 320px);
+  height: 180px;
+  border: 3px solid rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  /* Assombrit tout autour du cadre pour guider l'utilisateur */
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.35);
+}
+
+.barcode-hint {
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+.barcode-cancel {
+  pointer-events: auto;
+  padding: 0.65rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  background: #fff;
+  color: #111827;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
