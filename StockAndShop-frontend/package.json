@@ -38,6 +38,7 @@
     "@angular/build": "^21.2.21",
     "@angular/cli": "^21.2.21",
     "@angular/compiler-cli": "^21.2.20",
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.5.0",
     "autoprefixer": "^10.5.0",
     "jsdom": "^28.0.0",

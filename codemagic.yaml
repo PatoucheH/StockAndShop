@@ -1,0 +1,84 @@
+# Codemagic — build iOS de StockAndShop (Capacitor + Angular) -> TestFlight
+# L'Android est buildé en local (Android Studio), donc ce workflow ne gère QUE l'iOS.
+#
+# PRÉREQUIS (à faire une fois, côté Apple / Codemagic) :
+#   1. App Store Connect : créer l'app "Stock&Shop" avec le Bundle ID com.patoutech.stockandshop
+#   2. Codemagic : avoir une intégration "App Store Connect API key" (tu en as déjà une pour makeyourbrain)
+#      -> remplace <APP_STORE_CONNECT_KEY> ci-dessous par SON NOM exact dans Codemagic
+#   3. (rien à committer côté ios/ : le dossier iOS est généré dans le pipeline via `cap add ios`)
+
+workflows:
+  ios-stockandshop:
+    name: StockAndShop iOS -> TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    integrations:
+      app_store_connect: <APP_STORE_CONNECT_KEY>   # <-- nom de ta clé API dans Codemagic
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.patoutech.stockandshop
+      vars:
+        BUNDLE_ID: "com.patoutech.stockandshop"
+        XCODE_WORKSPACE: "StockAndShop-frontend/ios/App/App.xcworkspace"
+        XCODE_SCHEME: "App"
+      node: 20
+      xcode: latest
+      cocoapods: default
+
+    scripts:
+      - name: Installer les dépendances npm
+        script: |
+          cd StockAndShop-frontend
+          npm ci
+
+      - name: Build web (configuration capacitor)
+        script: |
+          cd StockAndShop-frontend
+          npx ng build --configuration capacitor
+
+      - name: Générer le projet iOS + sync
+        script: |
+          cd StockAndShop-frontend
+          [ -d ios ] || npx cap add ios
+          npx cap sync ios
+
+      - name: Ajouter la permission caméra (Info.plist)
+        script: |
+          PLIST="StockAndShop-frontend/ios/App/App/Info.plist"
+          MSG="Stock&Shop utilise la caméra pour scanner les codes-barres des produits."
+          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string \"$MSG\"" "$PLIST" \
+            || /usr/libexec/PlistBuddy -c "Set :NSCameraUsageDescription \"$MSG\"" "$PLIST"
+
+      - name: Cible iOS 15.5 (requise par ML Kit) + pods
+        script: |
+          cd StockAndShop-frontend/ios/App
+          # ML Kit (scanner natif) exige iOS >= 15.5 ; on force la plateforme du Podfile
+          sed -i '' "s/platform :ios, '.*'/platform :ios, '15.5'/" Podfile || true
+          pod install
+
+      - name: Numéro de build
+        script: |
+          cd StockAndShop-frontend/ios/App
+          agvtool new-version -all "$BUILD_NUMBER"
+
+      - name: Signature (profils gérés par Codemagic)
+        script: |
+          xcode-project use-profiles
+
+      - name: Build de l'IPA
+        script: |
+          xcode-project build-ipa \
+            --workspace "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME"
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        # Laisse false tant que tu n'as pas rempli la fiche App Store ; passe à true pour soumettre en review
+        submit_to_app_store: false
