@@ -47,12 +47,19 @@ workflows:
           /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string \"$MSG\"" "$PLIST" \
             || /usr/libexec/PlistBuddy -c "Set :NSCameraUsageDescription \"$MSG\"" "$PLIST"
 
-      - name: Cible iOS 15.5 (requise par ML Kit) + pods
+      - name: Pods (si CocoaPods) + cible iOS 15.5
         script: |
-          cd StockAndShop-frontend/ios/App
-          # ML Kit (scanner natif) exige iOS >= 15.5 ; on force la plateforme du Podfile
-          sed -i '' "s/platform :ios, '.*'/platform :ios, '15.5'/" Podfile || true
-          pod install
+          cd StockAndShop-frontend
+          PODFILE=$(find ios -name Podfile | head -1)
+          if [ -n "$PODFILE" ]; then
+            echo "CocoaPods détecté : $PODFILE"
+            # ML Kit (scanner natif) exige iOS >= 15.5
+            sed -i '' "s/platform :ios, '.*'/platform :ios, '15.5'/" "$PODFILE" || true
+            ( cd "$(dirname "$PODFILE")" && pod install )
+          else
+            echo "Pas de Podfile -> projet en Swift Package Manager, rien à installer ici."
+            echo "Structure ios/ :"; find ios -maxdepth 3 | head -60
+          fi
 
       - name: Numéro de build
         script: |
@@ -70,12 +77,20 @@ workflows:
 
       - name: Build de l'IPA
         script: |
-          xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME"
+          cd StockAndShop-frontend
+          WS=$(find ios -maxdepth 3 -name "*.xcworkspace" | head -1)
+          if [ -n "$WS" ]; then
+            echo "Build via workspace : $WS"
+            xcode-project build-ipa --workspace "$WS" --scheme "$XCODE_SCHEME"
+          else
+            PROJ=$(find ios -maxdepth 3 -name "*.xcodeproj" | head -1)
+            echo "Build via projet : $PROJ"
+            xcode-project build-ipa --project "$PROJ" --scheme "$XCODE_SCHEME"
+          fi
 
     artifacts:
-      - build/ios/ipa/*.ipa
+      - StockAndShop-frontend/build/ios/ipa/*.ipa
+      - "**/*.ipa"
       - /tmp/xcodebuild_logs/*.log
 
     publishing:
