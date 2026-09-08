@@ -73,6 +73,11 @@ workflows:
           # et récupère ton certificat de distribution déjà présent sur le compte Apple.
           app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
           keychain add-certificates
+          echo "=== Identités de signature dans le keychain ==="
+          security find-identity -v -p codesigning || true
+          echo "=== Profils de provisioning récupérés ==="
+          ls -la "$HOME/Library/MobileDevice/Provisioning Profiles/" || true
+          cd StockAndShop-frontend/ios/App
           xcode-project use-profiles
 
       - name: Build de l'IPA
