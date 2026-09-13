@@ -15,6 +15,11 @@ workflows:
     integrations:
       app_store_connect: Codemagic   # clé API App Store Connect (Key: MVVLT47P67)
     environment:
+      # Signature automatique gérée par Codemagic (comme makeyourbrain) :
+      # réutilise ton certificat de distribution stocké chez Codemagic + crée le profil du bundle ID.
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.patoutech.stockandshop
       vars:
         BUNDLE_ID: "com.patoutech.stockandshop"
         XCODE_WORKSPACE: "StockAndShop-frontend/ios/App/App.xcworkspace"
@@ -66,18 +71,9 @@ workflows:
           cd StockAndShop-frontend/ios/App
           agvtool new-version -all "$BUILD_NUMBER"
 
-      - name: Signature iOS (crée le profil via la clé API + certificat existant)
+      - name: Appliquer la signature au projet Xcode
         script: |
-          keychain initialize
-          # Crée le profil de provisioning App Store pour le bundle ID s'il n'existe pas,
-          # et récupère ton certificat de distribution déjà présent sur le compte Apple.
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
-          keychain add-certificates
-          echo "=== Identités de signature dans le keychain ==="
-          security find-identity -v -p codesigning || true
-          echo "=== Profils de provisioning récupérés ==="
-          ls -la "$HOME/Library/MobileDevice/Provisioning Profiles/" || true
-          cd StockAndShop-frontend/ios/App
+          cd StockAndShop-frontend
           xcode-project use-profiles
 
       - name: Build de l'IPA
