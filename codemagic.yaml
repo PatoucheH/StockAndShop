@@ -15,8 +15,6 @@ workflows:
     integrations:
       app_store_connect: Codemagic   # clé API App Store Connect (Key: MVVLT47P67)
     environment:
-      # Signature automatique gérée par Codemagic (comme makeyourbrain) :
-      # réutilise ton certificat de distribution stocké chez Codemagic + crée le profil du bundle ID.
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.patoutech.stockandshop
